@@ -114,7 +114,7 @@ Andersen, et al.       Expires September 16, 2017               [Page 2]
 Internet-Draft                ARC-Protocol                    March 2017
 
 
-     9.3.  dkimpy [[ needs update ]] . . . . . . . . . . . . . . . .  20
+     9.3.  dkimpy  . . . . . . . . . . . . . . . . . . . . . . . . .  20
      9.4.  OpenARC . . . . . . . . . . . . . . . . . . . . . . . . .  20
      9.5.  Mailman addition  . . . . . . . . . . . . . . . . . . . .  21
      9.6.  Copernica/MailerQ web-based validation  . . . . . . . . .  21
@@ -1072,7 +1072,7 @@ Internet-Draft                ARC-Protocol                    March 2017
 
    Contact Info: arc-discuss@dmarc.org [2]
 
-9.3.  dkimpy [[ needs update ]]
+9.3.  dkimpy
 
    Organization: dkimpy developers
 
@@ -1083,7 +1083,7 @@ Internet-Draft                ARC-Protocol                    March 2017
    Coverage: The internal test suite is incomplete, but the command line
    developmental version of validator was demonstrated to interoperate
    with the Google and AOL implementations during the interop on
-   2016-06-17 and the released version passes the tests in
+   2016-06-17 and the released version passes the tests in [ARC-TEST]
    https://github.com/ValiMail/arc_test_suite with both python and
    python3.
 
@@ -1328,15 +1328,15 @@ Internet-Draft                ARC-Protocol                    March 2017
               (I-D-05)", June 2016, <https://tools.ietf.org/html/draft-
               ietf-dmarc-arc-protocol-00>.
 
+   [ARC-TEST]
+              Blank, S., "ARC Test Suite", January 2017,
+              <https://github.com/ValiMail/arc_test_suite>.
+
    [ARC-USAGE]
               Jones, S., Adams, T., Rae-Grant, J., and K. Andersen,
-              "Recommended Usage of the ARC Headers", June 2016,
+              "Recommended Usage of the ARC Headers", December 2017,
               <https://tools.ietf.org/html/draft-ietf-dmarc-arc-usage-
-              00>.
-
-
-
-
+              01>.
 
 
 

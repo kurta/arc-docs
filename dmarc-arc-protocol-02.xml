@@ -822,7 +822,7 @@ test event which was held on 2016-06-17.</t>
 <t>Contact Info: <eref target="mailto:arc-discuss@dmarc.org">arc-discuss@dmarc.org</eref></t>
 
 </section>
-<section anchor="dkimpy-needs-update-" title="dkimpy [[ needs update ]]">
+<section anchor="dkimpy" title="dkimpy">
 
 <t>Organization: dkimpy developers</t>
 
@@ -833,7 +833,7 @@ test event which was held on 2016-06-17.</t>
 <t>Coverage: The internal test suite is incomplete, but the command line
    developmental version of validator was demonstrated to interoperate with
    the Google and AOL implementations during the interop on 2016-06-17 and the
-   released version passes the tests in
+   released version passes the tests in <xref target="ARC-TEST"/>
    https://github.com/ValiMail/arc_test_suite with both python and python3.</t>
 
 <t>Licensing: Open/Other (same as dkimpy package)</t>
@@ -1034,7 +1034,7 @@ system’s DKIM-Signature does not validate.</t>
     <date year="2016" month="June" day="25"/>
   </front>
 </reference>
-<reference anchor="ARC-USAGE" target="https://tools.ietf.org/html/draft-ietf-dmarc-arc-usage-00">
+<reference anchor="ARC-USAGE" target="https://tools.ietf.org/html/draft-ietf-dmarc-arc-usage-01">
   <front>
     <title>Recommended Usage of the ARC Headers</title>
     <author initials="S." surname="Jones" fullname="Steven Jones">
@@ -1049,7 +1049,16 @@ system’s DKIM-Signature does not validate.</t>
     <author initials="K." surname="Andersen" fullname="Kurt Andersen">
       <organization></organization>
     </author>
-    <date year="2016" month="June" day="25"/>
+    <date year="2017" month="December"/>
+  </front>
+</reference>
+<reference anchor="ARC-TEST" target="https://github.com/ValiMail/arc_test_suite">
+  <front>
+    <title>ARC Test Suite</title>
+    <author initials="S." surname="Blank" fullname="Seth Blank">
+      <organization></organization>
+    </author>
+    <date year="2017" month="January"/>
   </front>
 </reference>
 

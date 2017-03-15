@@ -413,7 +413,7 @@
 <link href="#rfc.section.9" rel="Chapter" title="9 Implementation Status"/>
 <link href="#rfc.section.9.1" rel="Chapter" title="9.1 GMail test reflector and incoming validation"/>
 <link href="#rfc.section.9.2" rel="Chapter" title="9.2 AOL test reflector and internal tagging"/>
-<link href="#rfc.section.9.3" rel="Chapter" title="9.3 dkimpy [[ needs update ]]"/>
+<link href="#rfc.section.9.3" rel="Chapter" title="9.3 dkimpy"/>
 <link href="#rfc.section.9.4" rel="Chapter" title="9.4 OpenARC"/>
 <link href="#rfc.section.9.5" rel="Chapter" title="9.5 Mailman addition"/>
 <link href="#rfc.section.9.6" rel="Chapter" title="9.6 Copernica/MailerQ web-based validation"/>
@@ -553,7 +553,7 @@
 </ul><li>9.   <a href="#rfc.section.9">Implementation Status</a></li>
 <ul><li>9.1.   <a href="#rfc.section.9.1">GMail test reflector and incoming validation</a></li>
 <li>9.2.   <a href="#rfc.section.9.2">AOL test reflector and internal tagging</a></li>
-<li>9.3.   <a href="#rfc.section.9.3">dkimpy [[ needs update ]]</a></li>
+<li>9.3.   <a href="#rfc.section.9.3">dkimpy</a></li>
 <li>9.4.   <a href="#rfc.section.9.4">OpenARC</a></li>
 <li>9.5.   <a href="#rfc.section.9.5">Mailman addition</a></li>
 <li>9.6.   <a href="#rfc.section.9.6">Copernica/MailerQ web-based validation</a></li>
@@ -872,11 +872,11 @@ if (chain not structurally valid) {
 <p id="rfc.section.9.2.p.7">Available for production mail via selected account whitelisting for test validation only.</p>
 <p id="rfc.section.9.2.p.8">Intermittent stability problems discovered at the interop event on 2017-02-24. Remediation underway as of the publication of this draft.</p>
 <p id="rfc.section.9.2.p.9">Contact Info: <a href="mailto:arc-discuss@dmarc.org">arc-discuss@dmarc.org</a></p>
-<h1 id="rfc.section.9.3"><a href="#rfc.section.9.3">9.3.</a> <a href="#dkimpy-needs-update-" id="dkimpy-needs-update-">dkimpy [[ needs update ]]</a></h1>
+<h1 id="rfc.section.9.3"><a href="#rfc.section.9.3">9.3.</a> <a href="#dkimpy" id="dkimpy">dkimpy</a></h1>
 <p id="rfc.section.9.3.p.1">Organization: dkimpy developers</p>
 <p id="rfc.section.9.3.p.2">Description: Python DKIM package</p>
 <p id="rfc.section.9.3.p.3">Status of Operation: Production</p>
-<p id="rfc.section.9.3.p.4">Coverage: The internal test suite is incomplete, but the command line developmental version of validator was demonstrated to interoperate with the Google and AOL implementations during the interop on 2016-06-17 and the released version passes the tests in https://github.com/ValiMail/arc_test_suite with both python and python3.</p>
+<p id="rfc.section.9.3.p.4">Coverage: The internal test suite is incomplete, but the command line developmental version of validator was demonstrated to interoperate with the Google and AOL implementations during the interop on 2016-06-17 and the released version passes the tests in <a href="#ARC-TEST">[ARC-TEST]</a> https://github.com/ValiMail/arc_test_suite with both python and python3.</p>
 <p id="rfc.section.9.3.p.5">Licensing: Open/Other (same as dkimpy package)</p>
 <p id="rfc.section.9.3.p.6">Contact Info: https://launchpad.net/dkimpy</p>
 <h1 id="rfc.section.9.4"><a href="#rfc.section.9.4">9.4.</a> <a href="#openarc" id="openarc">OpenARC</a></h1>
@@ -1054,9 +1054,15 @@ when trying to use OpenARC in a "sandwich" configuration around a MLM.
     </tr>
     <tr>
       <td class="reference">
+        <b id="ARC-TEST">[ARC-TEST]</b>
+      </td>
+      <td class="top"><a>Blank, S.</a>, "<a href="https://github.com/ValiMail/arc_test_suite">ARC Test Suite</a>", January 2017.</td>
+    </tr>
+    <tr>
+      <td class="reference">
         <b id="ARC-USAGE">[ARC-USAGE]</b>
       </td>
-      <td class="top"><a>Jones, S.</a>, <a>Adams, T.</a>, <a>Rae-Grant, J.</a> and <a>K. Andersen</a>, "<a href="https://tools.ietf.org/html/draft-ietf-dmarc-arc-usage-00">Recommended Usage of the ARC Headers</a>", June 2016.</td>
+      <td class="top"><a>Jones, S.</a>, <a>Adams, T.</a>, <a>Rae-Grant, J.</a> and <a>K. Andersen</a>, "<a href="https://tools.ietf.org/html/draft-ietf-dmarc-arc-usage-01">Recommended Usage of the ARC Headers</a>", December 2017.</td>
     </tr>
     <tr>
       <td class="reference">

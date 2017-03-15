@@ -115,8 +115,8 @@ informative:
         name: Steven Jones
   ARC-USAGE:
     title: Recommended Usage of the ARC Headers
-    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-usage-00
-    date: 2016-06-25
+    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-usage-01
+    date: 2017-12
     author:
       -
         ins: S. Jones
@@ -130,6 +130,14 @@ informative:
       -
         ins: K. Andersen
         name: Kurt Andersen
+  ARC-TEST:
+    title: ARC Test Suite
+    target: https://github.com/ValiMail/arc_test_suite
+    date: 2017-01
+    author:
+      -
+        ins: S. Blank
+        name: Seth Blank
 
 entity:
       SELF: "[I-D.ARC]"
@@ -835,7 +843,7 @@ test event which was held on 2016-06-17.
 
   Contact Info: <arc-discuss@dmarc.org>
 
-## dkimpy [[ needs update ]]
+## dkimpy 
 
    Organization: dkimpy developers
 
@@ -846,7 +854,7 @@ test event which was held on 2016-06-17.
    Coverage: The internal test suite is incomplete, but the command line
    developmental version of validator was demonstrated to interoperate with
    the Google and AOL implementations during the interop on 2016-06-17 and the
-   released version passes the tests in
+   released version passes the tests in {{ARC-TEST}}
    https://github.com/ValiMail/arc_test_suite with both python and python3.
 
    Licensing: Open/Other (same as dkimpy package)
