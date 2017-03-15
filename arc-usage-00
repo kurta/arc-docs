@@ -2,19 +2,14 @@
 title: Recommended Usage of the Authenticated Received Chain (ARC)
 abbrev: ARC-USAGE
 docname: draft-ietf-dmarc-arc-usage-01
-date: 2016-06-27
+date: 2016-12-27
 
 # stand_alone: true
 
 ipr: trust200902
-#ipr: noDerivativesTrust200902
 area: art
 wg: DMARC Working Group
-#wg: independent
-#kw: Internet-Draft
 submission: IETF
-#obsoletes: draft-jones-arc-usage-01
-#submission: independent
 cat: info
 
 coding: utf-8
@@ -73,33 +68,14 @@ informative:
         ins: M. Kucherawy
         name: Murray Kucherawy
     date: 2012-02-20
-  DMARC-INTEROP:
-    target: https://tools.ietf.org/html/draft-ietf-dmarc-interoperability-17
-    title: Interoperability Issues Between DMARC and Indirect Email Flows
-    author:
-      -
-        ins: F. Martin
-        name: Franck Martin
-      -
-        ins: E. Lear
-        name: Elliot Lear
-      -
-        ins: T. Draegen
-        name: Tim Draegen
-      -
-        ins: E. Zwicky
-        name: Elizabeth Zwicky
-      -
-        ins: K. Andersen
-        name: Kurt Andersen
-    date: 2016-06-23
+  RFC7960: DMARC-INTEROP
   ENHANCED-STATUS: 
     title: IANA SMTP Enhanced Status Codes
     target: http://www.iana.org/assignments/smtp-enhanced-status-codes/smtp-enhanced-status-codes.xhtml
   ARC:
     title: Authenticated Received Chain (ARC) Protocol
-    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-00
-    date: 2016-06-25
+    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-01
+    date: 2016-12
     author:
       -
         ins: K. Andersen
@@ -223,6 +199,7 @@ ARC chain is intact can be used to inform that local policy decision.
 So for example one message receiver may decide that, for messages with
 an intact ARC chain where a DMARC evaluation does not pass, but the
 ARC-Authentication-Results header field indicates a DKIM pass was reported
+by the first ARC intermediary
 that matches the domain in the RFC5322.From header field, it will override a
 DMARC “p=reject” policy. Another message receiver may decide to do so
 for intact ARC chains where the ARC-Authentication-Results header field
@@ -252,15 +229,15 @@ rejected.
 The absence of an ARC chain means nothing. ARC is intended to allow a
 participating message handler to preserve certain authentication
 results when a message is being forwarded and/or modified such that
-the final recipient can evaluate the source. If they are absent, there
+the final recipient can evaluate this information. If they are absent, there
 is nothing extra that ARC requires the final recipient to do.
 
 
 ## What reasonable conclusions can you draw based upon seeing lots of mail with ARC chains?
 
 With sufficient history, ARC can be used to augment DMARC
-authentication policy (i.e. a message could fail DMARC, but pass ARC
-and therefore could be considered as validly authenticated as reported
+authentication policy (i.e. a message could fail DMARC, but validated ARC
+information and therefore could be considered as validly authenticated as reported
 by the first ARC participant).  
 
 If the validator does content analysis and reputation tracking, the
@@ -331,8 +308,7 @@ domain owners can see where ARC is being used to augment the
 deliverability of their messages.
 
 
-## What prevents a malicious actor from removing the ARC header fields, 
-altering the content, and creating a new ARC chain?
+## What prevents a malicious actor from removing the ARC header fields, altering the content, and creating a new ARC chain?
 
 ARC does not prevent a malicious actor from doing this. Nor does it
 prevent a malicious actor from removing all but the first ADMD’s ARC
@@ -349,14 +325,14 @@ ARC intermediaries.
 In the first case, the bad actor has succeeded in manipulating the
 message but they have attached a verifiable signature identifying
 themselves. While not an ideal situation, it is something they are
-already able to do without ARC involved, but now a strong link to the
+already able to do without ARC involved, but now a signature linked to the
 domain responsible for the manipulation is present.
 
 Additionally in the second case it is possible some negative
 reputational impact might accrue to the first ARC participant left in
 place until more messages reveal the pattern of activity by the bad
 actor. But again, a bad actor can similarly manipulate a sequence of
-RFC5322.Received header fields today without ARC, and with ARC that bad
+RFC5322.Received header fields today without ARC, but with ARC that bad
 actor has verifiably identified themselves. 
 
 
@@ -475,8 +451,8 @@ to fail authentication checks at the message receiver. As a result
 these messages might not be delivered to the intended recipient.
 
 ARC seeks to provide these so-called “indirect mailflows” with a means
-to preserve email authentication results as seen by participating
-intermediaries. Message receivers may accept ARC results to supplement
+to preserve email authentication results as recorded by participating
+intermediaries. Message receivers may accept validated ARC information to supplement
 the information that DMARC provides, potentially deciding to deliver
 the message even though a DMARC check did not pass.
 
@@ -564,7 +540,7 @@ Intermediary
 : In the context of {{ARC}}, an Intermediary is typically an
   Administrative Management Domain (per {{RFC5598}}) that is receiving
   a message, potentially manipulating or altering it, and then passing
-  it on to another ADMD for delivery. Also see {{DMARC-INTEROP}} for
+  it on to another ADMD for delivery. Also see {{RFC7960}} for
   more information and discussion. Common examples of
   Intermediaries are mailing lists, alumni or professional email
   address providers like universities or professional organizations,
