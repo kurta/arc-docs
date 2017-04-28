@@ -444,8 +444,8 @@
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Andersen, K., Long, B., Ed., and S. Jones, Ed." />
-  <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-dmarc-arc-protocol-02" />
-  <meta name="dct.issued" scheme="ISO8601" content="2017-3-15" />
+  <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-dmarc-arc-protocol-03" />
+  <meta name="dct.issued" scheme="ISO8601" content="2017-4-28" />
   <meta name="dct.abstract" content="Authenticated Received Chain (ARC) permits an organization which is creating or handling email to indicate its involvement with the handling process.  It defines a set of cryptographically signed header fields in a manner analagous to that of DKIM.  Assertion of responsibility is validated through a cryptographic signature and by querying the Signer&#8217;s domain directly to retrieve the appropriate public key. Changes in the message that might break DKIM can be identified through the ARC set of header fields." />
   <meta name="description" content="Authenticated Received Chain (ARC) permits an organization which is creating or handling email to indicate its involvement with the handling process.  It defines a set of cryptographically signed header fields in a manner analagous to that of DKIM.  Assertion of responsibility is validated through a cryptographic signature and by querying the Signer&#8217;s domain directly to retrieve the appropriate public key. Changes in the message that might break DKIM can be identified through the ARC set of header fields." />
 
@@ -469,7 +469,7 @@
   <td class="right">B. Long, Ed.</td>
 </tr>
 <tr>
-  <td class="left">Expires: September 16, 2017</td>
+  <td class="left">Expires: October 30, 2017</td>
   <td class="right">Google</td>
 </tr>
 <tr>
@@ -482,7 +482,7 @@
 </tr>
 <tr>
   <td class="left"></td>
-  <td class="right">March 15, 2017</td>
+  <td class="right">April 28, 2017</td>
 </tr>
 
     	
@@ -490,7 +490,7 @@
   </table>
 
   <p class="title">Authenticated Received Chain (ARC) Protocol<br />
-  <span class="filename">draft-ietf-dmarc-arc-protocol-02</span></p>
+  <span class="filename">draft-ietf-dmarc-arc-protocol-03</span></p>
   
   <h1 id="rfc.abstract">
   <a href="#rfc.abstract">Abstract</a>
@@ -502,7 +502,7 @@
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at http://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on September 16, 2017.</p>
+<p>This Internet-Draft will expire on October 30, 2017.</p>
 <h1 id="rfc.copyrightnotice">
   <a href="#rfc.copyrightnotice">Copyright Notice</a>
 </h1>
@@ -584,7 +584,7 @@
 
   <h1 id="rfc.section.1"><a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a></h1>
 <p id="rfc.section.1.p.1">The development of strong domain authentication through Sender Policy Framework (SPF) <a href="#RFC7208">[RFC7208]</a> and DomainKeys Identified Mail (DKIM) <a href="#RFC6376">[RFC6376]</a> has led to the implementation of the DMARC framework <a href="#RFC7489">[RFC7489]</a> which extends the authentication to the author&#8217;s &#8220;From:&#8221; (RFC5322.From) field and permits publishing policies for non-compliant messages.  Implicit within the DMARC framework is a requirement that any intermediaries between the source system and ultimate receiver system need to preserve the validity of the DKIM signature; however, there are common legitimate email practices which break the DKIM validation (<a href="#DMARC-INTEROP">[DMARC-INTEROP]</a>). This specification defines an Authenticated Received Chain (ARC). ARC addresses the problems with the untrustworthiness of the standard Received header field sequence. Through the information tracked in the ARC series of headers, receivers can develop a more nuanced interpretation to guide any local policies related to messages that arrive with broken domain authentication (DMARC).</p>
-<p id="rfc.section.1.p.2">Forgery of the Received header fields is a common tactic used by bad actors. One of the goals of this specification defines a comparable set of trace header fields which can be relied upon by receivers, assuming all ADministrative Management Domain (ADMD) intermediary handlers of a message participate in ARC.</p>
+<p id="rfc.section.1.p.2">Forgery of the Received header fields is a common tactic used by bad actors. One of the goals of this specification defines a comparable set of trace header fields which can be relied upon by receivers, assuming all ADministrative Management Domain (ADMD) (<a href="#RFC5598">[RFC5598]</a>, section 2.2)  intermediary handlers of a message participate in ARC.</p>
 <p id="rfc.section.1.p.3">The Authentication-Results (A-R) mechanism <a href="#RFC7601">[RFC7601]</a> permits the output of an email authentication evaluation process to be transmitted from the evaluating agent to a consuming agent that uses the information.  On its own, A-R is believable only within a trust domain.  ARC provides a protection mechanism for the data, permiting the communication to cross trust domain boundaries.</p>
 <h1 id="rfc.section.2"><a href="#rfc.section.2">2.</a> <a href="#requirements" id="requirements">Requirements</a></h1>
 <p id="rfc.section.2.p.1">The specification of the ARC framework is driven by the following high-level goals, security considerations, and practical operational requirements.</p>
@@ -728,7 +728,7 @@ if (chain not structurally valid) {
 <p id="rfc.section.5.1.2.2.p.1">As with DKIM-Signature and ARC-Seal header fields, the &#8220;b&#8221; tag of the ARC-Message-Signature is empty until the signature is actually computed, and only then is it added to the header field, before affixing the ARC-Message-Signature to the message.</p>
 <p id="rfc.section.5.1.2.2.p.2">As with ARC-Seal and DKIM-Signature header fields, the order of header fields signed MUST be done in bottom-up order.</p>
 <h1 id="rfc.section.5.1.3"><a href="#rfc.section.5.1.3">5.1.3.</a> <a href="#aar-defn" id="aar-defn">ARC-Authentication-Results</a></h1>
-<p id="rfc.section.5.1.3.p.1">ARC-Authentication-Results is a direct copy of the Authentication-Results header field <a href="#RFC7601">[RFC7601]</a> created for archival purposes by the each MTA outside of the trust boundary of the originating system which is contributing to the chain of ARC header fields. The corresponding instance (&#8220;i=&#8221;) tag value MUST be prefixed to the Authentication-Results.</p>
+<p id="rfc.section.5.1.3.p.1">ARC-Authentication-Results is a copy of the Authentication-Results header field <a href="#RFC7601">[RFC7601]</a> value with the corresponding ARC-set instance (&#8220;i=&#8221;) tag value prefixed to the Authentication-Results value string.  Since Authentication-Results headers are frequently deleted from a message&#8217;s header list, the AAR is created for archival purposes by each ARC-participating ADMD outside of the trust boundary of the originating system.</p>
 <p id="rfc.section.5.1.3.p.2">The instance identifier MUST be separated from the rest of the Authentication-Results value contents with a semi-colon (&#8216;;&#8217;, 0x3b).</p>
 <p id="rfc.section.5.1.3.p.3">The value of the header field (after removing comments) consists of an instance identifier, an authentication identifier, and then a series of statements and supporting data, as described in <a href="#RFC7601">[RFC7601]</a>.  The header field can appear multiple times in a single message but each instance MUST have a unique &#8220;i=&#8221; value.</p>
 <h1 id="rfc.section.5.1.3.1"><a href="#rfc.section.5.1.3.1">5.1.3.1.</a> <a href="#i-aar-val" id="i-aar-val">&#8216;i&#8217; Tag Value</a></h1>

@@ -1,8 +1,8 @@
 ---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-02
-date: 2017-03-15
+docname: draft-ietf-dmarc-arc-protocol-03
+date: 2017-04-28
 
 # stand_alone: true
 
@@ -177,7 +177,8 @@ arrive with broken domain authentication (DMARC).
 Forgery of the Received header fields is a common tactic used by bad actors. One of
 the goals of this specification defines a comparable set of trace header fields
 which can be relied upon by receivers, assuming all ADministrative
-Management Domain (ADMD) intermediary handlers of a message participate in ARC.
+Management Domain (ADMD) ({{RFC5598}}, section 2.2)  intermediary 
+handlers of a message participate in ARC.
 
 The Authentication-Results (A-R) mechanism {{RFC7601}} permits the output of an email
 authentication evaluation process to be transmitted from the evaluating
@@ -488,11 +489,12 @@ MUST be done in bottom-up order.
 
 ### ARC-Authentication-Results {#aar-defn}
 
-ARC-Authentication-Results is a direct copy of the Authentication-Results
-header field {{RFC7601}} created for archival purposes by the each MTA outside of
-the trust boundary of the originating system which is contributing to the
-chain of ARC header fields. The corresponding
-instance ("i=") tag value MUST be prefixed to the Authentication-Results.
+ARC-Authentication-Results is a copy of the Authentication-Results header field
+{{RFC7601}} value with the corresponding ARC-set instance ("i=") tag value
+prefixed to the Authentication-Results value string.  Since
+Authentication-Results headers are frequently deleted from a message's header
+list, the AAR is created for archival purposes by each ARC-participating ADMD
+outside of the trust boundary of the originating system.  
 
 The instance identifier MUST be separated from the rest of the Authentication-Results
 value contents with a semi-colon (';', 0x3b).
