@@ -16,7 +16,7 @@
 <?rfc sortrefs="yes"?>
 <?rfc symrefs="yes"?>
 
-<rfc ipr="trust200902" docName="draft-ietf-dmarc-arc-usage-01" category="info">
+<rfc ipr="trust200902" docName="draft-ietf-dmarc-arc-usage-02" category="info">
 
   <front>
     <title abbrev="ARC-USAGE">Recommended Usage of the Authenticated Received Chain (ARC)</title>
@@ -53,7 +53,7 @@
       </address>
     </author>
 
-    <date year="2016" month="December" day="27"/>
+    <date year="2017" month="June" day="20"/>
 
     <area>art</area>
     <workgroup>DMARC Working Group</workgroup>
@@ -411,6 +411,8 @@ discussion of such a broad topic is beyond the scope of this document.</t>
 
 <t>Please join the arc-discuss list at <eref target="mailto:arc-discuss@dmarc.org">arc-discuss@dmarc.org</eref>[mailto:arc-discuss@dmarc.org].</t>
 
+<t>To discuss the IETF spec itself, please join the dmarc working group at [https://datatracker.ietf.org/wg/dmarc].</t>
+
 </section>
 <section anchor="howwhere-can-i-test-interoperabililty-for-my-implementation" title="How/where can I test interoperabililty for my implementation?">
 
@@ -503,7 +505,7 @@ intermediaries not employ ARC.</t>
     <date year="n.d."/>
   </front>
 </reference>
-<reference anchor="ARC" target="https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-01">
+<reference anchor="ARC" target="https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-04">
   <front>
     <title>Authenticated Received Chain (ARC) Protocol</title>
     <author initials="K." surname="Andersen" fullname="Kurt Andersen">
@@ -521,7 +523,7 @@ intermediaries not employ ARC.</t>
     <author initials="S." surname="Jones" fullname="Steven Jones">
       <organization></organization>
     </author>
-    <date year="2016" month="December"/>
+    <date year="2017" month="June" day="20"/>
   </front>
 </reference>
 
@@ -667,7 +669,8 @@ Mike Jones, Steve Jones, Terry Zink, Tim Draegen.</t>
 </section>
 <section anchor="comments-and-feedback" title="Comments and Feedback">
 
-<t>Please address all comments, discussions,  and questions to <eref target="mailto:arc-discuss@dmarc.org">arc-discuss@dmarc.org</eref>[mailto:arc-discuss@dmarc.org].</t>
+<t>Please address all comments, discussions,  and questions to 
+the dmarc working group at [https://datatracker.ietf.org/wg/dmarc].</t>
 
 </section>
 

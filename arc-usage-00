@@ -1,8 +1,8 @@
 ---
 title: Recommended Usage of the Authenticated Received Chain (ARC)
 abbrev: ARC-USAGE
-docname: draft-ietf-dmarc-arc-usage-01
-date: 2016-12-27
+docname: draft-ietf-dmarc-arc-usage-02
+date: 2017-06-20
 
 # stand_alone: true
 
@@ -74,8 +74,8 @@ informative:
     target: http://www.iana.org/assignments/smtp-enhanced-status-codes/smtp-enhanced-status-codes.xhtml
   ARC:
     title: Authenticated Received Chain (ARC) Protocol
-    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-01
-    date: 2016-12
+    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-04
+    date: 2017-06-20
     author:
       -
         ins: K. Andersen
@@ -438,6 +438,8 @@ discussion of such a broad topic is beyond the scope of this document.
 
 Please join the arc-discuss list at <arc-discuss@dmarc.org>[mailto:arc-discuss@dmarc.org].
 
+To discuss the IETF spec itself, please join the dmarc working group at [https://datatracker.ietf.org/wg/dmarc].
+
 ## How/where can I test interoperabililty for my implementation?
 
 The arc-discuss list is the best place to stay in touch with work in progress.
@@ -641,7 +643,8 @@ Mike Jones, Steve Jones, Terry Zink, Tim Draegen.
 
 # Comments and Feedback
 
-Please address all comments, discussions,  and questions to <arc-discuss@dmarc.org>[mailto:arc-discuss@dmarc.org].
+Please address all comments, discussions,  and questions to 
+the dmarc working group at [https://datatracker.ietf.org/wg/dmarc].
 
 
 --- fluff

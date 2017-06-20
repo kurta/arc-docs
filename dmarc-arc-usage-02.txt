@@ -5,16 +5,16 @@
 DMARC Working Group                                             S. Jones
 Internet-Draft                                                 DMARC.org
 Intended status: Informational                              J. Rae-Grant
-Expires: June 30, 2017                                            Google
+Expires: December 22, 2017                                        Google
                                                                 T. Adams
                                                                   Paypal
                                                         K. Andersen, Ed.
                                                                 LinkedIn
-                                                       December 27, 2016
+                                                           June 20, 2017
 
 
       Recommended Usage of the Authenticated Received Chain (ARC)
-                     draft-ietf-dmarc-arc-usage-01
+                     draft-ietf-dmarc-arc-usage-02
 
 Abstract
 
@@ -40,11 +40,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on June 30, 2017.
+   This Internet-Draft will expire on December 22, 2017.
 
 Copyright Notice
 
-   Copyright (c) 2016 IETF Trust and the persons identified as the
+   Copyright (c) 2017 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Jones, et al.             Expires June 30, 2017                 [Page 1]
+Jones, et al.           Expires December 22, 2017               [Page 1]
 
-Internet-Draft                  ARC-USAGE                  December 2016
+Internet-Draft                  ARC-USAGE                      June 2017
 
 
    publication of this document.  Please review these documents
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Jones, et al.             Expires June 30, 2017                 [Page 2]
+Jones, et al.           Expires December 22, 2017               [Page 2]
 
-Internet-Draft                  ARC-USAGE                  December 2016
+Internet-Draft                  ARC-USAGE                      June 2017
 
 
      5.3.  How can ARC impact my email?  . . . . . . . . . . . . . .  10
@@ -165,9 +165,9 @@ Internet-Draft                  ARC-USAGE                  December 2016
 
 
 
-Jones, et al.             Expires June 30, 2017                 [Page 3]
+Jones, et al.           Expires December 22, 2017               [Page 3]
 
-Internet-Draft                  ARC-USAGE                  December 2016
+Internet-Draft                  ARC-USAGE                      June 2017
 
 
    Any subsequent system participating in ARC that was not performing
@@ -221,9 +221,9 @@ Internet-Draft                  ARC-USAGE                  December 2016
 
 
 
-Jones, et al.             Expires June 30, 2017                 [Page 4]
+Jones, et al.           Expires December 22, 2017               [Page 4]
 
-Internet-Draft                  ARC-USAGE                  December 2016
+Internet-Draft                  ARC-USAGE                      June 2017
 
 
    Message receivers may make local policy decisions about whether to
@@ -277,9 +277,9 @@ Internet-Draft                  ARC-USAGE                  December 2016
 
 
 
-Jones, et al.             Expires June 30, 2017                 [Page 5]
+Jones, et al.           Expires December 22, 2017               [Page 5]
 
-Internet-Draft                  ARC-USAGE                  December 2016
+Internet-Draft                  ARC-USAGE                      June 2017
 
 
    If the validator does content analysis and reputation tracking, the
@@ -333,9 +333,9 @@ Internet-Draft                  ARC-USAGE                  December 2016
 
 
 
-Jones, et al.             Expires June 30, 2017                 [Page 6]
+Jones, et al.           Expires December 22, 2017               [Page 6]
 
-Internet-Draft                  ARC-USAGE                  December 2016
+Internet-Draft                  ARC-USAGE                      June 2017
 
 
    handle the message as indicated in the header fields.  In such cases
@@ -389,9 +389,9 @@ Internet-Draft                  ARC-USAGE                  December 2016
 
 
 
-Jones, et al.             Expires June 30, 2017                 [Page 7]
+Jones, et al.           Expires December 22, 2017               [Page 7]
 
-Internet-Draft                  ARC-USAGE                  December 2016
+Internet-Draft                  ARC-USAGE                      June 2017
 
 
 4.  Guidance for Intermediaries
@@ -445,9 +445,9 @@ Internet-Draft                  ARC-USAGE                  December 2016
 
 
 
-Jones, et al.             Expires June 30, 2017                 [Page 8]
+Jones, et al.           Expires December 22, 2017               [Page 8]
 
-Internet-Draft                  ARC-USAGE                  December 2016
+Internet-Draft                  ARC-USAGE                      June 2017
 
 
    Some organizations may operate multiple ADMDs, with more or less
@@ -501,9 +501,9 @@ Internet-Draft                  ARC-USAGE                  December 2016
 
 
 
-Jones, et al.             Expires June 30, 2017                 [Page 9]
+Jones, et al.           Expires December 22, 2017               [Page 9]
 
-Internet-Draft                  ARC-USAGE                  December 2016
+Internet-Draft                  ARC-USAGE                      June 2017
 
 
    As mentioned previously reputation systems are very complex and
@@ -517,6 +517,9 @@ Internet-Draft                  ARC-USAGE                  December 2016
 
    Please join the arc-discuss list at arc-discuss@dmarc.org
    [1][mailto:arc-discuss@dmarc.org].
+
+   To discuss the IETF spec itself, please join the dmarc working group
+   at [https://datatracker.ietf.org/wg/dmarc].
 
 5.2.  How/where can I test interoperabililty for my implementation?
 
@@ -551,17 +554,16 @@ Internet-Draft                  ARC-USAGE                  December 2016
    point that may be used as an input to such reputation systems.
    Messages deemed to have good content may provide a positive signal
    for the sending domain and the intermediaries that handled it, while
+
+
+
+Jones, et al.           Expires December 22, 2017              [Page 10]
+
+Internet-Draft                  ARC-USAGE                      June 2017
+
+
    messages with bad content may provide a negative signal for the
    sending domain and the intermediaries that handled it.  Intact and
-
-
-
-
-Jones, et al.             Expires June 30, 2017                [Page 10]
-
-Internet-Draft                  ARC-USAGE                  December 2016
-
-
    valid ARC elements may amplify or attenuate such signals, depending
    on the circumstances.
 
@@ -598,9 +600,9 @@ Internet-Draft                  ARC-USAGE                  December 2016
 6.2.  Informative References
 
    [ARC]      Andersen, K., Rae-Grant, J., Long, B., Adams, T., and S.
-              Jones, "Authenticated Received Chain (ARC) Protocol",
-              December 2016, <https://tools.ietf.org/html/draft-ietf-
-              dmarc-arc-protocol-01>.
+              Jones, "Authenticated Received Chain (ARC) Protocol", June
+              2017, <https://tools.ietf.org/html/draft-ietf-dmarc-arc-
+              protocol-04>.
 
    [ENHANCED-STATUS]
               "IANA SMTP Enhanced Status Codes", n.d.,
@@ -611,11 +613,9 @@ Internet-Draft                  ARC-USAGE                  December 2016
 
 
 
-
-
-Jones, et al.             Expires June 30, 2017                [Page 11]
+Jones, et al.           Expires December 22, 2017              [Page 11]
 
-Internet-Draft                  ARC-USAGE                  December 2016
+Internet-Draft                  ARC-USAGE                      June 2017
 
 
    [OAR]      Chew, M. and M. Kucherawy, "Original-Authentication-
@@ -638,8 +638,6 @@ Internet-Draft                  ARC-USAGE                  December 2016
 6.3.  URIs
 
    [1] mailto:arc-discuss@dmarc.org
-
-   [2] mailto:arc-discuss@dmarc.org
 
 Appendix A.  GLOSSARY
 
@@ -666,16 +664,15 @@ Appendix A.  GLOSSARY
 
    ARC-Authentication-Results (also abbreviated as "AAR")  An [RFC5322]
       message header field formed in compliance with the [ARC]
-
-
-
-Jones, et al.             Expires June 30, 2017                [Page 12]
-
-Internet-Draft                  ARC-USAGE                  December 2016
-
-
       specification.  It includes certain content about the message as
       it was received by the intermediary.
+
+
+
+Jones, et al.           Expires December 22, 2017              [Page 12]
+
+Internet-Draft                  ARC-USAGE                      June 2017
+
 
    Authentication Results Chain (ARC)  A system that allows a Message
       Receiver to identify Intermediaries or Message Handlers who have
@@ -723,15 +720,15 @@ Internet-Draft                  ARC-USAGE                  December 2016
       in order to evade anti-spam measures, or an entity that adds an
       attachment containing a virus to a message.
 
-
-
-Jones, et al.             Expires June 30, 2017                [Page 13]
-
-Internet-Draft                  ARC-USAGE                  December 2016
-
-
    Message Handler  A Message Handler is another name for an
       Intermediary.
+
+
+
+Jones, et al.           Expires December 22, 2017              [Page 13]
+
+Internet-Draft                  ARC-USAGE                      June 2017
+
 
    Message Receiver  In the transmission of an email message from one
       ADMD to another, this is the organization receiving the message on
@@ -777,19 +774,17 @@ Internet-Draft                  ARC-USAGE                  December 2016
       protocol used to transfer email messages between Message Transfer
       Agents (MTA) over a network.  Link: [RFC5321]
 
-
-
-
-
-Jones, et al.             Expires June 30, 2017                [Page 14]
-
-Internet-Draft                  ARC-USAGE                  December 2016
-
-
    RFC5322 - Internet Message Format  This document describes the format
       of Internet email messages, including both the header fields
       within the message and various types of content within the message
       body.  Link: [RFC5322]
+
+
+
+Jones, et al.           Expires December 22, 2017              [Page 14]
+
+Internet-Draft                  ARC-USAGE                      June 2017
+
 
    Validator  A Message Receiver that attempts to validate the ARC chain
       in a message.
@@ -808,8 +803,8 @@ Appendix C.  Acknowledgements
 
 Appendix D.  Comments and Feedback
 
-   Please address all comments, discussions, and questions to arc-
-   discuss@dmarc.org [2][mailto:arc-discuss@dmarc.org].
+   Please address all comments, discussions, and questions to the dmarc
+   working group at [https://datatracker.ietf.org/wg/dmarc].
 
 Authors' Addresses
 
@@ -831,17 +826,6 @@ Authors' Addresses
    Email: trent.adams@paypal.com
 
 
-
-
-
-
-
-
-Jones, et al.             Expires June 30, 2017                [Page 15]
-
-Internet-Draft                  ARC-USAGE                  December 2016
-
-
    Kurt Andersen (editor)
    LinkedIn
    2029 Stierlin Ct.
@@ -853,44 +837,4 @@ Internet-Draft                  ARC-USAGE                  December 2016
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Jones, et al.             Expires June 30, 2017                [Page 16]
+Jones, et al.           Expires December 22, 2017              [Page 15]
