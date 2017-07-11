@@ -1,7 +1,7 @@
 ---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-05
+docname: draft-ietf-dmarc-arc-protocol-05a
 date: 2017-06-30
 
 # stand_alone: true
@@ -903,7 +903,7 @@ test event which was held on 2016-06-17.
 
   Coverage: Built to support {{ARC-DRAFT}}
 
-  Licensing: On-line usage only, 
+  Licensing: On-line usage only 
 
   Implementation Notes: Released 2016-10-24
   
@@ -917,6 +917,22 @@ test event which was held on 2016-06-17.
     listed in this section.
 
   Contact Info: [https://www.copernica.com/]
+
+## Rspamd 
+
+  Organization: Rspamd community
+
+  Description: ARC signing and verification module
+
+  Status of Operation: Production, though deployment usage is unknown
+
+  Coverage: Built to support {{ARC-DRAFT}}
+
+  Licensing: Open source
+
+  Implementation Notes: Released with version 1.6.0 on 2017-06-12
+
+  Contact Info: [https://rspamd.com/doc/modules/arc.html]
 
 # Security Considerations {#sec-con}
 
