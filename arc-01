@@ -1,8 +1,8 @@
 ---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-05a
-date: 2017-06-30
+docname: draft-ietf-dmarc-arc-protocol-06
+date: 2017-07-18
 
 # stand_alone: true
 
@@ -468,6 +468,12 @@ MUST be done in bottom-up order.
 
 ### ARC-Authentication-Results {#aar-defn}
 
+\[\[ Note: The intent of the AAR header is to provide the necessary information
+for meaningful DMARC reporting back to the originating ADMD. As such, it needs
+to include additional information than the user-focused Authentication-Results
+header {{RFC7601}} but the details of that incremental information have not yet
+been fully determined. ]]
+
 ARC-Authentication-Results is a copy of the Authentication-Results header field
 {{RFC7601}} value with the corresponding ARC-set instance ("i=") tag value
 prefixed to the Authentication-Results value string.  Since
@@ -648,6 +654,14 @@ easily introduced by otherwise well-intended senders through machine or account
 compromises. All normal content-based analysis still needs to be performed on any
 messages bearing a valid chain of ARC header sets.
 
+### Marking and Sealing Invalid Chains
+
+The header fields signed by the AS header field b= value in the case of a major
+violation MUST be only the matching 'i=' instance headers created by the MTA
+which detected the malformed chain, as if this newest ARC set was the only set
+present. (This is the same procedure required for handling major/structural 
+validity problems.)
+
 ### Responding to ARC Validity Violations
 
 If a receiver determines that the ARC chain has failed, the
@@ -670,10 +684,10 @@ used to inform local-policy decisions:
 
 ### Reporting ARC Effects for DMARC Local Policy - Interim
 
-\[\[ Discussion on the IETF DMARC-WG list has indicated some interest in more substantial
+\[\[ Note: Discussion on the IETF DMARC-WG list has indicated some interest in more substantial
 reporting for analytic purposes. To support that effort, the following guidance is 
 provided only as an interim, minimal data set. A more complete reporting construct
-will be specified in a related spec - TBD. ]]
+will be specified in a related spec - TBD. (see also the note at {{aar-defn}}) ]]
 
 Receivers SHOULD indicate situations in which ARC evaluation influenced the
 results of their local policy determination. DMARC reporting of ARC-informed decisions
@@ -932,7 +946,7 @@ test event which was held on 2016-06-17.
 
   Implementation Notes: Released with version 1.6.0 on 2017-06-12
 
-  Contact Info: [https://rspamd.com/doc/modules/arc.html]
+  Contact Info: [https://rspamd.com/doc/modules/arc.html] and [https://github.com/vstakhov/rspamd]
 
 # Security Considerations {#sec-con}
 
