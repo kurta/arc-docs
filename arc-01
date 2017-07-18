@@ -1,7 +1,7 @@
 ---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-06
+docname: draft-ietf-dmarc-arc-protocol-06a
 date: 2017-07-18
 
 # stand_alone: true
@@ -433,16 +433,16 @@ message but each instance MUST have a unique "i=" value.
 
 Participants may include any other header fields within the scope of the
 ARC-Message-Signature signature except that they MUST NOT include ARC-Seal
-headers fields. In particular, including all DKIM-Signature header fields and 
-all ARC-Authentication-Results header fields is RECOMMENDED. 
+headers fields. In particular, including all DKIM-Signature header fields and
+all ARC-Authentication-Results header fields is RECOMMENDED.
 The advice regarding headers to include or avoid for ARC-Message-Signature is otherwise
 identical to that specified in section 5.4
-of {{RFC6376}}. 
+of {{RFC6376}}.
 
 ##### "Canonicalization" 'c' Tag Value {#c-ams-val}
 
 The ARC-Message-Signature header field MUST be created using the header
-and body canonicalization rules mechanisms in Section 3.4 of {{RFC6376}}. The 
+and body canonicalization rules mechanisms in Section 3.4 of {{RFC6376}}. The
 corresponding "c=" tag value MUST be specified in the AMS header field value.
 
 ##### "Instance" 'i' Tag Value {#i-ams-val}
@@ -616,18 +616,37 @@ both intermediaries and end receivers, please consult {{ARC-USAGE}}.
 
 ## Participation
 
-The inclusion of additional ARC sets is to be done whenever a trust
-boundary is crossed, and especially when prior DKIM-Signatures might not survive
-the handling being performed such as some mailing lists that modify
-the content of messages or some gateway transformations. Note that trust boundaries
-might or might not exactly correspond with ADMD boundaries. Some organizations
-may have internal trust boundaries within a single ADMD or have trust boundaries
-which span more than one ADMD.
+Participating in the ARC chain requires both the evaluation of DMARC (and possibly
+ARC) authentication information as well as affixing (one or more) ARC sets for a
+given ADMD.
 
 Each participating ADMD MUST validate the preceding ARC set as a
 part of asserting their own seal. Until the chain is determined to be failed,
 and marked with an ARC set bearing the "cv=fail" indication,
 each participating ADMD SHOULD apply their own seal.
+
+### ADMDs vs. Trust Boundaries
+
+The inclusion of additional ARC sets is to be done whenever a trust
+boundary is crossed, and especially when prior DKIM-Signatures might not survive
+the handling being performed such as some mailing lists that modify
+the content of messages or some gateway transformations.
+
+Note that trust boundaries might or might not exactly correspond with ADMD
+boundaries. Some organizations may have internal trust boundaries within a
+single ADMD or have trust boundaries which span more than one ADMD. Because
+such boundaries can not be defined in a protocol agnostic fashion, nor can
+the varieties of internal architectures be anticipated effectively, the ARC
+protocol does not dictate how trust is to be conveyed within the confines of
+a particular organization.
+
+For ARC to work, message authentication is checked upon ingress and then
+appropriately reflected in the ARC set (and cv verdict) which is affixed upon
+egress. Organizations may choose to use ARC sets in order to communicate across
+internal boundaries or whatever other methods are appropriate to their
+architectures. The essential aspect is that trusted / expected / allowed
+modifications to messages within a trust boundary MUST maintain "cv=pass"
+in the ARC chain.
 
 ## Relationship between DKIM Signatures and ARC Headers
 
@@ -636,7 +655,7 @@ ARC-aware DKIM signers do not DKIM-sign any ARC header fields.
 ## Validating the ARC Set of Header Fields {#arc-validation}
 
 Determining the validity of a chain of ARC sets is defined above in {{cv-calc}}.
-Validation failures MUST be indicated with a "cv=" tag value of 'fail' 
+Validation failures MUST be indicated with a "cv=" tag value of 'fail'
 when attaching a subsequent ARC-Seal header field.
 
 ## ARC Set Validity
@@ -649,7 +668,7 @@ of common behaviour may provide some basis for adjusting local policy decisions.
 
 This specification is exclusively focused on well-behaved, participating intermediaries
 that result in a valid chain of ARC-related header fields. The value of such a well-formed,
-valid chain needs to be interpreted with care since malicious content can be 
+valid chain needs to be interpreted with care since malicious content can be
 easily introduced by otherwise well-intended senders through machine or account
 compromises. All normal content-based analysis still needs to be performed on any
 messages bearing a valid chain of ARC header sets.
@@ -659,7 +678,7 @@ messages bearing a valid chain of ARC header sets.
 The header fields signed by the AS header field b= value in the case of a major
 violation MUST be only the matching 'i=' instance headers created by the MTA
 which detected the malformed chain, as if this newest ARC set was the only set
-present. (This is the same procedure required for handling major/structural 
+present. (This is the same procedure required for handling major/structural
 validity problems.)
 
 ### Responding to ARC Validity Violations
