@@ -1,7 +1,7 @@
 ---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-06
+docname: draft-ietf-dmarc-arc-protocol-06a
 date: 2017-07-18
 
 # stand_alone: true
@@ -616,18 +616,37 @@ both intermediaries and end receivers, please consult {{ARC-USAGE}}.
 
 ## Participation
 
-The inclusion of additional ARC sets is to be done whenever a trust
-boundary is crossed, and especially when prior DKIM-Signatures might not survive
-the handling being performed such as some mailing lists that modify
-the content of messages or some gateway transformations. Note that trust boundaries
-might or might not exactly correspond with ADMD boundaries. Some organizations
-may have internal trust boundaries within a single ADMD or have trust boundaries
-which span more than one ADMD.
+Participating in the ARC chain requires both the evaluation of DMARC (and possibly
+ARC) authentication information as well as affixing (one or more) ARC sets for a
+given ADMD.
 
 Each participating ADMD MUST validate the preceding ARC set as a
 part of asserting their own seal. Until the chain is determined to be failed,
 and marked with an ARC set bearing the "cv=fail" indication,
 each participating ADMD SHOULD apply their own seal.
+
+### ADMDs vs. Trust Boundaries
+
+The inclusion of additional ARC sets is to be done whenever a trust
+boundary is crossed, and especially when prior DKIM-Signatures might not survive
+the handling being performed such as some mailing lists that modify
+the content of messages or some gateway transformations. 
+
+Note that trust boundaries might or might not exactly correspond with ADMD
+boundaries. Some organizations may have internal trust boundaries within a
+single ADMD or have trust boundaries which span more than one ADMD. Because
+such boundaries can not be defined in a protocol agnostic fashion, nor can 
+the varieties of internal architectures be anticipated effectively, the ARC 
+protocol does not dictate how trust is to be conveyed within the confines of
+a particular organization. 
+
+For ARC to work, message authentication is checked upon ingress and then
+appropriately reflected in the ARC set (and cv verdict) which is affixed upon
+egress. Organizations may choose to use ARC sets in order to communicate across
+internal boundaries or whatever other methods are appropriate to their
+architectures. The essential aspect is that trusted / expected / allowed
+modifications to messages within a trust boundary MUST maintain "cv=pass" 
+in the ARC chain.
 
 ## Relationship between DKIM Signatures and ARC Headers
 
@@ -635,74 +654,72 @@ ARC-aware DKIM signers do not DKIM-sign any ARC header fields.
 
 ## Validating the ARC Set of Header Fields {#arc-validation}
 
-Determining the validity of a chain of ARC sets is defined above in {{cv-calc}}.
-Validation failures MUST be indicated with a "cv=" tag value of 'fail' 
-when attaching a subsequent ARC-Seal header field.
+Determining the validity of a chain of ARC sets is defined above in
+{{cv-calc}}.  Validation failures MUST be indicated with a "cv=" tag value of
+'fail' when attaching a subsequent ARC-Seal header field.
 
 ## ARC Set Validity
 
 ### Assessing Chain Validity Violations
 
-There are a wide variety of ways in which the ARC set of header fields can be broken.
-Receivers need to be wary of ascribing motive to such breakage although patterns
-of common behaviour may provide some basis for adjusting local policy decisions.
+There are a wide variety of ways in which the ARC set of header fields can be
+broken.  Receivers need to be wary of ascribing motive to such breakage
+although patterns of common behaviour may provide some basis for adjusting
+local policy decisions.
 
-This specification is exclusively focused on well-behaved, participating intermediaries
-that result in a valid chain of ARC-related header fields. The value of such a well-formed,
-valid chain needs to be interpreted with care since malicious content can be 
-easily introduced by otherwise well-intended senders through machine or account
-compromises. All normal content-based analysis still needs to be performed on any
-messages bearing a valid chain of ARC header sets.
+This specification is exclusively focused on well-behaved, participating
+intermediaries that result in a valid chain of ARC-related header fields. The
+value of such a well-formed, valid chain needs to be interpreted with care
+since malicious content can be easily introduced by otherwise well-intended
+senders through machine or account compromises. All normal content-based
+analysis still needs to be performed on any messages bearing a valid chain of
+ARC header sets.
 
 ### Marking and Sealing Invalid Chains
 
 The header fields signed by the AS header field b= value in the case of a major
 violation MUST be only the matching 'i=' instance headers created by the MTA
 which detected the malformed chain, as if this newest ARC set was the only set
-present. (This is the same procedure required for handling major/structural 
+present. (This is the same procedure required for handling major/structural
 validity problems.)
 
 ### Responding to ARC Validity Violations
 
-If a receiver determines that the ARC chain has failed, the
-receiver MAY signal the breakage through the extended SMTP response code 5.7.7 {{RFC3463}} 
-"message integrity failure" {{ENHANCED-STATUS}} and corresponding SMTP response code.
+If a receiver determines that the ARC chain has failed, the receiver MAY signal
+the breakage through the extended SMTP response code 5.7.7 {{RFC3463}} "message
+integrity failure" {{ENHANCED-STATUS}} and corresponding SMTP response code.
 
 ### Recording the Results of ARC Evaluation
 
-Receivers MAY add an "arc=pass" or "arc=fail" method annotation into a locally-affixed
-Authentication-Results {{RFC7601}} header field.
+Receivers MAY add an "arc=pass" or "arc=fail" method annotation into a
+locally-affixed Authentication-Results {{RFC7601}} header field.
 
 ### Output Data Points from ARC Evaluation
 
-The evaluation of a series of ARC sets results in the following data which MAY be
-used to inform local-policy decisions:
+The evaluation of a series of ARC sets results in the following data which MAY
+be used to inform local-policy decisions:
 
-* A list of the "d=" domains found in the validated (all) ARC-Seal header fields;
-* The "d=" domain found in the most recent (highest instance number) AMS header field
+* A list of the "d=" domains found in the validated (all) ARC-Seal header
+* fields; The "d=" domain found in the most recent (highest instance number)
+* AMS header field
   (since that is the only one necessarily validated)
 
 ### Reporting ARC Effects for DMARC Local Policy - Interim
 
-\[\[ Note: Discussion on the IETF DMARC-WG list has indicated some interest in more substantial
-reporting for analytic purposes. To support that effort, the following guidance is 
-provided only as an interim, minimal data set. A more complete reporting construct
-will be specified in a related spec - TBD. (see also the note at {{aar-defn}}) ]]
+\[\[ Note: Discussion on the IETF DMARC-WG list has indicated some interest in
+more substantial reporting for analytic purposes. To support that effort, the
+following guidance is provided only as an interim, minimal data set. A more
+complete reporting construct will be specified in a related spec - TBD. (see
+also the note at {{aar-defn}}) ]]
 
 Receivers SHOULD indicate situations in which ARC evaluation influenced the
-results of their local policy determination. DMARC reporting of ARC-informed decisions
-is augmented by adding a local_policy comment explanation as follows: 
+results of their local policy determination. DMARC reporting of ARC-informed
+decisions is augmented by adding a local_policy comment explanation as follows: 
 
-~~~~~~~~~~
-&lt;policy_evaluated>
-  &lt;disposition>delivered&lt;/disposition>
-  &lt;dkim>fail&lt;/dkim>
-  &lt;spf>fail&lt;/spf>
-  &lt;reason>
-   &lt;type>local_policy&lt;/type>
-   &lt;comment>arc=pass ams=d1.example d=d1.example,d2.example&lt;/comment>
-  &lt;/reason>
-&lt;/policy_evaluated>
+~~~~~~~~~~ &lt;policy_evaluated> &lt;disposition>delivered&lt;/disposition>
+&lt;dkim>fail&lt;/dkim> &lt;spf>fail&lt;/spf> &lt;reason>
+&lt;type>local_policy&lt;/type> &lt;comment>arc=pass ams=d1.example
+d=d1.example,d2.example&lt;/comment> &lt;/reason> &lt;/policy_evaluated>
 ~~~~~~~~~~
 
 # Privacy Considerations
@@ -734,8 +751,8 @@ This draft adds one item to the IANA "Email Authentication Methods" registry:
 
 ## Definitions of the ARC header fields
 
-This specification adds three new header fields to the "Permanent Message Header
-Field Registry", as follows:
+This specification adds three new header fields to the "Permanent Message
+Header Field Registry", as follows:
 
 *  Header field name: ARC-Seal
 
@@ -775,8 +792,8 @@ Field Registry", as follows:
 
 # Implementation Status {#implstat}
 
-\[\[ Note to the RFC Editor: Please remove this section before 
-publication along with the reference to {{RFC6982}}. ]]
+\[\[ Note to the RFC Editor: Please remove this section before publication
+along with the reference to {{RFC6982}}. ]]
 
 This section records the status of known implementations of the protocol
 defined by this specification at the time of posting of this Internet-Draft,
@@ -795,15 +812,15 @@ which may serve as evidence of valuable experimentation and feedback that have
 made the implemented protocols more mature.  It is up to the individual working
 groups to use this information as they see fit".
 
-This information is known to be correct as of the third interoperability 
-test event which was held on 2016-06-17.
+This information is known to be correct as of the third interoperability test
+event which was held on 2016-06-17.
 
 ## GMail test reflector and incoming validation
 
   Organization: Google
 
-  Description: Internal prototype implementation with both debug
-    analysis and validating + sealing pass-through function
+  Description: Internal prototype implementation with both debug analysis and
+  validating + sealing pass-through function
 
   Status of Operation: Production - Incoming Validation
 
@@ -811,8 +828,8 @@ test event which was held on 2016-06-17.
 
   Licensing: Proprietary - Internal only
 
-  Implementation Notes: Full functionality was demonstrated during
-   the interop testing on 2016-06-17
+  Implementation Notes: Full functionality was demonstrated during the interop
+  testing on 2016-06-17
 
   In place for reporting usage only as of 2016-11-21 on all GMail flows.
 
@@ -824,24 +841,24 @@ test event which was held on 2016-06-17.
 
   Organization: AOL
 
-  Description: Internal prototype implementation with both debug
-    analysis and validating + sealing pass-through function
+  Description: Internal prototype implementation with both debug analysis and
+  validating + sealing pass-through function
 
   Status of Operation: Beta
 
   Coverage: ARC chain validity status checking is not operational, but
-    otherwise this system conforms to {{ARC-DRAFT}}
+  otherwise this system conforms to {{ARC-DRAFT}}
 
   Licensing: Proprietary - Internal only
 
-  Implementation Notes: Full functionality with the exception of chain
-   validity checking was demonstrated during the interop testing on 2016-06-17
+  Implementation Notes: Full functionality with the exception of chain validity
+  checking was demonstrated during the interop testing on 2016-06-17
 
   Available for production mail via selected account whitelisting for test
-   validation only.
+  validation only.
 
-  Intermittent stability problems discovered at the interop event on 
-   2017-02-24. Remediation underway as of the publication of this draft.
+  Intermittent stability problems discovered at the interop event on
+  2017-02-24. Remediation underway as of the publication of this draft.
 
   Contact Info: <arc-discuss@dmarc.org>
 
@@ -854,8 +871,8 @@ test event which was held on 2016-06-17.
    Status of Operation: Production
 
    Coverage: The internal test suite is incomplete, but the command line
-   developmental version of validator was demonstrated to interoperate with
-   the Google and AOL implementations during the interop on 2016-06-17 and the
+   developmental version of validator was demonstrated to interoperate with the
+   Google and AOL implementations during the interop on 2016-06-17 and the
    released version passes the tests in {{ARC-TEST}}
    https://github.com/ValiMail/arc_test_suite with both python and python3.
 
@@ -867,8 +884,8 @@ test event which was held on 2016-06-17.
 
   Organization: TDP/Murray Kucherawy
 
-  Description: Implemention of milter functionality related to the OpenDKIM
-    and OpenDMARC packages
+  Description: Implemention of milter functionality related to the OpenDKIM and
+  OpenDMARC packages
 
   Status of Operation: Beta
 
@@ -876,16 +893,15 @@ test event which was held on 2016-06-17.
 
   Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)
 
-  Implementation Notes: The build is FreeBSD oriented and takes some tweaks
-    to build on RedHat-based Linux platforms. 
+  Implementation Notes: The build is FreeBSD oriented and takes some tweaks to
+  build on RedHat-based Linux platforms. 
 
-    Initial testing during the
-    interop event on 2016-06-17 showed that it can be operational, but the
-    documentation regarding configuration settings is unclear and the 
-    generated signature values do not validate when compared to the Google,
-    AOL or dkimpy implementations.
+    Initial testing during the interop event on 2016-06-17 showed that it can
+    be operational, but the documentation regarding configuration settings is
+    unclear and the generated signature values do not validate when compared to
+    the Google, AOL or dkimpy implementations.
 
-    Testing during the 2017-02-24 interop event showed that some of the 
+    Testing during the 2017-02-24 interop event showed that some of the
     problems have been fixed, but there are still interoperability problems
     when trying to use OpenARC in a "sandwich" configuration around a MLM.
 
@@ -924,11 +940,11 @@ test event which was held on 2016-06-17.
    Requires full message content to be pasted into a web form found at
    [http://arc.mailerq.com/] (warning - https is not supported).
 
-   An additional instance of an ARC signature can be added if one is 
-    willing to paste a private key into an unsecured web form.
+   An additional instance of an ARC signature can be added if one is willing to
+   paste a private key into an unsecured web form.
 
-   Initial testing shows that results match the other implementations
-    listed in this section.
+   Initial testing shows that results match the other implementations listed in
+   this section.
 
   Contact Info: [https://www.copernica.com/]
 
@@ -946,33 +962,34 @@ test event which was held on 2016-06-17.
 
   Implementation Notes: Released with version 1.6.0 on 2017-06-12
 
-  Contact Info: [https://rspamd.com/doc/modules/arc.html] and [https://github.com/vstakhov/rspamd]
+  Contact Info: [https://rspamd.com/doc/modules/arc.html] and
+  [https://github.com/vstakhov/rspamd]
 
 # Security Considerations {#sec-con}
 
 The Security Considerations of {{RFC6376}} and {{RFC7601}} apply directly to
 this specification.
 
-Inclusion of ARC sets in the header of emails may cause problems for some
-older or more constrained MTAs if they are unable to accept the greater 
-size of the header.
+Inclusion of ARC sets in the header of emails may cause problems for some older
+or more constrained MTAs if they are unable to accept the greater size of the
+header.
 
-Operators who receive a message bearing N ARC sets has to complete N+1 
-DNS queries to evaluate the chain (barring DNS redirection mechanisms which 
-can increase the lookups for a given target value).  This has at least two effects:
+Operators who receive a message bearing N ARC sets has to complete N+1 DNS
+queries to evaluate the chain (barring DNS redirection mechanisms which can
+increase the lookups for a given target value).  This has at least two effects:
 
   1. An attacker can send a message to an ARC partipant with a concocted
-sequence of ARC sets bearing the domains of intended victims, and all of them
-will be queried by the participant until a failure is discovered.
+  sequence of ARC sets bearing the domains of intended victims, and all of them
+  will be queried by the participant until a failure is discovered.
 
   2.  DKIM only does one DNS check per signature, while this one can do many.
-Absent caching, slow DNS responses can cause SMTP timeouts; this could be
-exploited as a DoS attack.
+  Absent caching, slow DNS responses can cause SMTP timeouts; this could be
+  exploited as a DoS attack.
 
 ## Message Content Suspicion
 
-Recipients are cautioned to treat messages bearing ARC sets with the
-same suspicion that they apply to all other email messages. This includes
+Recipients are cautioned to treat messages bearing ARC sets with the same
+suspicion that they apply to all other email messages. This includes
 appropriate content scanning and other checks for potentially malicious
 content. The handlers which are identified within the ARC-Seal chain may be
 used to provide input to local policy engines in cases where the sending
@@ -984,38 +1001,28 @@ system's DKIM-Signature does not validate.
 # Appendix A - Example Usage (Obsolete but retained for illustrative purposes)
 
 \[\[ Note: The following examples were mocked up early in the definition
-process for the spec. They no longer reflect the current definition and
-need various updates. ]]
+process for the spec. They no longer reflect the current definition and need
+various updates. ]]
 
 ## Example 1: Simple mailing list
 
 ### Here’s the message as it exits the Origin:
 
-~~~~~~~~~~
-Return-Path: &lt;jqd@d1.example>
-Received: from \[10.10.10.131] (w-x-y-z.dsl.static.isp.com \[w.x.y.z])
-    (authenticated bits=0)
-    by segv.d1.example with ESMTP id t0FN4a8O084569;
-    Thu, 14 Jan 2015 15:00:01 -0800 (PST)
-    (envelope-from jqd@d1.example)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=d1.example;
-    s=20130426; t=1421363082;
-    bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
-    h=Message-ID:Date:From:MIME-Version:To:CC:Subject:Content-Type:
-     Content-Transfer-Encoding;
-    b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijrvQw
-     bv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4Gd3TRJl
-     gotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ=
-Message-ID: &lt;54B84785.1060301@d1.example>
-Date: Thu, 14 Jan 2015 15:00:01 -0800
-From: John Q Doe &lt;jqd@d1.example>
-To: arc@dmarc.org
-Subject: Example 1
+~~~~~~~~~~ Return-Path: &lt;jqd@d1.example> Received: from \[10.10.10.131]
+(w-x-y-z.dsl.static.isp.com \[w.x.y.z]) (authenticated bits=0) by
+segv.d1.example with ESMTP id t0FN4a8O084569; Thu, 14 Jan 2015 15:00:01 -0800
+(PST) (envelope-from jqd@d1.example) DKIM-Signature: v=1; a=rsa-sha256;
+c=relaxed/simple; d=d1.example; s=20130426; t=1421363082;
+bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
+h=Message-ID:Date:From:MIME-Version:To:CC:Subject:Content-Type:
+Content-Transfer-Encoding;
+b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijrvQw
+bv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4Gd3TRJl
+gotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ= Message-ID:
+&lt;54B84785.1060301@d1.example> Date: Thu, 14 Jan 2015 15:00:01 -0800 From:
+John Q Doe &lt;jqd@d1.example> To: arc@dmarc.org Subject: Example 1
  
-Hey gang,
-This is a test message.
---J.
-~~~~~~~~~~
+Hey gang, This is a test message.  --J.  ~~~~~~~~~~
 
 ### Message is then received at example.org
 
@@ -1023,60 +1030,43 @@ This is a test message.
 
 Processing at example.org:
 
-*       example.org performs authentication checks
-*       No previous Auth-Results or ARC-Seal headers are present
-*       example.org adds ARC-Auth-Results header
-*       example.org adds Received: header
-*       example.org adds a ARC-Seal header
+*       example.org performs authentication checks No previous Auth-Results or
+*       ARC-Seal headers are present example.org adds ARC-Auth-Results header
+*       example.org adds Received: header example.org adds a ARC-Seal header
 
 Here’s the message as it exits example.org:
 
-~~~~~~~~~~
-Return-Path: &lt;jqd@d1.example>
-ARC-Seal: i=1; a=rsa-sha256; t=1421363107;
-    s=seal2015; d=example.org; cv=none; 
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
-     TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
-     EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
-    d=example.org; s=clochette; t=1421363105;
-    bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
-    h=List-Id:List-Unsubscribe:List-Archive:List-Post:
-     List-Help:List-Subscribe:Reply-To:DKIM-Signature;
-    b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF1F5
-     vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3A+m4bw
-     a6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M=
-Received: from segv.d1.example (segv.d1.example [72.52.75.15])
-    by lists.example.org (8.14.5/8.14.5) with ESMTP id t0EKaNU9010123
-    for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
-    (envelope-from jqd@d1.example)
-ARC-Authentication-Results: i=1; lists.example.org;
-    spf=pass smtp.mfrom=jqd@d1.example;
-    dkim=pass (1024-bit key) header.i=@d1.example; 
-    dmarc=pass
-Received: from \[10.10.10.131] (w-x-y-z.dsl.static.isp.com \[w.x.y.z])
-    (authenticated bits=0)
-    by segv.d1.example with ESMTP id t0FN4a8O084569;
-    Thu, 14 Jan 2015 15:00:01 -0800 (PST)
-    (envelope-from jqd@d1.example)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=d1.example;
-    s=20130426; t=1421363082;
-    bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
-    h=Message-ID:Date:From:MIME-Version:To:CC:Subject:Content-Type:
-     Content-Transfer-Encoding;
-    b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijr
-     vQwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4G
-     d3TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ=
-Message-ID: &lt;54B84785.1060301@d1.example>
-Date: Thu, 14 Jan 2015 15:00:01 -0800
-From: John Q Doe &lt;jqd@d1.example>
-To: arc@example.org
-Subject: [Lists] Example 1
+~~~~~~~~~~ Return-Path: &lt;jqd@d1.example> ARC-Seal: i=1; a=rsa-sha256;
+t=1421363107; s=seal2015; d=example.org; cv=none;
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
+TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
+EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A= ARC-Message-Signature: i=1;
+a=rsa-sha256; c=relaxed/relaxed; d=example.org; s=clochette; t=1421363105;
+bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
+h=List-Id:List-Unsubscribe:List-Archive:List-Post:
+List-Help:List-Subscribe:Reply-To:DKIM-Signature;
+b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF1F5
+vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3A+m4bw
+a6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M= Received: from segv.d1.example
+(segv.d1.example [72.52.75.15]) by lists.example.org (8.14.5/8.14.5) with ESMTP
+id t0EKaNU9010123 for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
+(envelope-from jqd@d1.example) ARC-Authentication-Results: i=1;
+lists.example.org; spf=pass smtp.mfrom=jqd@d1.example; dkim=pass (1024-bit key)
+header.i=@d1.example; dmarc=pass Received: from \[10.10.10.131]
+(w-x-y-z.dsl.static.isp.com \[w.x.y.z]) (authenticated bits=0) by
+segv.d1.example with ESMTP id t0FN4a8O084569; Thu, 14 Jan 2015 15:00:01 -0800
+(PST) (envelope-from jqd@d1.example) DKIM-Signature: v=1; a=rsa-sha256;
+c=relaxed/simple; d=d1.example; s=20130426; t=1421363082;
+bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
+h=Message-ID:Date:From:MIME-Version:To:CC:Subject:Content-Type:
+Content-Transfer-Encoding;
+b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijr
+vQwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4G
+d3TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ= Message-ID:
+&lt;54B84785.1060301@d1.example> Date: Thu, 14 Jan 2015 15:00:01 -0800 From:
+John Q Doe &lt;jqd@d1.example> To: arc@example.org Subject: [Lists] Example 1
  
-Hey gang,
-This is a test message.
---J.
-~~~~~~~~~~
+Hey gang, This is a test message.  --J.  ~~~~~~~~~~
 
 ### Example 1: Message received by Recipient
 
@@ -1084,98 +1074,71 @@ Let’s say that the Recipient is example.com
 
 Processing at example.com:
 
-*       example.com performs usual authentication checks
-*       example.com adds Auth-Results: header, Received header
-*       Determines that message fails DMARC
-*       Checks for ARC-Seal: header; finds one
-*       Validates the signature in the ARC-Seal: header, which covers the ARC-Authentication-Results: header
-*       example.com can use the ARC-Authentication-Results values or verify the DKIM-Signature from lists.example.org
+*       example.com performs usual authentication checks example.com adds
+*       Auth-Results: header, Received header Determines that message fails
+*       DMARC Checks for ARC-Seal: header; finds one Validates the signature in
+*       the ARC-Seal: header, which covers the ARC-Authentication-Results:
+*       header example.com can use the ARC-Authentication-Results values or
+*       verify the DKIM-Signature from lists.example.org
 
 Here’s what the message looks like at this point:
 
-~~~~~~~~~~
-Return-Path: &lt;jqd@d1.example>
-Received: from example.org (example.org [208.69.40.157])
-    by clothilde.example.com with ESMTP id 
-    d200mr22663000ykb.93.1421363207
-    for <fmartin@example.com>; Thu, 14 Jan 2015 15:02:40 -0800 (PST)
-Authentication-Results: clothilde.example.com; spf=fail
-    smtp.from=jqd@d1.example; dkim=pass (1024-bit key) 
-    header.i=@example.org; dmarc=fail; arc=pass
-ARC-Seal: i=1; a=rsa-sha256; t=1421363107;
-    s=seal2015; d=example.org; cv=none; 
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
-     TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
-     EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
-    d=example.org; s=clochette; t=1421363105;
-    bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
-    h=List-Id:List-Unsubscribe:List-Archive:List-Post:
-     List-Help:List-Subscribe:Reply-To:DKIM-Signature;
-    b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF
-     1F5vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3
-     A+m4bwa6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M=
-Received: from segv.d1.example (segv.d1.example [72.52.75.15])
-    by lists.example.org (8.14.5/8.14.5) with ESMTP id t0EKaNU9010123
-    for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
-    (envelope-from jqd@d1.example)
-ARC-Authentication-Results: i=1; lists.example.org;
-    spf=pass smtp.mfrom=jqd@d1.example;
-    dkim=pass (1024-bit key) header.i=@d1.example; 
-    dmarc=pass
-Received: from \[10.10.10.131] (w-x-y-z.dsl.static.isp.com \[w.x.y.z])
-    (authenticated bits=0)
-    by segv.d1.example with ESMTP id t0FN4a8O084569;
-    Thu, 14 Jan 2015 15:00:01 -0800 (PST)
-    (envelope-from jqd@d1.example)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=d1.example;
-    s=20130426; t=1421363082;
-    bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
-    h=Message-ID:Date:From:MIME-Version:To:CC:Subject:Content-Type:
-     Content-Transfer-Encoding;
-    b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijrvQw
-     bv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4Gd3TRJl
-     gotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ=
-Message-ID: &lt;54B84785.1060301@d1.example>
-Date: Thu, 14 Jan 2015 15:00:01 -0800
-From: John Q Doe &lt;jqd@d1.example>
-To: arc@example.org
-Subject: [Lists] Example 1
+~~~~~~~~~~ Return-Path: &lt;jqd@d1.example> Received: from example.org
+(example.org [208.69.40.157]) by clothilde.example.com with ESMTP id
+d200mr22663000ykb.93.1421363207 for <fmartin@example.com>; Thu, 14 Jan 2015
+15:02:40 -0800 (PST) Authentication-Results: clothilde.example.com; spf=fail
+smtp.from=jqd@d1.example; dkim=pass (1024-bit key) header.i=@example.org;
+dmarc=fail; arc=pass ARC-Seal: i=1; a=rsa-sha256; t=1421363107; s=seal2015;
+d=example.org; cv=none;
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
+TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
+EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A= ARC-Message-Signature: i=1;
+a=rsa-sha256; c=relaxed/relaxed; d=example.org; s=clochette; t=1421363105;
+bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
+h=List-Id:List-Unsubscribe:List-Archive:List-Post:
+List-Help:List-Subscribe:Reply-To:DKIM-Signature;
+b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF
+1F5vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3
+A+m4bwa6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M= Received: from segv.d1.example
+(segv.d1.example [72.52.75.15]) by lists.example.org (8.14.5/8.14.5) with ESMTP
+id t0EKaNU9010123 for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
+(envelope-from jqd@d1.example) ARC-Authentication-Results: i=1;
+lists.example.org; spf=pass smtp.mfrom=jqd@d1.example; dkim=pass (1024-bit key)
+header.i=@d1.example; dmarc=pass Received: from \[10.10.10.131]
+(w-x-y-z.dsl.static.isp.com \[w.x.y.z]) (authenticated bits=0) by
+segv.d1.example with ESMTP id t0FN4a8O084569; Thu, 14 Jan 2015 15:00:01 -0800
+(PST) (envelope-from jqd@d1.example) DKIM-Signature: v=1; a=rsa-sha256;
+c=relaxed/simple; d=d1.example; s=20130426; t=1421363082;
+bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
+h=Message-ID:Date:From:MIME-Version:To:CC:Subject:Content-Type:
+Content-Transfer-Encoding;
+b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijrvQw
+bv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4Gd3TRJl
+gotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ= Message-ID:
+&lt;54B84785.1060301@d1.example> Date: Thu, 14 Jan 2015 15:00:01 -0800 From:
+John Q Doe &lt;jqd@d1.example> To: arc@example.org Subject: [Lists] Example 1
  
-Hey gang,
-This is a test message.
---J.
-~~~~~~~~~~
+Hey gang, This is a test message.  --J.  ~~~~~~~~~~
 
 ## Example 2: Mailing list to forwarded mailbox
 
 ### Here’s the message as it exits the Origin:
 
-~~~~~~~~~~
-Return-Path: &lt;jqd@d1.example>
-Received: from \[10.10.10.131] (w-x-y-z.dsl.static.isp.com \[w.x.y.z])
-    (authenticated bits=0)
-    by segv.d1.example with ESMTP id t0FN4a8O084569;
-    Thu, 14 Jan 2015 15:00:01 -0800 (PST)
-    (envelope-from jqd@d1.example)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=d1.example;
-    s=20130426; t=1421363082;
-    bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
-    h=Message-ID:Date:From:MIME-Version:To:CC:Subject:Content-Type:
-     Content-Transfer-Encoding;
-    b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijrvQw
-     bv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4Gd3TRJl
-     gotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ=
-Message-ID: &lt;54B84785.1060301@d1.example>
-Date: Thu, 14 Jan 2015 15:00:01 -0800
-From: John Q Doe &lt;jqd@d1.example>
-To: arc@example.org
-Subject: Example 1
+~~~~~~~~~~ Return-Path: &lt;jqd@d1.example> Received: from \[10.10.10.131]
+(w-x-y-z.dsl.static.isp.com \[w.x.y.z]) (authenticated bits=0) by
+segv.d1.example with ESMTP id t0FN4a8O084569; Thu, 14 Jan 2015 15:00:01 -0800
+(PST) (envelope-from jqd@d1.example) DKIM-Signature: v=1; a=rsa-sha256;
+c=relaxed/simple; d=d1.example; s=20130426; t=1421363082;
+bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
+h=Message-ID:Date:From:MIME-Version:To:CC:Subject:Content-Type:
+Content-Transfer-Encoding;
+b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijrvQw
+bv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4Gd3TRJl
+gotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ= Message-ID:
+&lt;54B84785.1060301@d1.example> Date: Thu, 14 Jan 2015 15:00:01 -0800 From:
+John Q Doe &lt;jqd@d1.example> To: arc@example.org Subject: Example 1
  
-Hey gang,
-This is a test message.
---J.
-~~~~~~~~~~
+Hey gang, This is a test message.  --J.  ~~~~~~~~~~
 
 ### Message is then received at example.org
 
@@ -1183,74 +1146,58 @@ This is a test message.
 
 Processing at example.org:
 
-*       example.org performs authentication checks
-*       example.org applies standard DKIM signature
-*       No previous Auth-Results or ARC-Seal headers are present
-*       example.org adds ARC-Auth-Results header
-*       example.org adds usual Received: header
-*       example.org adds a ARC-Seal header
+*       example.org performs authentication checks example.org applies standard
+*       DKIM signature No previous Auth-Results or ARC-Seal headers are present
+*       example.org adds ARC-Auth-Results header example.org adds usual
+*       Received: header example.org adds a ARC-Seal header
 
 Here’s the message as it exits Step A:
 
-~~~~~~~~~~
-Return-Path: &lt;jqd@d1.example>
-ARC-Seal: i=1; a=rsa-sha256; t=1421363107;
-    s=seal2015; d=example.org; cv=none; 
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz6
-     1TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L
-     69EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
-    d=example.org; s=clochette; t=1421363105;
-    bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
-    h=List-Id:List-Unsubscribe:List-Archive:List-Post:
-     List-Help:List-Subscribe:Reply-To:DKIM-Signature;
-    b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF
-     1F5vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3
-     A+m4bwa6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M=
-Received: from segv.d1.example (segv.d1.example [72.52.75.15])
-    by lists.example.org (8.14.5/8.14.5) with ESMTP id t0EKaNU9010123
-    for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
-    (envelope-from jqd@d1.example)
-ARC-Authentication-Results: i=1; lists.example.org;
-    spf=pass smtp.mfrom=jqd@d1.example;
-    dkim=pass (1024-bit key) header.i=@d1.example; 
-    dmarc=pass
-Received: from \[10.10.10.131] (w-x-y-z.dsl.static.isp.com \[w.x.y.z])
-    (authenticated bits=0)
-    by segv.d1.example with ESMTP id t0FN4a8O084569;
-    Thu, 14 Jan 2015 15:00:01 -0800 (PST)
-    (envelope-from jqd@d1.example)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=d1.example;
-    s=20130426; t=1421363082;
-    bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
-    h=Message-ID:Date:From:MIME-Version:To:CC:Subject:Content-Type:
-     Content-Transfer-Encoding;
-    b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijr
-     vQwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4G
-     d3TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ=
-Message-ID: &lt;54B84785.1060301@d1.example>
-Date: Thu, 14 Jan 2015 15:00:01 -0800
-From: John Q Doe &lt;jqd@d1.example>
-To: arc@example.org
-Subject: [Lists] Example 1
+~~~~~~~~~~ Return-Path: &lt;jqd@d1.example> ARC-Seal: i=1; a=rsa-sha256;
+t=1421363107; s=seal2015; d=example.org; cv=none;
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz6
+1TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L
+69EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A= ARC-Message-Signature: i=1;
+a=rsa-sha256; c=relaxed/relaxed; d=example.org; s=clochette; t=1421363105;
+bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
+h=List-Id:List-Unsubscribe:List-Archive:List-Post:
+List-Help:List-Subscribe:Reply-To:DKIM-Signature;
+b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF
+1F5vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3
+A+m4bwa6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M= Received: from segv.d1.example
+(segv.d1.example [72.52.75.15]) by lists.example.org (8.14.5/8.14.5) with ESMTP
+id t0EKaNU9010123 for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
+(envelope-from jqd@d1.example) ARC-Authentication-Results: i=1;
+lists.example.org; spf=pass smtp.mfrom=jqd@d1.example; dkim=pass (1024-bit key)
+header.i=@d1.example; dmarc=pass Received: from \[10.10.10.131]
+(w-x-y-z.dsl.static.isp.com \[w.x.y.z]) (authenticated bits=0) by
+segv.d1.example with ESMTP id t0FN4a8O084569; Thu, 14 Jan 2015 15:00:01 -0800
+(PST) (envelope-from jqd@d1.example) DKIM-Signature: v=1; a=rsa-sha256;
+c=relaxed/simple; d=d1.example; s=20130426; t=1421363082;
+bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
+h=Message-ID:Date:From:MIME-Version:To:CC:Subject:Content-Type:
+Content-Transfer-Encoding;
+b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijr
+vQwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4G
+d3TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ= Message-ID:
+&lt;54B84785.1060301@d1.example> Date: Thu, 14 Jan 2015 15:00:01 -0800 From:
+John Q Doe &lt;jqd@d1.example> To: arc@example.org Subject: [Lists] Example 1
  
-Hey gang,
-This is a test message.
---J.
-~~~~~~~~~~
+Hey gang, This is a test message.  --J.  ~~~~~~~~~~
 
 #### Example 2, Step B: Message from list forwarded
 
-The message is delivered to a mailbox at gmail.com  
-Processing at gmail.com:
+The message is delivered to a mailbox at gmail.com  Processing at gmail.com:
 
 -   gmail.com performs usual authentication checks
 -   gmail.com adds Auth-Results: and Received: header
 -   Determines that message fails DMARC
 -   Checks for ARC-Seal: header; finds one
--   Validates the signature in the ARC-Seal: header, which covers the ARC-Authentication-Results: header
+-   Validates the signature in the ARC-Seal: header, which covers the
+    ARC-Authentication-Results: header
 -   Uses the ARC-Auth-Results: values, but:
--   Instead of delivering message, prepares to forward message per user settings
+-   Instead of delivering message, prepares to forward message per user
+    settings
 -   Applies usual DKIM signature
 -   gmail.com adds it’s own ARC-Seal: header, contents of which are
     -       version
@@ -1260,208 +1207,161 @@ Processing at gmail.com:
     -       selector for key (“s=notary01”)
     -       domain for key (“d=gmail.com”)
     -       headers included  in hash (“h=ARC-Authentication-Results:ARC-Seal”)
-    -       Note: algorithm requires only ARC-Seals with lower sequence # be included, in ascending order
+    -       Note: algorithm requires only ARC-Seals with lower sequence # be
+            included, in ascending order
     -       signature of the header hash
 
 Here’s what the message looks like at this point:
 
-~~~~~~~~~~
-Return-Path: &lt;jqd@d1.example>
-ARC-Seal: i=2; a=rsa-sha256; t=1421363253;
-    s=notary01; d=gmail.com; cv=pass; 
-    b=sjHDMriRZ0Mui5eVEOGscRHWbQHcy97lvrduHQ8h+f2CfIrxUiKOE44x3LQwDWR
-     YbDjf5fcM9MdcIahC+cP59BQ9Y9DHwMDzwRTnM7NVb4kY+tSaVnLoIOaP9lF/sut
-     txO+RRNr0fCFw==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed;
-    d=gmail.com; s=20120806;
-    h=mime-version:content-type:x-original-sender:
-     x-original-authentication-results:precedence:mailing-list:
-     list-id:list-post:list-help:list-archive:sender:reply-to:
-     list-unsubscribe:DKIM-Signature;
-    bh=2+gZwZhUK2V7JbpoO2MTrU19WvhcA4JnjiohFm9ZZ/g=;
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
-     TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
-     EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0Ab8Oi1ebYV/hIBmfhS
-     LF1E80hMPcMijONfTQB6g5Hoh/kE6N2fgp6aSngL/WA3+g3Id8ElhXHvIGcJRFeM
-     KdJqiW5cxdqPTRW+BnR5ee6Tzg06kr265NTDIAU8p8fQNuLfZj49MMA+QwDBJtXw
-     bQoZyRtb6X6q0mYaszUB8kw==
-Received: by mail-yk0-f179.google.com with SMTP id 19so2728865ykq.10
-    for <mailbox@gmail.com>; Thu, 14 Jan 2015 15:02:45 -0800 (PST)
-Authentication-Results: i=2; gmail.com; spf=fail
-    smtp.from=jqd@d1.example; dkim=pass (1024-bit key) 
-    header.i=@example.org; dmarc=fail; arc=pass
-ARC-Seal: i=1; a=rsa-sha256; t=1421363107;
-    s=seal2015; d=example.org; cv=none:
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
-     TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
-     EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
-    d=example.org; s=clochette; t=1421363105;
-    bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
-    h=List-Id:List-Unsubscribe:List-Archive:List-Post:
-     List-Help:List-Subscribe:Reply-To:DKIM-Signature;
-    b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF
-     1F5vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3
-     A+m4bwa6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M=
-Received: from segv.d1.example (segv.d1.example [72.52.75.15])
-    by lists.example.org (8.14.5/8.14.5) with ESMTP id t0EKaNU9010123
-    for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
-    (envelope-from jqd@d1.example)
-ARC-Authentication-Results: i=1; lists.example.org;
-    spf=pass smtp.mfrom=jqd@d1.example;
-    dkim=pass (1024-bit key) header.i=@d1.example; 
-    dmarc=pass
-Received: from \[10.10.10.131] (w-x-y-z.dsl.static.isp.com \[w.x.y.z])
-    (authenticated bits=0)
-    by segv.d1.example with ESMTP id t0FN4a8O084569;
-    Thu, 14 Jan 2015 15:00:01 -0800 (PST)
-    (envelope-from jqd@d1.example)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=d1.example;
-    s=20130426; t=1421363082;
-    bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
-    h=Message-ID:Date:From:MIME-Version:To:CC:Subject:Content-Type:
-     Content-Transfer-Encoding;
-    b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijr
-     vQwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4G
-     d3TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ=
-Message-ID: &lt;54B84785.1060301@d1.example>
-Date: Thu, 14 Jan 2015 15:00:01 -0800
-From: John Q Doe &lt;jqd@d1.example>
-To: arc@example.org
-Subject: [Lists] Example 1
+~~~~~~~~~~ Return-Path: &lt;jqd@d1.example> ARC-Seal: i=2; a=rsa-sha256;
+t=1421363253; s=notary01; d=gmail.com; cv=pass;
+b=sjHDMriRZ0Mui5eVEOGscRHWbQHcy97lvrduHQ8h+f2CfIrxUiKOE44x3LQwDWR
+YbDjf5fcM9MdcIahC+cP59BQ9Y9DHwMDzwRTnM7NVb4kY+tSaVnLoIOaP9lF/sut
+txO+RRNr0fCFw== ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed;
+d=gmail.com; s=20120806; h=mime-version:content-type:x-original-sender:
+x-original-authentication-results:precedence:mailing-list:
+list-id:list-post:list-help:list-archive:sender:reply-to:
+list-unsubscribe:DKIM-Signature;
+bh=2+gZwZhUK2V7JbpoO2MTrU19WvhcA4JnjiohFm9ZZ/g=;
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
+TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
+EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0Ab8Oi1ebYV/hIBmfhS
+LF1E80hMPcMijONfTQB6g5Hoh/kE6N2fgp6aSngL/WA3+g3Id8ElhXHvIGcJRFeM
+KdJqiW5cxdqPTRW+BnR5ee6Tzg06kr265NTDIAU8p8fQNuLfZj49MMA+QwDBJtXw
+bQoZyRtb6X6q0mYaszUB8kw== Received: by mail-yk0-f179.google.com with SMTP id
+19so2728865ykq.10 for <mailbox@gmail.com>; Thu, 14 Jan 2015 15:02:45 -0800
+(PST) Authentication-Results: i=2; gmail.com; spf=fail
+smtp.from=jqd@d1.example; dkim=pass (1024-bit key) header.i=@example.org;
+dmarc=fail; arc=pass ARC-Seal: i=1; a=rsa-sha256; t=1421363107; s=seal2015;
+d=example.org; cv=none:
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
+TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
+EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A= ARC-Message-Signature: i=1;
+a=rsa-sha256; c=relaxed/relaxed; d=example.org; s=clochette; t=1421363105;
+bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
+h=List-Id:List-Unsubscribe:List-Archive:List-Post:
+List-Help:List-Subscribe:Reply-To:DKIM-Signature;
+b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF
+1F5vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3
+A+m4bwa6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M= Received: from segv.d1.example
+(segv.d1.example [72.52.75.15]) by lists.example.org (8.14.5/8.14.5) with ESMTP
+id t0EKaNU9010123 for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
+(envelope-from jqd@d1.example) ARC-Authentication-Results: i=1;
+lists.example.org; spf=pass smtp.mfrom=jqd@d1.example; dkim=pass (1024-bit key)
+header.i=@d1.example; dmarc=pass Received: from \[10.10.10.131]
+(w-x-y-z.dsl.static.isp.com \[w.x.y.z]) (authenticated bits=0) by
+segv.d1.example with ESMTP id t0FN4a8O084569; Thu, 14 Jan 2015 15:00:01 -0800
+(PST) (envelope-from jqd@d1.example) DKIM-Signature: v=1; a=rsa-sha256;
+c=relaxed/simple; d=d1.example; s=20130426; t=1421363082;
+bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
+h=Message-ID:Date:From:MIME-Version:To:CC:Subject:Content-Type:
+Content-Transfer-Encoding;
+b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijr
+vQwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4G
+d3TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ= Message-ID:
+&lt;54B84785.1060301@d1.example> Date: Thu, 14 Jan 2015 15:00:01 -0800 From:
+John Q Doe &lt;jqd@d1.example> To: arc@example.org Subject: [Lists] Example 1
  
-Hey gang,
-This is a test message.
---J.
-~~~~~~~~~~
+Hey gang, This is a test message.  --J.  ~~~~~~~~~~
 
 
  
 
 ### Example 2: Message received by Recipient
 
-Let’s say that the Recipient is example.com  
-Processing at example.com:
+Let’s say that the Recipient is example.com  Processing at example.com:
 
 -       example.com performs usual authentication checks
 -       example.com adds Auth-Results: header, Received header
 -       Determines that message fails DMARC
 -       Checks for ARC-Seal: header; finds two
--       Validates the signature in the highest numbered (“i=2”) ARC-Seal: header, which covers all previous ARC-Seal: and ARC-Authentication-Results: headers
--       Validates the other ARC-Seal header (“i=1”), which covers the ARC-Authentication-Results: header
+-       Validates the signature in the highest numbered (“i=2”) ARC-Seal:
+        header, which covers all previous ARC-Seal: and
+        ARC-Authentication-Results: headers
+-       Validates the other ARC-Seal header (“i=1”), which covers the
+        ARC-Authentication-Results: header
 -       example.com uses the ARC-Authentication-Results: values
 
 Here’s what the message looks like at this point:
 
-~~~~~~~~~~
-Return-Path: &lt;jqd@d1.example>
-Received: from mail-ob0-f188.google.com (mail-ob0-f188.google.com
-    [208.69.40.157]) by clothilde.example.com with ESMTP id
-    d200mr22663000ykb.93.1421363268
-    for <fmartin@example.com>; Thu, 14 Jan 2015 15:03:15 -0800 (PST)
+~~~~~~~~~~ Return-Path: &lt;jqd@d1.example> Received: from
+mail-ob0-f188.google.com (mail-ob0-f188.google.com [208.69.40.157]) by
+clothilde.example.com with ESMTP id d200mr22663000ykb.93.1421363268 for
+<fmartin@example.com>; Thu, 14 Jan 2015 15:03:15 -0800 (PST)
 Authentication-Results: clothilde.example.com; spf=fail
-    smtp.from=jqd@d1.example; dkim=pass (1024-bit key) 
-    header.i=@gmail.com; dmarc=fail; arc=pass
-ARC-Seal: i=2; a=rsa-sha256; t=1421363253;
-    s=notary01; d=gmail.com; cv=pass; 
-    b=sjHDMriRZ0Mui5eVEOGscRHWbQHcy97lvrduHQ8h+f2CfIrxUiKOE44x3LQwDWR
-     YbDjf5fcM9MdcIahC+cP59BQ9Y9DHwMDzwRTnM7NVb4kY+tSaVnLoIOaP9lF/sut
-     txO+RRNr0fCFw==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed;
-    d=gmail.com; s=20120806;
-    h=mime-version:content-type:x-original-sender:
-     x-original-authentication-results:precedence:mailing-list:
-     list-id:list-post:list-help:list-archive:sender:reply-to:
-     :list-unsubscribe:DKIM-Signature;
-    bh=2+gZwZhUK2V7JbpoO2MTrU19WvhcA4JnjiohFm9ZZ/g=;
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
-     TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
-     EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0Ab8Oi1ebYV/hIBmfhS
-     LF1E80hMPcMijONfTQB6g5Hoh/kE6N2fgp6aSngL/WA3+g3Id8ElhXHvIGcJRFeM
-     KdJqiW5cxdqPTRW+BnR5ee6Tzg06kr265NTDIAU8p8fQNuLfZj49MMA+QwDBJtXw
-     bQoZyRtb6X6q0mYaszUB8kw==
-Received: by mail-yk0-f179.google.com with SMTP id 19so2728865ykq.10
-    for <mailbox@gmail.com>; Thu, 14 Jan 2015 15:02:45 -0800 (PST)
-Authentication-Results: i=2; gmail.com; spf=fail
-    smtp.from=jqd@d1.example; dkim=pass (1024-bit key) 
-    header.i=@example.org; dmarc=fail; arc=pass
-ARC-Seal: i=1; a=rsa-sha256; t=1421363107;
-    s=seal2015; d=example.org; cv=none; 
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
-     TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
-     EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
-    d=example.org; s=clochette; t=1421363105;
-    bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
-    h=List-Id:List-Unsubscribe:List-Archive:List-Post:
-     List-Help:List-Subscribe:Reply-To:DKIM-Signature;
-    b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF
-     1F5vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3
-     A+m4bwa6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M=
-Received: from segv.d1.example (segv.d1.example [72.52.75.15])
-    by lists.example.org (8.14.5/8.14.5) with ESMTP id t0EKaNU9010123
-    for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
-    (envelope-from jqd@d1.example)
-ARC-Authentication-Results: i=1; lists.example.org;
-    spf=pass smtp.mfrom=jqd@d1.example;
-    dkim=pass (1024-bit key) header.i=@d1.example; 
-    dmarc=pass
-Received: from \[10.10.10.131] (w-x-y-z.dsl.static.isp.com \[w.x.y.z])
-    (authenticated bits=0)
-    by segv.d1.example with ESMTP id t0FN4a8O084569;
-    Thu, 14 Jan 2015 15:00:01 -0800 (PST)
-    (envelope-from jqd@d1.example)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=d1.example;
-    s=20130426; t=1421363082;
-    bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
-    h=Message-ID:Date:From:MIME-Version:To:CC:Subject:Content-Type:
-     Content-Transfer-Encoding;
-    b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijr
-     vQwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4G
-     d3TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ=
-Message-ID: &lt;54B84785.1060301@d1.example>
-Date: Thu, 14 Jan 2015 15:00:01 -0800
-From: John Q Doe &lt;jqd@d1.example>
-To: arc@example.org
-Subject: [Lists] Example 1
+smtp.from=jqd@d1.example; dkim=pass (1024-bit key) header.i=@gmail.com;
+dmarc=fail; arc=pass ARC-Seal: i=2; a=rsa-sha256; t=1421363253; s=notary01;
+d=gmail.com; cv=pass;
+b=sjHDMriRZ0Mui5eVEOGscRHWbQHcy97lvrduHQ8h+f2CfIrxUiKOE44x3LQwDWR
+YbDjf5fcM9MdcIahC+cP59BQ9Y9DHwMDzwRTnM7NVb4kY+tSaVnLoIOaP9lF/sut
+txO+RRNr0fCFw== ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed;
+d=gmail.com; s=20120806; h=mime-version:content-type:x-original-sender:
+x-original-authentication-results:precedence:mailing-list:
+list-id:list-post:list-help:list-archive:sender:reply-to:
+:list-unsubscribe:DKIM-Signature;
+bh=2+gZwZhUK2V7JbpoO2MTrU19WvhcA4JnjiohFm9ZZ/g=;
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
+TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
+EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0Ab8Oi1ebYV/hIBmfhS
+LF1E80hMPcMijONfTQB6g5Hoh/kE6N2fgp6aSngL/WA3+g3Id8ElhXHvIGcJRFeM
+KdJqiW5cxdqPTRW+BnR5ee6Tzg06kr265NTDIAU8p8fQNuLfZj49MMA+QwDBJtXw
+bQoZyRtb6X6q0mYaszUB8kw== Received: by mail-yk0-f179.google.com with SMTP id
+19so2728865ykq.10 for <mailbox@gmail.com>; Thu, 14 Jan 2015 15:02:45 -0800
+(PST) Authentication-Results: i=2; gmail.com; spf=fail
+smtp.from=jqd@d1.example; dkim=pass (1024-bit key) header.i=@example.org;
+dmarc=fail; arc=pass ARC-Seal: i=1; a=rsa-sha256; t=1421363107; s=seal2015;
+d=example.org; cv=none;
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
+TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
+EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A= ARC-Message-Signature: i=1;
+a=rsa-sha256; c=relaxed/relaxed; d=example.org; s=clochette; t=1421363105;
+bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
+h=List-Id:List-Unsubscribe:List-Archive:List-Post:
+List-Help:List-Subscribe:Reply-To:DKIM-Signature;
+b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF
+1F5vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3
+A+m4bwa6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M= Received: from segv.d1.example
+(segv.d1.example [72.52.75.15]) by lists.example.org (8.14.5/8.14.5) with ESMTP
+id t0EKaNU9010123 for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
+(envelope-from jqd@d1.example) ARC-Authentication-Results: i=1;
+lists.example.org; spf=pass smtp.mfrom=jqd@d1.example; dkim=pass (1024-bit key)
+header.i=@d1.example; dmarc=pass Received: from \[10.10.10.131]
+(w-x-y-z.dsl.static.isp.com \[w.x.y.z]) (authenticated bits=0) by
+segv.d1.example with ESMTP id t0FN4a8O084569; Thu, 14 Jan 2015 15:00:01 -0800
+(PST) (envelope-from jqd@d1.example) DKIM-Signature: v=1; a=rsa-sha256;
+c=relaxed/simple; d=d1.example; s=20130426; t=1421363082;
+bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
+h=Message-ID:Date:From:MIME-Version:To:CC:Subject:Content-Type:
+Content-Transfer-Encoding;
+b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijr
+vQwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4G
+d3TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ= Message-ID:
+&lt;54B84785.1060301@d1.example> Date: Thu, 14 Jan 2015 15:00:01 -0800 From:
+John Q Doe &lt;jqd@d1.example> To: arc@example.org Subject: [Lists] Example 1
  
-Hey gang,
-This is a test message.
---J.
-~~~~~~~~~~
+Hey gang, This is a test message.  --J.  ~~~~~~~~~~
 
 ## Example 3: Mailing list to forwarded mailbox with source 
 
-### Here’s the message as it exits the Origin:
-~~~~~~~~~~
-Return-Path: &lt;jqd@d1.example>
-Received: from \[10.10.10.131] (w-x-y-z.dsl.static.isp.com \[w.x.y.z])
-    (authenticated bits=0)
-    by segv.d1.example with ESMTP id t0FN4a8O084569;
-    Thu, 14 Jan 2015 15:00:01 -0800 (PST)
-    (envelope-from jqd@d1.example)
-ARC-Seal: i=1; a=rsa-sha256; t=1421363107;
-    s=origin2015; d=d1.example; cv=none; 
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61T
-     X6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69EU
-     8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
-    d=d1.example; s=20130426; t=1421363082;
-    bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
-    h=MIME-Version:CC:Content-Type:Content-Transfer-Encoding;
-    b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijrv
-     Qwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4Gd3
-     TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ=
-Message-ID: &lt;54B84785.1060301@d1.example>
-Date: Thu, 14 Jan 2015 15:00:01 -0800
-From: John Q Doe &lt;jqd@d1.example>
-To: arc@example.org
-Subject: Example 1
+### Here’s the message as it exits the Origin: ~~~~~~~~~~ Return-Path:
+&lt;jqd@d1.example> Received: from \[10.10.10.131] (w-x-y-z.dsl.static.isp.com
+\[w.x.y.z]) (authenticated bits=0) by segv.d1.example with ESMTP id
+t0FN4a8O084569; Thu, 14 Jan 2015 15:00:01 -0800 (PST) (envelope-from
+jqd@d1.example) ARC-Seal: i=1; a=rsa-sha256; t=1421363107; s=origin2015;
+d=d1.example; cv=none;
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61T
+X6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69EU
+8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A= ARC-Message-Signature: i=1;
+a=rsa-sha256; c=relaxed/relaxed; d=d1.example; s=20130426; t=1421363082;
+bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
+h=MIME-Version:CC:Content-Type:Content-Transfer-Encoding;
+b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijrv
+Qwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4Gd3
+TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ= Message-ID:
+&lt;54B84785.1060301@d1.example> Date: Thu, 14 Jan 2015 15:00:01 -0800 From:
+John Q Doe &lt;jqd@d1.example> To: arc@example.org Subject: Example 1
  
-Hey gang,
-This is a test message.
---J.
-~~~~~~~~~~
+Hey gang, This is a test message.  --J.  ~~~~~~~~~~
 
 ### Message is then received at example.org
 
@@ -1474,7 +1374,8 @@ Processing at example.org:
 -   example.org performs authentication checks
 -   example.org applies standard DKIM signature
 -   Checks for ARC-Seal: header; finds one (i=1)
--   Validates the signature in the ARC-Seal (i=1): header, which covers the d1.example ARC-Message-Signature: header
+-   Validates the signature in the ARC-Seal (i=1): header, which covers the
+    d1.example ARC-Message-Signature: header
 -   example.org adds ARC-Auth-Results header
 -   example.org adds usual Received: header
 -   example.org adds a DKIM-Signature
@@ -1489,70 +1390,56 @@ Processing at example.org:
 
 Here’s the message as it exits Step A:
 
-~~~~~~~~~~
-Return-Path: &lt;jqd@d1.example>
-ARC-Seal: i=2; a=rsa-sha256; t=1421363107;
-    s=seal2015; d=example.org; cv=pass; 
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz6
-     1TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L
-     69EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A=
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed;
-    d=example.org; s=clochette; t=1421363105;
-    bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
-    h=List-Id:List-Unsubscribe:List-Archive:List-Post:
-     List-Help:List-Subscribe:From:Reply-To:DKIM-Signature;
-    b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF
-     1F5vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3
-     A+m4bwa6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M=
-Received: from segv.d1.example (segv.d1.example [72.52.75.15])
-    by lists.example.org (8.14.5/8.14.5) with ESMTP id t0EKaNU9010123
-    for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
-    (envelope-from jqd@d1.example)
-ARC-Authentication-Results: i=2; lists.example.org;
-    spf=pass smtp.mfrom=jqd@d1.example;
-    dkim=pass (1024-bit key) header.i=@d1.example; 
-    dmarc=pass
-Received: from \[10.10.10.131] (w-x-y-z.dsl.static.isp.com \[w.x.y.z])
-    (authenticated bits=0)
-    by segv.d1.example with ESMTP id t0FN4a8O084569;
-    Thu, 14 Jan 2015 15:00:01 -0800 (PST)
-    (envelope-from jqd@d1.example)
-ARC-Seal: i=1; a=rsa-sha256; t=1421363107;
-    s=origin2015; d=d1.example; cv=none; 
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
-     TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
-     EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
-    d=d1.example; s=20130426; t=1421363082;
-    bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
-    h=MIME-Version:CC:Content-Type:Content-Transfer-Encoding;
-    b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijr
-     vQwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4G
-     d3TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ=
-Message-ID: &lt;54B84785.1060301@d1.example>
-Date: Thu, 14 Jan 2015 15:00:01 -0800
-From: John Q Doe &lt;jqd@d1.example>
-To: arc@example.org
-Subject: [Lists] Example 1
+~~~~~~~~~~ Return-Path: &lt;jqd@d1.example> ARC-Seal: i=2; a=rsa-sha256;
+t=1421363107; s=seal2015; d=example.org; cv=pass;
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz6
+1TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L
+69EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A= ARC-Message-Signature: i=2;
+a=rsa-sha256; c=relaxed/relaxed; d=example.org; s=clochette; t=1421363105;
+bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
+h=List-Id:List-Unsubscribe:List-Archive:List-Post:
+List-Help:List-Subscribe:From:Reply-To:DKIM-Signature;
+b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF
+1F5vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3
+A+m4bwa6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M= Received: from segv.d1.example
+(segv.d1.example [72.52.75.15]) by lists.example.org (8.14.5/8.14.5) with ESMTP
+id t0EKaNU9010123 for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
+(envelope-from jqd@d1.example) ARC-Authentication-Results: i=2;
+lists.example.org; spf=pass smtp.mfrom=jqd@d1.example; dkim=pass (1024-bit key)
+header.i=@d1.example; dmarc=pass Received: from \[10.10.10.131]
+(w-x-y-z.dsl.static.isp.com \[w.x.y.z]) (authenticated bits=0) by
+segv.d1.example with ESMTP id t0FN4a8O084569; Thu, 14 Jan 2015 15:00:01 -0800
+(PST) (envelope-from jqd@d1.example) ARC-Seal: i=1; a=rsa-sha256; t=1421363107;
+s=origin2015; d=d1.example; cv=none;
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
+TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
+EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A= ARC-Message-Signature: i=1;
+a=rsa-sha256; c=relaxed/relaxed; d=d1.example; s=20130426; t=1421363082;
+bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
+h=MIME-Version:CC:Content-Type:Content-Transfer-Encoding;
+b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijr
+vQwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4G
+d3TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ= Message-ID:
+&lt;54B84785.1060301@d1.example> Date: Thu, 14 Jan 2015 15:00:01 -0800 From:
+John Q Doe &lt;jqd@d1.example> To: arc@example.org Subject: [Lists] Example 1
  
-Hey gang,
-This is a test message.
---J.
-~~~~~~~~~~
+Hey gang, This is a test message.  --J.  ~~~~~~~~~~
 
 #### Example 3, Step B: Message from list forwarded with source
 
-The message is delivered to a mailbox at gmail.com  
-Processing at gmail.com:
+The message is delivered to a mailbox at gmail.com  Processing at gmail.com:
 
 -   gmail.com performs usual authentication checks
 -   gmail.com adds Auth-Results: and Received: header
 -   Determines that message fails DMARC
 -   Checks for ARC-Seal: header; finds two
--   Validates the signature in the ARC-Seal (i=2): header, which covers the ARC-Authentication-Results: header
--   Validates the signature in the ARC-Seal (i=1): header, which covers the d1.example ARC-Message-Signature: header
+-   Validates the signature in the ARC-Seal (i=2): header, which covers the
+    ARC-Authentication-Results: header
+-   Validates the signature in the ARC-Seal (i=1): header, which covers the
+    d1.example ARC-Message-Signature: header
 -   Uses the ARC-Auth-Results: values, but:
--   Instead of delivering message, prepares to forward message per user settings
+-   Instead of delivering message, prepares to forward message per user
+    settings
 -   Applies usual DKIM signature
 -   gmail.com adds it’s own ARC-Seal: header, contents of which are
     -       version
@@ -1561,204 +1448,165 @@ Processing at gmail.com:
     -       timestamp (“t=”)
     -       selector for key (“s=notary01”)
     -       domain for key (“d=gmail.com”)
-    -       Note: algorithm requires only ARC-Seals with lower sequence # be included, in ascending order
+    -       Note: algorithm requires only ARC-Seals with lower sequence # be
+            included, in ascending order
     -       signature of the chain
 
 Here’s what the message looks like at this point:
 
-~~~~~~~~~~
-Return-Path: &lt;jqd@d1.example>
-ARC-Seal: i=3; a=rsa-sha256; t=1421363253;
-    s=notary01; d=gmail.com; cv=pass; 
-    b=sjHDMriRZ0Mui5eVEOGscRHWbQHcy97lvrduHQ8h+f2CfIrxUiKOE44x3LQwD
-     WRYbDjf5fcM9MdcIahC+cP59BQ9Y9DHwMDzwRTnM7NVb4kY+tSaVnLoIOaP9lF
-     /suttxO+RRNr0fCFw==
-ARC-Message-Signature: i=3; a=rsa-sha256; c=relaxed/relaxed;
-    d=gmail.com; s=20120806;
-    h=mime-version:content-type:x-original-sender
-     :x-original-authentication-results:precedence:mailing-list
-     :list-id:list-post:list-help:list-archive:sender
-     :list-unsubscribe:reply-to;
-    bh=2+gZwZhUK2V7JbpoO2MTrU19WvhcA4JnjiohFm9ZZ/g=;
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz6
-     1TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L
-     69EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0Ab8Oi1ebYV/hIBm
-     fhSLF1E80hMPcMijONfTQB6g5Hoh/kE6N2fgp6aSngL/WA3+g3Id8ElhXHvIGcJ
-     RFeMKdJqiW5cxdqPTRW+BnR5ee6Tzg06kr265NTDIAU8p8fQNuLfZj49MMA+QwD
-     BJtXwbQoZyRtb6X6q0mYaszUB8kw==
-Received: by mail-yk0-f179.google.com with SMTP id 19so2728865ykq.10
-    for <mailbox@gmail.com>; Thu, 14 Jan 2015 15:02:45 -0800 (PST)
-Authentication-Results: i=3; gmail.com; spf=fail
-    smtp.from=jqd@d1.example; dkim=pass (1024-bit key) 
-    header.i=@example.org; dmarc=fail; arc=pass
-ARC-Seal: i=2; a=rsa-sha256; t=1421363107;
-    s=seal2015; d=example.org; cv=pass; 
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
-     TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
-     EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A=
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed;
-    d=example.org; s=clochette; t=1421363105;
-    bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
-    h=List-Id:List-Unsubscribe:List-Archive:List-Post:
-     List-Help:List-Subscribe:Reply-To:DKIM-Signature;
-    b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF1
-     F5vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3A+
-     m4bwa6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M=
-Received: from segv.d1.example (segv.d1.example [72.52.75.15])
-    by lists.example.org (8.14.5/8.14.5) with ESMTP id t0EKaNU9010123
-    for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
-    (envelope-from jqd@d1.example)
-ARC-Authentication-Results: i=2; lists.example.org;
-    spf=pass smtp.mfrom=jqd@d1.example;
-    dkim=pass (1024-bit key) header.i=@d1.example; 
-    dmarc=pass
-Received: from \[10.10.10.131] (w-x-y-z.dsl.static.isp.com \[w.x.y.z])
-    (authenticated bits=0)
-    by segv.d1.example with ESMTP id t0FN4a8O084569;
-    Thu, 14 Jan 2015 15:00:01 -0800 (PST)
-    (envelope-from jqd@d1.example)
-ARC-Seal: i=1; a=rsa-sha256; t=1421363107;
-    s=origin2015; d=d1.example; cv=none; 
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
-     TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
-     EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
-    d=d1.example; s=20130426; t=1421363082;
-    bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
-    h=MIME-Version:CC:Content-Type:Content-Transfer-Encoding;
-    b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYij
-     rvQwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD
-     4Gd3TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ=
-Message-ID: &lt;54B84785.1060301@d1.example>
-Date: Thu, 14 Jan 2015 15:00:01 -0800
-From: John Q Doe &lt;jqd@d1.example>
-To: arc@example.org
-Subject: [Lists] Example 1
+~~~~~~~~~~ Return-Path: &lt;jqd@d1.example> ARC-Seal: i=3; a=rsa-sha256;
+t=1421363253; s=notary01; d=gmail.com; cv=pass;
+b=sjHDMriRZ0Mui5eVEOGscRHWbQHcy97lvrduHQ8h+f2CfIrxUiKOE44x3LQwD
+WRYbDjf5fcM9MdcIahC+cP59BQ9Y9DHwMDzwRTnM7NVb4kY+tSaVnLoIOaP9lF
+/suttxO+RRNr0fCFw== ARC-Message-Signature: i=3; a=rsa-sha256;
+c=relaxed/relaxed; d=gmail.com; s=20120806;
+h=mime-version:content-type:x-original-sender
+:x-original-authentication-results:precedence:mailing-list
+:list-id:list-post:list-help:list-archive:sender :list-unsubscribe:reply-to;
+bh=2+gZwZhUK2V7JbpoO2MTrU19WvhcA4JnjiohFm9ZZ/g=;
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz6
+1TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L
+69EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0Ab8Oi1ebYV/hIBm
+fhSLF1E80hMPcMijONfTQB6g5Hoh/kE6N2fgp6aSngL/WA3+g3Id8ElhXHvIGcJ
+RFeMKdJqiW5cxdqPTRW+BnR5ee6Tzg06kr265NTDIAU8p8fQNuLfZj49MMA+QwD
+BJtXwbQoZyRtb6X6q0mYaszUB8kw== Received: by mail-yk0-f179.google.com with SMTP
+id 19so2728865ykq.10 for <mailbox@gmail.com>; Thu, 14 Jan 2015 15:02:45 -0800
+(PST) Authentication-Results: i=3; gmail.com; spf=fail
+smtp.from=jqd@d1.example; dkim=pass (1024-bit key) header.i=@example.org;
+dmarc=fail; arc=pass ARC-Seal: i=2; a=rsa-sha256; t=1421363107; s=seal2015;
+d=example.org; cv=pass;
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
+TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
+EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A= ARC-Message-Signature: i=2;
+a=rsa-sha256; c=relaxed/relaxed; d=example.org; s=clochette; t=1421363105;
+bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
+h=List-Id:List-Unsubscribe:List-Archive:List-Post:
+List-Help:List-Subscribe:Reply-To:DKIM-Signature;
+b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF1
+F5vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3A+
+m4bwa6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M= Received: from segv.d1.example
+(segv.d1.example [72.52.75.15]) by lists.example.org (8.14.5/8.14.5) with ESMTP
+id t0EKaNU9010123 for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
+(envelope-from jqd@d1.example) ARC-Authentication-Results: i=2;
+lists.example.org; spf=pass smtp.mfrom=jqd@d1.example; dkim=pass (1024-bit key)
+header.i=@d1.example; dmarc=pass Received: from \[10.10.10.131]
+(w-x-y-z.dsl.static.isp.com \[w.x.y.z]) (authenticated bits=0) by
+segv.d1.example with ESMTP id t0FN4a8O084569; Thu, 14 Jan 2015 15:00:01 -0800
+(PST) (envelope-from jqd@d1.example) ARC-Seal: i=1; a=rsa-sha256; t=1421363107;
+s=origin2015; d=d1.example; cv=none;
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
+TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
+EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A= ARC-Message-Signature: i=1;
+a=rsa-sha256; c=relaxed/relaxed; d=d1.example; s=20130426; t=1421363082;
+bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
+h=MIME-Version:CC:Content-Type:Content-Transfer-Encoding;
+b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYij
+rvQwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD
+4Gd3TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ= Message-ID:
+&lt;54B84785.1060301@d1.example> Date: Thu, 14 Jan 2015 15:00:01 -0800 From:
+John Q Doe &lt;jqd@d1.example> To: arc@example.org Subject: [Lists] Example 1
  
-Hey gang,
-This is a test message.
---J.
-~~~~~~~~~~
+Hey gang, This is a test message.  --J.  ~~~~~~~~~~
 
 ### Example 3: Message received by Recipient
 
-Let’s say that the Recipient is example.com  
-Processing at example.com:
+Let’s say that the Recipient is example.com  Processing at example.com:
 
 -       example.com performs usual authentication checks
 -       example.com adds Auth-Results: header, Received header
 -       Determines that message fails DMARC
 -       Checks for ARC-Seal: header; finds three
--       Validates the signature in the highest numbered (“i=2”) ARC-Seal: header, which covers all previous ARC-Seal: and ARC-Authentication-Results: headers
--       Validates the other ARC-Seal header (“i=2”), which covers the ARC-Authentication-Results: header
--       Validates the other ARC-Seal header (“i=1”), which covers the d1.example ARC-Message-Signature: header
+-       Validates the signature in the highest numbered (“i=2”) ARC-Seal:
+        header, which covers all previous ARC-Seal: and
+        ARC-Authentication-Results: headers
+-       Validates the other ARC-Seal header (“i=2”), which covers the
+        ARC-Authentication-Results: header
+-       Validates the other ARC-Seal header (“i=1”), which covers the
+        d1.example ARC-Message-Signature: header
 -       example.com uses the ARC-Authentication-Results: values
 
 Here’s what the message looks like at this point:
 
-~~~~~~~~~~
-Return-Path: &lt;jqd@d1.example>
-Received: from mail-ob0-f188.google.com (mail-ob0-f188.google.com
-    [208.69.40.157]) by clothilde.example.com with ESMTP id
-    d200mr22663000ykb.93.1421363268
-    for <fmartin@example.com>; Thu, 14 Jan 2015 15:03:15 -0800 (PST)
+~~~~~~~~~~ Return-Path: &lt;jqd@d1.example> Received: from
+mail-ob0-f188.google.com (mail-ob0-f188.google.com [208.69.40.157]) by
+clothilde.example.com with ESMTP id d200mr22663000ykb.93.1421363268 for
+<fmartin@example.com>; Thu, 14 Jan 2015 15:03:15 -0800 (PST)
 Authentication-Results: clothilde.example.com; spf=fail
-    smtp.from=jqd@d1.example; dkim=pass (1024-bit key) 
-    header.i=@gmail.com; dmarc=fail; arc=pass
-ARC-Seal: i=3; a=rsa-sha256; t=1421363253;
-    s=notary01; d=gmail.com; cv=pass; 
-    b=sjHDMriRZ0Mui5eVEOGscRHWbQHcy97lvrduHQ8h+f2CfIrxUiKOE44x3LQwDW
-     RYbDjf5fcM9MdcIahC+cP59BQ9Y9DHwMDzwRTnM7NVb4kY+tSaVnLoIOaP9lF/s
-     uttxO+RRNr0fCFw==
-ARC-Message-Signature: i=3; a=rsa-sha256; c=relaxed/relaxed;
-    d=gmail.com; s=20120806;
-    h=mime-version:content-type:x-original-sender
-     :x-original-authentication-results:precedence
-     :mailing-list:list-id:list-post:list-help:list-archive:sender
-     :list-unsubscribe:reply-to;
-    bh=2+gZwZhUK2V7JbpoO2MTrU19WvhcA4JnjiohFm9ZZ/g=;
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz6
-     1TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L
-     69EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0Ab8Oi1ebYV/hIBm
-     fhSLF1E80hMPcMijONfTQB6g5Hoh/kE6N2fgp6aSngL/WA3+g3Id8ElhXHvIGcJ
-     RFeMKdJqiW5cxdqPTRW+BnR5ee6Tzg06kr265NTDIAU8p8fQNuLfZj49MMA+QwD
-     BJtXwbQoZyRtb6X6q0mYaszUB8kw==
-Received: by mail-yk0-f179.google.com with SMTP id 19so2728865ykq.10
-    for <mailbox@gmail.com>; Thu, 14 Jan 2015 15:02:45 -0800 (PST)
-Authentication-Results: i=3; gmail.com; spf=fail
-    smtp.from=jqd@d1.example; dkim=pass (1024-bit key) 
-    header.i=@example.org; dmarc=fail; arc=pass
-ARC-Seal: i=2; a=rsa-sha256; t=1421363107;
-    s=seal2015; d=example.org; cv=pass; 
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz6
-     1TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L
-     69EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A=
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed;
-    d=example.org; s=clochette; t=1421363105;
-    bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
-    h=List-Id:List-Unsubscribe:List-Archive:List-Post:
-     List-Help:List-Subscribe:Reply-To:DKIM-Signature;
-    b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF1
-     F5vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3A+
-     m4bwa6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M=
-Received: from segv.d1.example (segv.d1.example [72.52.75.15])
-    by lists.example.org (8.14.5/8.14.5) with ESMTP id t0EKaNU9010123
-    for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
-    (envelope-from jqd@d1.example)
-ARC-Authentication-Results: i=2; lists.example.org;
-    spf=pass smtp.mfrom=jqd@d1.example;
-    dkim=pass (1024-bit key) header.i=@d1.example; 
-    dmarc=pass
-Received: from \[10.10.10.131] (w-x-y-z.dsl.static.isp.com \[w.x.y.z])
-    (authenticated bits=0)
-    by segv.d1.example with ESMTP id t0FN4a8O084569;
-    Thu, 14 Jan 2015 15:00:01 -0800 (PST)
-    (envelope-from jqd@d1.example)
-ARC-Seal: i=1; a=rsa-sha256; t=1421363107;
-    s=origin2015; d=d1.example; cv=none; 
-    b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
-     TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
-     EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
-    d=d1.example; s=20130426; t=1421363082;
-    bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
-    h=MIME-Version:To:CC:Subject:Content-Type:Content-Transfer-Encoding;
-    b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijr
-     vQwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4G
-     d3TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ=
-Message-ID: &lt;54B84785.1060301@d1.example>
-Date: Thu, 14 Jan 2015 15:00:01 -0800
-From: John Q Doe &lt;jqd@d1.example>
-To: arc@example.org
-Subject: [Lists] Example 1
+smtp.from=jqd@d1.example; dkim=pass (1024-bit key) header.i=@gmail.com;
+dmarc=fail; arc=pass ARC-Seal: i=3; a=rsa-sha256; t=1421363253; s=notary01;
+d=gmail.com; cv=pass;
+b=sjHDMriRZ0Mui5eVEOGscRHWbQHcy97lvrduHQ8h+f2CfIrxUiKOE44x3LQwDW
+RYbDjf5fcM9MdcIahC+cP59BQ9Y9DHwMDzwRTnM7NVb4kY+tSaVnLoIOaP9lF/s
+uttxO+RRNr0fCFw== ARC-Message-Signature: i=3; a=rsa-sha256; c=relaxed/relaxed;
+d=gmail.com; s=20120806; h=mime-version:content-type:x-original-sender
+:x-original-authentication-results:precedence
+:mailing-list:list-id:list-post:list-help:list-archive:sender
+:list-unsubscribe:reply-to; bh=2+gZwZhUK2V7JbpoO2MTrU19WvhcA4JnjiohFm9ZZ/g=;
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz6
+1TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L
+69EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0Ab8Oi1ebYV/hIBm
+fhSLF1E80hMPcMijONfTQB6g5Hoh/kE6N2fgp6aSngL/WA3+g3Id8ElhXHvIGcJ
+RFeMKdJqiW5cxdqPTRW+BnR5ee6Tzg06kr265NTDIAU8p8fQNuLfZj49MMA+QwD
+BJtXwbQoZyRtb6X6q0mYaszUB8kw== Received: by mail-yk0-f179.google.com with SMTP
+id 19so2728865ykq.10 for <mailbox@gmail.com>; Thu, 14 Jan 2015 15:02:45 -0800
+(PST) Authentication-Results: i=3; gmail.com; spf=fail
+smtp.from=jqd@d1.example; dkim=pass (1024-bit key) header.i=@example.org;
+dmarc=fail; arc=pass ARC-Seal: i=2; a=rsa-sha256; t=1421363107; s=seal2015;
+d=example.org; cv=pass;
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz6
+1TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L
+69EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A= ARC-Message-Signature: i=2;
+a=rsa-sha256; c=relaxed/relaxed; d=example.org; s=clochette; t=1421363105;
+bh=FjQYm3HhXStuzauzV4Uc02o55EzATNfL4uBvEoy7k3s=;
+h=List-Id:List-Unsubscribe:List-Archive:List-Post:
+List-Help:List-Subscribe:Reply-To:DKIM-Signature;
+b=Wb4EiVANwAX8obWwrRWpmlhxmdIvj0dv0psIkiaGOOug32iTAcc74/iWvlPXpF1
+F5vYVF0mw5cmKOa824tKkUOOE3yinTAekqnly7GJuFCDeSA1fQHhStVV7BzAr3A+
+m4bwa6RIDgr3rOPJil678dZTHfztFWyjwIUxB5Ajxj/M= Received: from segv.d1.example
+(segv.d1.example [72.52.75.15]) by lists.example.org (8.14.5/8.14.5) with ESMTP
+id t0EKaNU9010123 for <arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
+(envelope-from jqd@d1.example) ARC-Authentication-Results: i=2;
+lists.example.org; spf=pass smtp.mfrom=jqd@d1.example; dkim=pass (1024-bit key)
+header.i=@d1.example; dmarc=pass Received: from \[10.10.10.131]
+(w-x-y-z.dsl.static.isp.com \[w.x.y.z]) (authenticated bits=0) by
+segv.d1.example with ESMTP id t0FN4a8O084569; Thu, 14 Jan 2015 15:00:01 -0800
+(PST) (envelope-from jqd@d1.example) ARC-Seal: i=1; a=rsa-sha256; t=1421363107;
+s=origin2015; d=d1.example; cv=none;
+b=pCw3Qxgfs9E1qnyNZ+cTTF3KHgAjWwZz++Rju0BceSiuwIg0Pkk+3RZH/kaiz61
+TX6RVT6E4gs49Sstp41K7muj1OR5R6Q6llahLlQJZ/YfDZ3NImCU52gFWLUD7L69
+EU8TzypfkUhscqXjOJgDwjIceBNNOfh3Jy+V8hQZrVFCw0A= ARC-Message-Signature: i=1;
+a=rsa-sha256; c=relaxed/relaxed; d=d1.example; s=20130426; t=1421363082;
+bh=EoJqaaRvhrngQxmQ3VnRIIMRBgecuKf1pdkxtfGyWaU=;
+h=MIME-Version:To:CC:Subject:Content-Type:Content-Transfer-Encoding;
+b=HxsvPubDE+R96v9dM9Y7V3dJUXvajd6rvF5ec5BPe/vpVBRJnD4I2weEIyYijr
+vQwbv9uUA1t94kMN0Q+haFo6hiQPnkuDxku5+oxyZWOqtNH7CTMgcBWWTp4QD4G
+d3TRJlgotsX4RkbNcUhlfnoQ0p+CywWjieI8aR6eof6WDQ= Message-ID:
+&lt;54B84785.1060301@d1.example> Date: Thu, 14 Jan 2015 15:00:01 -0800 From:
+John Q Doe &lt;jqd@d1.example> To: arc@example.org Subject: [Lists] Example 1
  
-Hey gang,
-This is a test message.
---J.
-~~~~~~~~~~
+Hey gang, This is a test message.  --J.  ~~~~~~~~~~
 
 # Acknowledgements
 
 This draft is the work of OAR-Dev Group. 
 
-The authors thank all of the OAR-Dev group for the ongoing help and though-provoking
-discussions from all the participants, especially: Alex Brotman, Brandon Long, Dave Crocker, 
-Elizabeth Zwicky, Franck Martin, Greg Colburn, J. Trent Adams, John Rae-Grant, Mike Hammer,
-Mike Jones, Steve Jones, Terry Zink, Tim Draegen.
+The authors thank all of the OAR-Dev group for the ongoing help and
+though-provoking discussions from all the participants, especially: Alex
+Brotman, Brandon Long, Dave Crocker, Elizabeth Zwicky, Franck Martin, Greg
+Colburn, J. Trent Adams, John Rae-Grant, Mike Hammer, Mike Jones, Steve Jones,
+Terry Zink, Tim Draegen.
 
-Grateful appreciation is extended to the people who provided feedback through the discuss
-mailing list.
+Grateful appreciation is extended to the people who provided feedback through
+the discuss mailing list.
 
 # Comments and Feedback
 
-Please address all comments, discussions, and questions to <dmarc@ietf.org>. 
+Please address all comments, discussions, and questions to <dmarc@ietf.org>.
 Earlier discussions can be found at <arc-discuss@dmarc.org>.
 
 
 --- fluff
 
-<!--  LocalWords:  received header email DMARC authentication authenticated
--->
-<!--  LocalWords:  signature DKIM OAR authentication-results
--->
+<!--  LocalWords:  received header email DMARC authentication authenticated -->
+<!--  LocalWords:  signature DKIM OAR authentication-results -->
 
