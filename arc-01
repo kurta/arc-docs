@@ -30,7 +30,7 @@ author:
         street: 1000 West Maude Ave
         city: Sunnyvale
         region: California
-        code: 94043
+        code: 94085
         country: USA
         email: kurta@linkedin.com
       -
@@ -45,6 +45,13 @@ author:
         org: TDP
         role: editor
         email: smj@crash.com
+
+      -
+        ins: M. Kucherawy
+        name: Murray Kucherawy
+        org: TDP
+        role: editor
+        email: superuser@gmail.com
 
 normative:
   RFC1345:
@@ -74,7 +81,7 @@ informative:
   ENHANCED-STATUS: 
     title: IANA SMTP Enhanced Status Codes
     target: http://www.iana.org/assignments/smtp-enhanced-status-codes/smtp-enhanced-status-codes.xhtml
-  ARC-DRAFT:
+  ARC-DRAFT-03:
     title: Authenticated Received Chain (ARC) Protocol (I-D-03)
     target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-03
     date: 2017-04-28
@@ -136,7 +143,7 @@ authentication at each step along the handling path, for use by the final
 recipient in making choices about the disposition of the message.
 
 --- middle
-# Introduction
+# Introduction {#intro}
 
 Modern email authentication techniques such as the Sender Policy Framework
 (SPF) {{RFC7208}} and DomainKeys Identified Mail (DKIM) [RFC6376] have become
@@ -205,7 +212,7 @@ all instances of these fields added by prior ADMDs.
 
 A distinguishing feature of all of these is that an ARC participant always adds
 all of them before relaying a message to the next handling agent en route to
-its destination.  Moreover, as described in Section {{i-defn}}, they each have an
+its destination.  Moreover, as described in {{i-defn}}, they each have an
 "instance" number that increases with each ADMD in the handling chain so that
 their original order can be preserved and the three of them can be processed as
 a group.
@@ -224,7 +231,7 @@ particular, the potential roles of intermediaries in the delivery of email.
 
 Syntax descriptions use Augmented BNF (ABNF) {{RFC5234}}. 
 
-A single group of the header fields introduced in Section 2 is called an "ARC
+A single group of the header fields introduced in {{intro}} is called an "ARC
 Set", and the complete sequence of these groups is called an "Authenticated
 Received Chain" or merely an "ARC chain".  Although the "Received" header field is
 typically not included in the signed content, the name is based on the notion
@@ -250,7 +257,7 @@ constructs, the i= tag may be found anywhere within the header field value, but 
 represented throughout this spec in the initial position for convenience. Implementers
 SHOULD seek to start with the i= tag to facilitate human inspection of the headers.
 
-## Valid Range for "Instance" 'i' Tag Value {#i-hdr}
+## Valid Range for Instance Tags {#i-hdr}
 
 The 'i' tag value can range from 1-1024 (inclusive).
 
@@ -278,7 +285,7 @@ The ARC-Authentication-Results header field is defined.  It is syntactically
 and semantically identical to an Authentication-Results header field {{RFC7601}} (A-R),
 as is the mechanism by which it is constructed, with the following exception:
 
-* There is an "i" tag, as described in Section {{i-defn}}.
+* There is an "i" tag, as described in {{i-defn}}.
 
 The instance identifier MUST be separated from the rest of the Authentication-Results
 value contents with a semi-colon (';', 0x3b).
@@ -301,7 +308,7 @@ The ARC-Message-Signature header field is defined.  It is syntactically and
 semantically identical to a DKIM-Signature header field {{RFC6376}}, as is the
 mechanism by which it is constructed, with the following exceptions:
 
-* There is an "i" tag, as described in Section {{i-defn}}.
+* There is an "i" tag, as described in {{i-defn}}.
 * There is no "v" tag.
 * ARC-Seal header fields MUST never be included in the content covered
 by the signature in this header field.
@@ -321,7 +328,7 @@ progresses toward delivery.
 The ARC-Seal header field is defined.  It is syntactically and semantically
 similar to a DKIM-Signature field, with the following exceptions:
 
-*  There is an "i" tag, as described in Section {{i-defn}}.
+*  There is an "i" tag, as described in {{i-defn}}.
 *  The ARC-Seal covers none of the body content of the message.  It only covers
 specific header fields.  (See below: {{implicit-as-h}}.)  As a result, no body
 canonicalization is done.  Further, only "relaxed" header canonicalization
@@ -384,21 +391,21 @@ highest instance number.  If this verification fails, then the chain state is
 "fail" and the algorithm stops here.
 4. For each ARC-Seal from the "N"th instance to the first, apply the following
 logic:
-   A. If the value of the "cv" tag on that seal is "fail", the chain state is
+    1. If the value of the "cv" tag on that seal is "fail", the chain state is
 the same as that value and the algorithm stops here.
-   B. If the instance number being processed is not 1 and the value of the
+    2. If the instance number being processed is not 1 and the value of the
 "cv" tag is "none", the chain state is "fail" and the algorithm stops here.
-   C. Prepare a hash function corresponding to the "a" tag of the ARC-Seal.
-   D. Compute the canonicalized form of the ARC header fields, in the order
-described in Section {{implicit-as-h}}, using the "relaxed" header
+    3. Prepare a hash function corresponding to the "a" tag of the ARC-Seal.
+    4. Compute the canonicalized form of the ARC header fields, in the order
+described in {{implicit-as-h}}, using the "relaxed" header
 canonicalization defined in (Section 3.4.2 of {{RFC6376}}.  Pass them to the
 hash function.
-   E. Retrieve the final digest from the hash function.
-   F. Retrieve the public key identified by the "s" and "d" tags in the
-ARC-Seal, as described in Section {{key-mgmt}}.
-   G. Determine whether the signature portion ("b" tag) of the ARC-Seal and
+    5. Retrieve the final digest from the hash function.
+    6. Retrieve the public key identified by the "s" and "d" tags in the
+ARC-Seal, as described in {{key-mgmt}}.
+    7. Determine whether the signature portion ("b" tag) of the ARC-Seal and
 the digest computed above are valid according to the public key.
-   H. If the signature is not valid, the chain state is "fail" and the
+    8. If the signature is not valid, the chain state is "fail" and the
 algorithm stops here.
 5. If all seals pass validation, then the chain state is "pass", and the
 algorithm is complete.
@@ -417,9 +424,9 @@ implementation takes when presented with a message.
 The signing agent should undertake the following steps:
 
 1. Do any authentication steps that the ADMD normally does:
-  A. If a message is traveling within the same trust boundary, this would
+   1. If a message is traveling within the same trust boundary, this would
 include any transitive trust conveyance with the message;
-  B. If a message is coming from outside the same trust boundary, this would
+   2. If a message is coming from outside the same trust boundary, this would
 include any SPF / DKIM / DMARC / other authentication evaluation steps.
 2. Do any DKIM signing or authentication assertion steps that the ADMD normally
 does.
@@ -427,16 +434,16 @@ does.
 header field using the ADMD's authserv-id (see Section 2.5 of {{RFC7601}})
 indicating whatever authentication might have been done by the MTA, or possibly
 indicate that none was done.
-  A. If an ARC chain exists on the message, then set "N" equal to the highest
+   1. If an ARC chain exists on the message, then set "N" equal to the highest
 instance number found on the chain (i=); otherwise set "N" equal to zero for
 the following steps.
 3. Generate and attach to the message an ARC-Authentication-Results header
 field using instance number N+1 and the same content from the previous step.
 4. Generate and attach to the message an ARC-Message-Signature header field
 using the general algorithm described in Section 5 of {{RFC6376}} and as modified
-in Section 5.1 above, using instance number N+1.
+in {{aar-defn}} above, using instance number N+1.
 5. Generate and attach to the message an ARC-Seal header field using the
-general algorithm described in Section 5.3 above, using a chain validation
+general algorithm described in {{as-defn}} above, using a chain validation
 status as determined in {{cv-calc}} and instance number N+1.
 
 # Key Management {#key-mgmt}
@@ -446,7 +453,7 @@ semantics as those for DKIM signatures, described in Section 3.6 of {{RFC6376}}.
 Operators may use distinct selectors and/or domains for the ARC header fields
 at their own discretion. 
 
-# ARC Set Validity
+# Usage of Chain Validity
 
 ## Assessing Chain Validity Violations
 
@@ -480,14 +487,17 @@ receiver MAY signal the breakage through the extended SMTP response code 5.7.7 {
 Receivers MAY add an "arc=\[pass|fail|policy]" method annotation into a locally-affixed
 Authentication-Results {{RFC7601}} header field along with any salient comment(s).
 
-### Output Information from an ARC Evaluation
+### Output Information from an ARC Evaluation {#arc-data}
 
 The evaluation of a series of ARC sets results in the following data which MAY be
 used to inform local-policy decisions:
 
-* A list of the "d=" domains found in the validated (all) ARC-Seal header fields;
+* A list of the "d=" domains found in the validated (== all) ARC-Seal header fields;
 * The "d=" domain found in the most recent (highest instance number) AMS header field
 (since that is the only one necessarily validated)
+
+In the case of a failed chain, only the terminal ARC set is covered by the ARC-Seal
+so the reporting is limited to the findings in that terminal ARC set.
 
 ### Reporting ARC Effects for DMARC Local Policy - Interim
 
@@ -498,7 +508,8 @@ will be specified in a related spec - TBD. (see also the note at {{aar-defn}}) ]
 
 Receivers SHOULD indicate situations in which ARC evaluation influenced the
 results of their local policy determination. DMARC reporting of ARC-informed decisions
-is augmented by adding a local_policy comment explanation as follows: 
+is augmented by adding a local_policy comment explanation containing the list
+of data discovered in the ARC evaluation ({{arc-data}}): 
 
 ~~~~~~~~~~
 &lt;policy_evaluated>
@@ -507,10 +518,13 @@ is augmented by adding a local_policy comment explanation as follows:
   &lt;spf>fail&lt;/spf>
   &lt;reason>
    &lt;type>local_policy&lt;/type>
-   &lt;comment>arc=pass ams=d1.example d=d1.example,d2.example&lt;/comment>
+   &lt;comment>arc=pass ams=d2.example d=d2.example,d1.example&lt;/comment>
   &lt;/reason>
 &lt;/policy_evaluated>
 ~~~~~~~~~~
+
+In the suggested sample, d2.example is the sealing domain for ARC\[2] and 
+d1.example is the sealing domain for ARC\[1].
 
 # Privacy Considerations
 
@@ -614,7 +628,7 @@ test event which was held on 2016-06-17.
 
   Status of Operation: Production - Incoming Validation
 
-  Coverage: Full spec implemented as of {{ARC-DRAFT}}
+  Coverage: Full spec implemented as of {{ARC-DRAFT-03}}
 
   Licensing: Proprietary - Internal only
 
@@ -637,7 +651,7 @@ test event which was held on 2016-06-17.
   Status of Operation: Beta
 
   Coverage: ARC chain validity status checking is not operational, but
-    otherwise this system conforms to {{ARC-DRAFT}}
+    otherwise this system conforms to {{ARC-DRAFT-03}}
 
   Licensing: Proprietary - Internal only
 
@@ -679,7 +693,7 @@ test event which was held on 2016-06-17.
 
   Status of Operation: Beta
 
-  Coverage: Built to support {{ARC-DRAFT}}
+  Coverage: Built to support {{ARC-DRAFT-03}}
 
   Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)
 
@@ -712,7 +726,7 @@ test event which was held on 2016-06-17.
 
   Implementation Notes: Incomplete at this time
 
-  Contact Info: [https://www.gnu.org/software/mailman/contact.html]
+  Contact Info: https://www.gnu.org/software/mailman/contact.html
 
 ## Copernica/MailerQ web-based validation
 
@@ -722,14 +736,14 @@ test event which was held on 2016-06-17.
 
   Status of Operation: Beta
 
-  Coverage: Built to support {{ARC-DRAFT}}
+  Coverage: Built to support {{ARC-DRAFT-03}}
 
   Licensing: On-line usage only 
 
   Implementation Notes: Released 2016-10-24
   
    Requires full message content to be pasted into a web form found at
-   [http://arc.mailerq.com/] (warning - https is not supported).
+   http://arc.mailerq.com/ (warning - https is not supported).
 
    An additional instance of an ARC signature can be added if one is 
     willing to paste a private key into an unsecured web form.
@@ -747,13 +761,29 @@ test event which was held on 2016-06-17.
 
   Status of Operation: Production, though deployment usage is unknown
 
-  Coverage: Built to support {{ARC-DRAFT}}
+  Coverage: Built to support {{ARC-DRAFT-03}}
 
   Licensing: Open source
 
   Implementation Notes: Released with version 1.6.0 on 2017-06-12
 
   Contact Info: [https://rspamd.com/doc/modules/arc.html] and [https://github.com/vstakhov/rspamd]
+
+## PERL Mail::Milter::Authentication module 
+
+  Organization: FastMail
+
+  Description: Email domain authentication milter, previously included SPF / DKIM / DMARC, now has ARC added
+
+  Status of Operation: Intial validation completed during IETF99 hackathon with some follow-on work during the week
+
+  Coverage: Built to support {{&SELF}}
+
+  Licensing: Open Source
+
+  Implementation Notes:
+
+  Contact Info: https://github.com/fastmail/authentication_milter
 
 # Security Considerations {#sec-con}
 
