@@ -171,7 +171,7 @@ occurred.  Equipped with this more compelte information, the final recipient
 can make a more informed handling choice, reducing or eliminating the
 false postives inherent in use of DKIM and/or SPF themselves.
 
-# Overview
+# Overview {#overview}
 
 In DKIM, every participating signing agent attaches a signature that is based
 on the content of the message, local policy, and the domain name of the
@@ -231,7 +231,7 @@ particular, the potential roles of intermediaries in the delivery of email.
 
 Syntax descriptions use Augmented BNF (ABNF) {{RFC5234}}. 
 
-A single group of the header fields introduced in {{intro}} is called an "ARC
+A single group of the header fields introduced in {{overview}} is called an "ARC
 Set", and the complete sequence of these groups is called an "Authenticated
 Received Chain" or merely an "ARC chain".  Although the "Received" header field is
 typically not included in the signed content, the name is based on the notion
@@ -313,10 +313,10 @@ mechanism by which it is constructed, with the following exceptions:
 * ARC-Seal header fields MUST never be included in the content covered
 by the signature in this header field.
 
-It is generally advisable to include in the header fields covered by this
-signature any DKIM-Signature header fields already present on the message.
+The AMS SHOULD include any DKIM-Signature header fields already present on the
+message in the header fields covered by this signature.
 
-Including Authentication-Results header fields is not encouraged since they are
+Authentication-Results header fields SHOULD NOT be included since they are
 likely to be deleted by downstream ADMDs, thereby breaking the AMS signature.
 
 As with a DKIM-Signature, the purpose of this header field is to allow the ADMD
@@ -333,8 +333,9 @@ similar to a DKIM-Signature field, with the following exceptions:
 specific header fields.  (See below: {{implicit-as-h}}.)  As a result, no body
 canonicalization is done.  Further, only "relaxed" header canonicalization
 (Section 3.4.2 of {{RFC6376}}) is used.
-*  The only supported tags are "a", "b", "d, "i", "s", and "t", and their
-definitions are copied from Section 3.5 of {{RFC6376}}.
+*  The only supported tags are "i" ({{i-defn}} supercedes the {{RFC6376}} 
+definition), and "a", "b", "d, "s", "t". The latter 5 tag definitions are 
+copied from Section 3.5 of {{RFC6376}}.
 *  An additional tag, "cv" is defined.  (See below: {{cv-defn}})
 
 The purpose of this field is to assure the integrity of the ARC set being added
