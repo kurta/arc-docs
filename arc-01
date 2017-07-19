@@ -334,7 +334,7 @@ The purpose of this field is to assure the integrity of the ARC set being added
 by the ADMD generating this header field, and moreover to ensure no tampering
 with the ARC overall.
 
-### The 'cv' Tag
+### The 'cv' Tag {#cv-defn}
 
 A new tag "cv" (chain validation) is defined, which indicates the state of the
 ARC chain as evaluated when it arrived at the ADMD adding this header field.
@@ -439,7 +439,7 @@ in Section 5.1 above, using instance number N+1.
 general algorithm described in Section 5.3 above, using a chain validation
 status as determined in {{cv-calc}} and instance number N+1.
 
-# Key Management
+# Key Management {#key-mgmt}
 
 The public keys for ARC header fields follow the same requirements, syntax and
 semantics as those for DKIM signatures, described in Section 3.6 of {{RFC6376}}.
@@ -461,7 +461,7 @@ easily introduced by otherwise well-intended senders through machine or account
 compromises. All normal content-based analysis still needs to be performed on any
 messages bearing a valid chain of ARC header sets.
 
-## Marking and Sealing Invalid Chains
+## Marking and Sealing Invalid Chains {#seal-failed}
 
 The header fields signed by the AS header field b= value in the case of a major
 violation MUST be only the matching 'i=' instance headers created by the MTA
@@ -477,7 +477,7 @@ receiver MAY signal the breakage through the extended SMTP response code 5.7.7 {
 
 ## Recording the Results of ARC Evaluation
 
-Receivers MAY add an "arc=[pass|fail|policy]" method annotation into a locally-affixed
+Receivers MAY add an "arc=\[pass|fail|policy]" method annotation into a locally-affixed
 Authentication-Results {{RFC7601}} header field along with any salient comment(s).
 
 ### Output Information from an ARC Evaluation
@@ -533,7 +533,7 @@ This draft adds one item to the IANA "Email Authentication Methods" registry:
 
   Property: chain evaluation result
 
-  Value: chain evaluation result status (see {{seal-hdr}})
+  Value: chain evaluation result status (see {{as-defn}})
 
   Status: active
 
