@@ -527,6 +527,38 @@ of data discovered in the ARC evaluation ({{arc-data}}):
 In the suggested sample, d2.example is the sealing domain for ARC\[2] and 
 d1.example is the sealing domain for ARC\[1].
 
+# Supporting Alternate Signing Algorithms
+
+In the following branch diagrams, each algorithm is represented by an 'A' or
+'B' at each hop to depict the ARC chain that develops over a five hop scenario.
+'x' represents a hop that does not support that algorithm.
+
+Note that during a transitional period where multiple algorithms are allowed, 
+all of the statements in this spec which refer to "exactly one set of ARC headers
+per instance" need to be understood as "at least one set per instance and no more 
+than one instance-set per algorithm".
+
+## Introductory Period
+
+Intermediaries MUST be able to validate ARC chains build with either algorithm
+but MAY create ARC sets with either (or both) algorithm.
+
+The introductory period should be at least six (6) months.
+
+## Co-Existence Period
+
+Intermediaries MUST be able to validate ARC chains build with either algorithm
+and MUST create ARC sets with both algorithms.  Chains ending with either
+algorithm may be used for the result.
+
+## Deprecation Period
+
+ARC sets built with algorithms that are being deprecated MAY be considered
+valid within an ARC chain, however, intermediaries MUST not create additional
+sets with the deprecated algorithm.
+
+The deprecation period should be at least two (2) years.
+
 # Privacy Considerations
 
 The ARC chain provides a verifiable record of the handlers for a message.
