@@ -330,10 +330,10 @@ available to the ADMD which is recording the A-R:
 * header.s - The selector value associated with each dkim signature (added to the 
 dkim data sections of the A-R/AAR record)
 * ARC-related data (added to the arc data sections of the A-R/AAR record):
-   * ams[N].d - The domain value associated with the 'N'th ARC set's AMS header
-   * ams[N].s - The selector associated with the 'N'th ARC set's AMS header
-   * as[N].d - The domain value associated with the 'N'th ARC set's AS header
-   * as[N].s - The selector associated with the 'N'th ARC set's AS header
+   * ams\[N].d - The domain value associated with the 'N'th ARC set's AMS header
+   * ams\[N].s - The selector associated with the 'N'th ARC set's AMS header
+   * as\[N].d - The domain value associated with the 'N'th ARC set's AS header
+   * as\[N].s - The selector associated with the 'N'th ARC set's AS header
 
 ## ARC-Message-Signature (AMS) {#ams-defn}
 
@@ -572,7 +572,7 @@ specified in {{aar-new-info}}) ]]
 Receivers SHOULD indicate situations in which ARC evaluation influenced the
 results of their local policy determination. DMARC reporting of ARC-informed decisions
 is augmented by adding a local_policy comment explanation containing the list
-of data discovered in the ARC evaluation ({{arc-data}} and {{arc-new-info}}): 
+of data discovered in the ARC evaluation ({{arc-data}} and {{aar-new-info}}): 
 
 ~~~~~~~~~~
 &lt;policy_evaluated>
