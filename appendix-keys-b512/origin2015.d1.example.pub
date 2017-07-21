@@ -1,0 +1,2 @@
+origin2015._domainkey IN TXT ( "v=DKIM1; k=rsa; "
+	"p=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBANE0Ui5yiq2yShdi4W6JbYeqaVE1p7TLMx8lMN9idfh3wD/xTp/h3RI+TM1YyJGmWjJLzOoBY2GG0dz3t2XcM70CAwEAAQ==" ) ;

@@ -1,0 +1,2 @@
+notary01._domainkey IN TXT ( "v=DKIM1; k=rsa; "
+	"p=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAL3yg1+YDV37PaYRMURPj31FN8y97bIzcBL267ivRm+Y67MnuK8723AuQiJgltGu1a8+2AaI/dNtl+0V4WnrTdsCAwEAAQ==" ) ;

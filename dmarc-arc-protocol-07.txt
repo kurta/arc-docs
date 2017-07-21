@@ -74,15 +74,15 @@ Table of Contents
    5.  The ARC Header Fields . . . . . . . . . . . . . . . . . . . .   6
      5.1.  ARC-Authentication-Results (AAR)  . . . . . . . . . . . .   6
      5.2.  ARC-Message-Signature (AMS) . . . . . . . . . . . . . . .   7
-     5.3.  ARC-Seal (AS) . . . . . . . . . . . . . . . . . . . . . .   8
+     5.3.  ARC-Seal (AS) . . . . . . . . . . . . . . . . . . . . . .   7
        5.3.1.  The 'cv' Tag  . . . . . . . . . . . . . . . . . . . .   8
-       5.3.2.  Selected Header Fields  . . . . . . . . . . . . . . .   9
+       5.3.2.  Selected Header Fields  . . . . . . . . . . . . . . .   8
    6.  Verifier Actions  . . . . . . . . . . . . . . . . . . . . . .   9
    7.  Signer Actions  . . . . . . . . . . . . . . . . . . . . . . .  10
    8.  Key Management  . . . . . . . . . . . . . . . . . . . . . . .  11
    9.  Usage of Chain Validity . . . . . . . . . . . . . . . . . . .  11
      9.1.  Assessing Chain Validity Violations . . . . . . . . . . .  11
-     9.2.  Marking and Sealing Invalid Chains  . . . . . . . . . . .  12
+     9.2.  Marking and Sealing Invalid Chains  . . . . . . . . . . .  11
      9.3.  Handling DNS Problems While Validating ARC  . . . . . . .  12
      9.4.  Responding to ARC Validity Violations . . . . . . . . . .  12
      9.5.  Recording the Results of ARC Evaluation . . . . . . . . .  12
@@ -97,13 +97,13 @@ Table of Contents
    12. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
      12.1.  Authentication-Results Method Registry Update  . . . . .  14
      12.2.  Definitions of the ARC header fields . . . . . . . . . .  15
-   13. Implementation Status . . . . . . . . . . . . . . . . . . . .  16
+   13. Implementation Status . . . . . . . . . . . . . . . . . . . .  15
      13.1.  GMail test reflector and incoming validation . . . . . .  16
-     13.2.  AOL test reflector and internal tagging  . . . . . . . .  17
+     13.2.  AOL test reflector and internal tagging  . . . . . . . .  16
      13.3.  dkimpy . . . . . . . . . . . . . . . . . . . . . . . . .  17
-     13.4.  OpenARC  . . . . . . . . . . . . . . . . . . . . . . . .  18
+     13.4.  OpenARC  . . . . . . . . . . . . . . . . . . . . . . . .  17
      13.5.  Mailman addition . . . . . . . . . . . . . . . . . . . .  18
-     13.6.  Copernica/MailerQ web-based validation . . . . . . . . .  19
+     13.6.  Copernica/MailerQ web-based validation . . . . . . . . .  18
      13.7.  Rspamd . . . . . . . . . . . . . . . . . . . . . . . . .  19
      13.8.  PERL Mail::Milter::Authentication module . . . . . . . .  19
 
@@ -116,14 +116,14 @@ Internet-Draft                ARC-Protocol                     July 2017
 
    14. Security Considerations . . . . . . . . . . . . . . . . . . .  20
      14.1.  Message Content Suspicion  . . . . . . . . . . . . . . .  20
-   15. References  . . . . . . . . . . . . . . . . . . . . . . . . .  21
-     15.1.  Normative References . . . . . . . . . . . . . . . . . .  21
+   15. References  . . . . . . . . . . . . . . . . . . . . . . . . .  20
+     15.1.  Normative References . . . . . . . . . . . . . . . . . .  20
      15.2.  Informative References . . . . . . . . . . . . . . . . .  22
      15.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  23
    Appendix A.  Appendix A - Example Usage (Obsolete but retained
-                for illustrative purposes) . . . . . . . . . . . . .  24
-     A.1.  Example 1: Simple mailing list  . . . . . . . . . . . . .  24
-       A.1.1.  Here's the message as it exits the Origin:  . . . . .  24
+                for illustrative purposes) . . . . . . . . . . . . .  23
+     A.1.  Example 1: Simple mailing list  . . . . . . . . . . . . .  23
+       A.1.1.  Here's the message as it exits the Origin:  . . . . .  23
        A.1.2.  Message is then received at example.org . . . . . . .  24
        A.1.3.  Example 1: Message received by Recipient  . . . . . .  26
      A.2.  Example 2: Mailing list to forwarded mailbox  . . . . . .  27
@@ -308,13 +308,6 @@ Internet-Draft                ARC-Protocol                     July 2017
 
 5.1.  ARC-Authentication-Results (AAR)
 
-   [[ Note: The intent of the AAR header is to provide the necessary
-   information for meaningful DMARC reporting back to the originating
-   ADMD.  As such, it needs to include additional information than the
-   user-focused Authentication-Results header [RFC7601] but the details
-   of that incremental information have not yet been fully determined.
-   ]]
-
    The ARC-Authentication-Results header field is defined.  It is
    syntactically and semantically identical to an Authentication-Results
    header field [RFC7601] (A-R), as is the mechanism by which it is
@@ -330,6 +323,13 @@ Internet-Draft                ARC-Protocol                     July 2017
    designed for machine-based consumption over the course of a message's
    transit through a series of mediators and to facilitate
    troubleshooting of problematic sources by sending organizations, two
+   additional fields of data SHOULD be added to the normal A-R content,
+   if available to the A-R generating system:
+
+   o  source.ip - The connecting client IP address from which the
+      message is received; and
+
+
 
 
 
@@ -337,12 +337,6 @@ Andersen, et al.        Expires January 22, 2018                [Page 6]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
-
-   additional fields of data SHOULD be added to the normal A-R content,
-   if available to the A-R generating system:
-
-   o  source.ip - The connecting client IP address from which the
-      message is received; and
 
    o  header.s - The selector value associated with each dkim signature
       (added to the dkim or arc data sections of the A-R/AAR record
@@ -384,7 +378,13 @@ Internet-Draft                ARC-Protocol                     July 2017
    allow the ADMD generating it to take some responsibility for handling
    this message as it progresses toward delivery.
 
+5.3.  ARC-Seal (AS)
 
+   The ARC-Seal header field is defined.  It is syntactically and
+   semantically similar to a DKIM-Signature field, with the following
+   exceptions:
+
+   o  There is an "i" tag, as described in Section 4.
 
 
 
@@ -393,14 +393,6 @@ Andersen, et al.        Expires January 22, 2018                [Page 7]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
-
-5.3.  ARC-Seal (AS)
-
-   The ARC-Seal header field is defined.  It is syntactically and
-   semantically similar to a DKIM-Signature field, with the following
-   exceptions:
-
-   o  There is an "i" tag, as described in Section 4.
 
    o  The ARC-Seal covers none of the body content of the message.  It
       only covers specific header fields.  (See below: Section 5.3.2.)
@@ -438,18 +430,6 @@ Internet-Draft                ARC-Protocol                     July 2017
     seal-cv-tag = %x63.76 [FWS] "=" [FWS]
                   ("none" / "fail" / "pass")
 
-
-
-
-
-
-
-
-Andersen, et al.        Expires January 22, 2018                [Page 8]
-
-Internet-Draft                ARC-Protocol                     July 2017
-
-
 5.3.2.  Selected Header Fields
 
    The ARC-Seal signature is an encryption of the hash of the
@@ -461,6 +441,14 @@ Internet-Draft                ARC-Protocol                     July 2017
    Within a set, the header fields are presented in the following order:
 
    1.  ARC-Authentication-Results
+
+
+
+
+Andersen, et al.        Expires January 22, 2018                [Page 8]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
    2.  ARC-Message-Signature
 
@@ -490,13 +478,25 @@ Internet-Draft                ARC-Protocol                     July 2017
        following logic:
 
        1.  If the value of the "cv" tag on that seal is "fail", the
-           chain state is the same as that value and the algorithm stops
-           here.
+           chain state is "fail" and the algorithm stops here.
 
-       2.  If the instance number being processed is not 1 and the value
-           of the "cv" tag is "none", the chain state is "fail" and the
+       2.  If the instance number being processed is greater than 1 and
+           the value of the "cv" tag is "none", the chain state is
+           "fail" and the algorithm stops here.
+
+       3.  If the instance number being processed is 1 and the value of
+           the "cv" tag is not "none", the chain state is "fail" and the
            algorithm stops here.
 
+       4.  Prepare a hash function corresponding to the "a" tag of the
+           ARC-Seal.
+
+       5.  Compute the canonicalized form of the ARC header fields, in
+           the order described in Section 5.3.2, using the "relaxed"
+           header canonicalization defined in (Section 3.4.2 of
+           [RFC6376].  Pass them to the hash function.
+
+       6.  Retrieve the final digest from the hash function.
 
 
 
@@ -506,24 +506,14 @@ Andersen, et al.        Expires January 22, 2018                [Page 9]
 Internet-Draft                ARC-Protocol                     July 2017
 
 
-       3.  Prepare a hash function corresponding to the "a" tag of the
-           ARC-Seal.
-
-       4.  Compute the canonicalized form of the ARC header fields, in
-           the order described in Section 5.3.2, using the "relaxed"
-           header canonicalization defined in (Section 3.4.2 of
-           [RFC6376].  Pass them to the hash function.
-
-       5.  Retrieve the final digest from the hash function.
-
-       6.  Retrieve the public key identified by the "s" and "d" tags in
+       7.  Retrieve the public key identified by the "s" and "d" tags in
            the ARC-Seal, as described in Section 8.
 
-       7.  Determine whether the signature portion ("b" tag) of the ARC-
+       8.  Determine whether the signature portion ("b" tag) of the ARC-
            Seal and the digest computed above are valid according to the
            public key.
 
-       8.  If the signature is not valid, the chain state is "fail" and
+       9.  If the signature is not valid, the chain state is "fail" and
            the algorithm stops here.
 
    5.  If all seals pass validation, then the chain state is "pass", and
@@ -553,15 +543,6 @@ Internet-Draft                ARC-Protocol                     July 2017
            this would include any SPF / DKIM / DMARC / other
            authentication evaluation steps.
 
-
-
-
-
-Andersen, et al.        Expires January 22, 2018               [Page 10]
-
-Internet-Draft                ARC-Protocol                     July 2017
-
-
    2.  Do any DKIM signing or authentication assertion steps that the
        ADMD normally does.
 
@@ -570,6 +551,16 @@ Internet-Draft                ARC-Protocol                     July 2017
        Section 2.5 of [RFC7601]) indicating whatever authentication
        might have been done by the MTA, or possibly indicate that none
        was done.
+
+
+
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 10]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
        1.  If an ARC chain exists on the message, then set "N" equal to
            the highest instance number found on the chain (i=);
@@ -610,14 +601,6 @@ Internet-Draft                ARC-Protocol                     July 2017
    related header fields.  The value of such a well-formed, valid chain
    needs to be interpreted with care since malicious content can be
    easily introduced by otherwise well-intended senders through machine
-
-
-
-Andersen, et al.        Expires January 22, 2018               [Page 11]
-
-Internet-Draft                ARC-Protocol                     July 2017
-
-
    or account compromises.  All normal content-based analysis still
    needs to be performed on any messages bearing a valid chain of ARC
    header sets.
@@ -627,6 +610,14 @@ Internet-Draft                ARC-Protocol                     July 2017
    The header fields signed by the AS header field b= value in the case
    of a major violation MUST be only the matching 'i=' instance headers
    created by the MTA which detected the malformed chain, as if this
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 11]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
+
    newest ARC set was the only set present.  (This is the same procedure
    required for handling major/structural validity problems.)
 
@@ -664,6 +655,15 @@ Internet-Draft                ARC-Protocol                     July 2017
    o  A list of the "d=" domains found in the validated (== all) ARC-
       Seal header fields;
 
+   o  The "d=" domain found in the most recent (highest instance number)
+      AMS header field (since that is the only one necessarily
+      validated)
+
+   In the case of a failed chain, only the terminal ARC set is covered
+   by the ARC-Seal so the reporting is limited to the findings in that
+   terminal ARC set.
+
+
 
 
 
@@ -673,14 +673,6 @@ Andersen, et al.        Expires January 22, 2018               [Page 12]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
-
-   o  The "d=" domain found in the most recent (highest instance number)
-      AMS header field (since that is the only one necessarily
-      validated)
-
-   In the case of a failed chain, only the terminal ARC set is covered
-   by the ARC-Seal so the reporting is limited to the findings in that
-   terminal ARC set.
 
 9.5.2.  Reporting ARC Effects for DMARC Local Policy - Interim
 
@@ -718,10 +710,18 @@ Internet-Draft                ARC-Protocol                     July 2017
 
 10.  Supporting Alternate Signing Algorithms
 
+   [[ Note: Some additional development of this section is needed. ]]
+
    In the following branch diagrams, each algorithm is represented by an
    'A' or 'B' at each hop to depict the ARC chain that develops over a
    five hop scenario.  'x' represents a hop that does not support that
    algorithm.
+
+   Note that during a transitional period where multiple algorithms are
+   allowed, all of the statements in this spec which refer to "exactly
+   one set of ARC headers per instance" need to be understood as "at
+   least one set per instance and no more than one instance-set per
+   algorithm".
 
 
 
@@ -729,12 +729,6 @@ Andersen, et al.        Expires January 22, 2018               [Page 13]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
-
-   Note that during a transitional period where multiple algorithms are
-   allowed, all of the statements in this spec which refer to "exactly
-   one set of ARC headers per instance" need to be understood as "at
-   least one set per instance and no more than one instance-set per
-   algorithm".
 
 10.1.  Introductory Period
 
@@ -778,6 +772,12 @@ Internet-Draft                ARC-Protocol                     July 2017
 
       ptype: header
 
+      Property: chain evaluation result
+
+      Value: chain evaluation result status (see Section 5.3)
+
+      Status: active
+
 
 
 
@@ -785,12 +785,6 @@ Andersen, et al.        Expires January 22, 2018               [Page 14]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
-
-      Property: chain evaluation result
-
-      Value: chain evaluation result status (see Section 5.3)
-
-      Status: active
 
       Version: 1
 
@@ -835,17 +829,18 @@ Internet-Draft                ARC-Protocol                     July 2017
 
       Related information: [RFC7601]
 
+13.  Implementation Status
+
+   [[ Note to the RFC Editor: Please remove this section before
+   publication along with the reference to [RFC6982]. ]]
+
+
 
 
 Andersen, et al.        Expires January 22, 2018               [Page 15]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
-
-13.  Implementation Status
-
-   [[ Note to the RFC Editor: Please remove this section before
-   publication along with the reference to [RFC6982]. ]]
 
    This section records the status of known implementations of the
    protocol defined by this specification at the time of posting of this
@@ -887,17 +882,6 @@ Internet-Draft                ARC-Protocol                     July 2017
 
    Contact Info: arc-discuss@dmarc.org [1]
 
-
-
-
-
-
-
-Andersen, et al.        Expires January 22, 2018               [Page 16]
-
-Internet-Draft                ARC-Protocol                     July 2017
-
-
 13.2.  AOL test reflector and internal tagging
 
    Organization: AOL
@@ -906,6 +890,13 @@ Internet-Draft                ARC-Protocol                     July 2017
    analysis and validating + sealing pass-through function
 
    Status of Operation: Beta
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 16]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
    Coverage: ARC chain validity status checking is not operational, but
    otherwise this system conforms to [ARC-DRAFT-03]
@@ -944,16 +935,6 @@ Internet-Draft                ARC-Protocol                     July 2017
 
    Contact Info: https://launchpad.net/dkimpy
 
-
-
-
-
-
-Andersen, et al.        Expires January 22, 2018               [Page 17]
-
-Internet-Draft                ARC-Protocol                     July 2017
-
-
 13.4.  OpenARC
 
    Organization: TDP/Murray Kucherawy
@@ -964,6 +945,14 @@ Internet-Draft                ARC-Protocol                     July 2017
    Status of Operation: Beta
 
    Coverage: Built to support [ARC-DRAFT-03]
+
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 17]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
    Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)
 
@@ -998,18 +987,6 @@ Internet-Draft                ARC-Protocol                     July 2017
 
    Contact Info: https://www.gnu.org/software/mailman/contact.html
 
-
-
-
-
-
-
-
-Andersen, et al.        Expires January 22, 2018               [Page 18]
-
-Internet-Draft                ARC-Protocol                     July 2017
-
-
 13.6.  Copernica/MailerQ web-based validation
 
    Organization: Copernica
@@ -1023,6 +1000,15 @@ Internet-Draft                ARC-Protocol                     July 2017
    Licensing: On-line usage only
 
    Implementation Notes: Released 2016-10-24
+
+
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 18]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
    Requires full message content to be pasted into a web form found at
    http://arc.mailerq.com/ (warning - https is not supported).
@@ -1059,13 +1045,6 @@ Internet-Draft                ARC-Protocol                     July 2017
    Description: Email domain authentication milter, previously included
    SPF / DKIM / DMARC, now has ARC added
 
-
-
-Andersen, et al.        Expires January 22, 2018               [Page 19]
-
-Internet-Draft                ARC-Protocol                     July 2017
-
-
    Status of Operation: Intial validation completed during IETF99
    hackathon with some follow-on work during the week
 
@@ -1076,6 +1055,16 @@ Internet-Draft                ARC-Protocol                     July 2017
    Implementation Notes:
 
    Contact Info: https://github.com/fastmail/authentication_milter
+
+
+
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 19]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
 14.  Security Considerations
 
@@ -1110,18 +1099,6 @@ Internet-Draft                ARC-Protocol                     July 2017
    policy engines in cases where the sending system's DKIM-Signature
    does not validate.
 
-
-
-
-
-
-
-
-Andersen, et al.        Expires January 22, 2018               [Page 20]
-
-Internet-Draft                ARC-Protocol                     July 2017
-
-
 15.  References
 
 15.1.  Normative References
@@ -1134,6 +1111,16 @@ Internet-Draft                ARC-Protocol                     July 2017
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
               RFC2119, March 1997,
               <http://www.rfc-editor.org/info/rfc2119>.
+
+
+
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 20]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
    [RFC2142]  Crocker, D., "Mailbox Names for Common Services, Roles and
               Functions", RFC 2142, DOI 10.17487/RFC2142, May 1997,
@@ -1169,15 +1156,6 @@ Internet-Draft                ARC-Protocol                     July 2017
               10.17487/RFC5322, October 2008,
               <http://www.rfc-editor.org/info/rfc5322>.
 
-
-
-
-
-Andersen, et al.        Expires January 22, 2018               [Page 21]
-
-Internet-Draft                ARC-Protocol                     July 2017
-
-
    [RFC5585]  Hansen, T., Crocker, D., and P. Hallam-Baker, "DomainKeys
               Identified Mail (DKIM) Service Overview", RFC 5585, DOI
               10.17487/RFC5585, July 2009,
@@ -1192,6 +1170,13 @@ Internet-Draft                ARC-Protocol                     July 2017
               Deployment, and Operations", RFC 5863, DOI 10.17487/
               RFC5863, May 2010,
               <http://www.rfc-editor.org/info/rfc5863>.
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 21]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
    [RFC6376]  Crocker, D., Ed., Hansen, T., Ed., and M. Kucherawy, Ed.,
               "DomainKeys Identified Mail (DKIM) Signatures", STD 76,
@@ -1225,15 +1210,6 @@ Internet-Draft                ARC-Protocol                     July 2017
               (I-D-03)", April 2017, <https://tools.ietf.org/html/draft-
               ietf-dmarc-arc-protocol-03>.
 
-
-
-
-
-Andersen, et al.        Expires January 22, 2018               [Page 22]
-
-Internet-Draft                ARC-Protocol                     July 2017
-
-
    [ARC-TEST]
               Blank, S., "ARC Test Suite", January 2017,
               <https://github.com/ValiMail/arc_test_suite>.
@@ -1248,6 +1224,15 @@ Internet-Draft                ARC-Protocol                     July 2017
               "IANA SMTP Enhanced Status Codes", n.d.,
               <http://www.iana.org/assignments/smtp-enhanced-status-
               codes/smtp-enhanced-status-codes.xhtml>.
+
+
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 22]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
    [RFC6982]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
               Code: The Implementation Status Section", RFC 6982, DOI
@@ -1278,6 +1263,21 @@ Internet-Draft                ARC-Protocol                     July 2017
 
    [5] mailto:arc-discuss@dmarc.org
 
+Appendix A.  Appendix A - Example Usage (Obsolete but retained for
+             illustrative purposes)
+
+   [[ Note: The following examples were mocked up early in the
+   definition process for the spec.  They no longer reflect the current
+   definition and need various updates which will be included in draft
+   -08. ]]
+
+A.1.  Example 1: Simple mailing list
+
+A.1.1.  Here's the message as it exits the Origin:
+
+
+
+
 
 
 
@@ -1289,17 +1289,6 @@ Andersen, et al.        Expires January 22, 2018               [Page 23]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
-
-Appendix A.  Appendix A - Example Usage (Obsolete but retained for
-             illustrative purposes)
-
-   [[ Note: The following examples were mocked up early in the
-   definition process for the spec.  They no longer reflect the current
-   definition and need various updates. ]]
-
-A.1.  Example 1: Simple mailing list
-
-A.1.1.  Here's the message as it exits the Origin:
 
  Return-Path: <jqd@d1.example>
  Received: from [10.10.10.131] (w-x-y-z.dsl.static.isp.com [w.x.y.z])
@@ -1339,16 +1328,23 @@ A.1.2.1.  Example 1, Step A: Message forwarded to list members
 
    o  example.org adds Received: header
 
+   o  example.org adds a ARC-Seal header
+
+   Here's the message as it exits example.org:
+
+
+
+
+
+
+
+
 
 
 Andersen, et al.        Expires January 22, 2018               [Page 24]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
-
-   o  example.org adds a ARC-Seal header
-
-   Here's the message as it exits example.org:
 
  Return-Path: <jqd@d1.example>
  ARC-Seal: i=1; a=rsa-sha256; t=1421363107;
@@ -1394,6 +1390,10 @@ Internet-Draft                ARC-Protocol                     July 2017
  Hey gang,
  This is a test message.
  --J.
+
+
+
+
 
 
 

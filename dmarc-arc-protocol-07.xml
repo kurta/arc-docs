@@ -233,12 +233,6 @@ specifies changes in syntax and semantics.</t>
 
 <section anchor="aar-defn" title="ARC-Authentication-Results (AAR)">
 
-<t>[[ Note: The intent of the AAR header is to provide the necessary information
-for meaningful DMARC reporting back to the originating ADMD. As such, it needs
-to include additional information than the user-focused Authentication-Results
-header <xref target="RFC7601"/> but the details of that incremental information have not yet
-been fully determined. ]]</t>
-
 <t>The ARC-Authentication-Results header field is defined.  It is syntactically
 and semantically identical to an Authentication-Results header field <xref target="RFC7601"/> (A-R),
 as is the mechanism by which it is constructed, with the following exception:</t>
@@ -381,9 +375,11 @@ highest instance number.  If this verification fails, then the chain state is
 logic:
   <list style="numbers">
       <t>If the value of the “cv” tag on that seal is “fail”, the chain state is
-the same as that value and the algorithm stops here.</t>
-      <t>If the instance number being processed is not 1 and the value of the
+“fail” and the algorithm stops here.</t>
+      <t>If the instance number being processed is greater than 1 and the value of the
 “cv” tag is “none”, the chain state is “fail” and the algorithm stops here.</t>
+      <t>If the instance number being processed is 1 and the value of the
+“cv” tag is not “none”, the chain state is “fail” and the algorithm stops here.</t>
       <t>Prepare a hash function corresponding to the “a” tag of the ARC-Seal.</t>
       <t>Compute the canonicalized form of the ARC header fields, in the order
 described in <xref target="implicit-as-h"/>, using the “relaxed” header
@@ -555,6 +551,8 @@ necessary accommodations.</t>
 </section>
 </section>
 <section anchor="supporting-alternate-signing-algorithms" title="Supporting Alternate Signing Algorithms">
+
+<t>[[ Note: Some additional development of this section is needed. ]]</t>
 
 <t>In the following branch diagrams, each algorithm is represented by an ‘A’ or
 ‘B’ at each hop to depict the ARC chain that develops over a five hop scenario.
@@ -973,7 +971,7 @@ system’s DKIM-Signature does not validate.</t>
 
 <t>[[ Note: The following examples were mocked up early in the definition
 process for the spec. They no longer reflect the current definition and
-need various updates. ]]</t>
+need various updates which will be included in draft -08. ]]</t>
 
 <section anchor="example-1-simple-mailing-list" title="Example 1: Simple mailing list">
 

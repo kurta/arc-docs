@@ -1,0 +1,2 @@
+dk-lists._domainkey IN TXT ( "v=DKIM1; k=rsa; "
+	"p=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAOZR1xhpZKUA3k1gtYPy20KITWKEeV1AbxLCB9fQYtzwQjhbyXlvXsqdwA8XMHzBtmUY6upoDgXG8YJuso1uLSkCAwEAAQ==" ) ;

@@ -1,0 +1,2 @@
+clochette._domainkey IN TXT ( "v=DKIM1; k=rsa; "
+	"p=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAK0zysVNanOoZ617SgqHq4pl5lRadNN3oW49lbAnCBC9QvWt6z1N8ZSqwdoKUK5rJeJwWNXqI4MtIz9LvCrGc0MCAwEAAQ==" ) ;
