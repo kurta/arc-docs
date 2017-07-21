@@ -1,8 +1,8 @@
 ---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-06a
-date: 2017-07-18
+docname: draft-ietf-dmarc-arc-protocol-07
+date: 2017-07-21
 
 # stand_alone: true
 
@@ -291,7 +291,15 @@ The instance identifier MUST be separated from the rest of the Authentication-Re
 value contents with a semi-colon (';', 0x3b).
 
 An ARC signer generates this field in the same way that a conventional
-A-R field would be generated.
+A-R field would be generated. Because the AAR is designed for machine-based consumption
+over the course of a message's transit through a series of mediators and to facilitate
+troubleshooting of problematic sources by sending organizations, two additional 
+fields of data SHOULD be added to the normal A-R content, if available to the A-R
+generating system:
+
+* source.ip - The connecting client IP address from which the message is received; and
+* header.s - The selector value associated with each dkim signature (added to the 
+dkim or arc data sections of the A-R/AAR record
 
 The purpose of this header field is to incorporate into the record the success
 or failure of any authentication done on the message upstream of the
@@ -477,6 +485,18 @@ which detected the malformed chain, as if this newest ARC set was the only set
 present. (This is the same procedure required for handling major/structural
 validity problems.)
 
+## Handling DNS Problems While Validating ARC {#dns-arc}
+
+DNS failures to resolve or return data which is needed for ARC validation SHOULD
+result in a 421 tempfail during the SMTP conversation with the sending system. 
+Temporary or intermittent DNS problems will generally not be sufficiently transitory
+to allow a mediator to obtain a different result during the ordinary transit
+duration so it is better to have the source system queue the problematic message(s)
+than to generate (potential) backscatter. 
+
+DNS-based failures to verify a chain are treated no differently than any other
+ARC violation. They result in a cv=fail verdict.
+
 ## Responding to ARC Validity Violations
 
 If a receiver determines that the ARC chain has failed, the
@@ -526,6 +546,12 @@ of data discovered in the ARC evaluation ({{arc-data}}):
 
 In the suggested sample, d2.example is the sealing domain for ARC\[2] and 
 d1.example is the sealing domain for ARC\[1].
+
+Mediators SHOULD generate DMARC reports on messages which transit their system 
+just like any other message which they receive. This will result in multiple
+reports for each mediated message as they transit the series of handlers.
+DMARC report consumers should be aware of this behaviour and make the
+necessary accommodations.
 
 # Supporting Alternate Signing Algorithms
 
@@ -643,14 +669,8 @@ that was supplied by IETF contributors.  This is not intended as, and must not
 be construed to be, a catalog of available implementations or their features.
 Readers are advised to note that other implementations may exist.
 
-According to {{RFC6982}}, "this will allow reviewers and working groups to
-assign due consideration to documents that have the benefit of running code,
-which may serve as evidence of valuable experimentation and feedback that have
-made the implemented protocols more mature.  It is up to the individual working
-groups to use this information as they see fit".
-
-This information is known to be correct as of the third interoperability 
-test event which was held on 2016-06-17.
+This information is known to be correct as of the seventh interoperability 
+test event which was held on 2017-07-15 & 16 at IETF99.
 
 ## GMail test reflector and incoming validation
 
