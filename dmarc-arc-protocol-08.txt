@@ -103,7 +103,7 @@ Table of Contents
      12.2.  Definitions of the ARC header fields . . . . . . . . . .  16
    13. Implementation Status . . . . . . . . . . . . . . . . . . . .  17
      13.1.  GMail test reflector and incoming validation . . . . . .  17
-     13.2.  AOL test reflector and internal tagging  . . . . . . . .  17
+     13.2.  AOL test reflector and internal tagging  . . . . . . . .  18
      13.3.  dkimpy . . . . . . . . . . . . . . . . . . . . . . . . .  18
      13.4.  OpenARC  . . . . . . . . . . . . . . . . . . . . . . . .  18
 
@@ -115,32 +115,32 @@ Internet-Draft                ARC-Protocol                     July 2017
 
 
      13.5.  Mailman 3.1+ patch . . . . . . . . . . . . . . . . . . .  19
-     13.6.  Copernica/MailerQ web-based validation . . . . . . . . .  19
+     13.6.  Copernica/MailerQ web-based validation . . . . . . . . .  20
      13.7.  Rspamd . . . . . . . . . . . . . . . . . . . . . . . . .  20
-     13.8.  PERL Mail::Milter::Authentication module . . . . . . . .  20
+     13.8.  PERL Mail::Milter::Authentication module . . . . . . . .  21
    14. Security Considerations . . . . . . . . . . . . . . . . . . .  21
-     14.1.  Message Content Suspicion  . . . . . . . . . . . . . . .  21
-   15. References  . . . . . . . . . . . . . . . . . . . . . . . . .  21
-     15.1.  Normative References . . . . . . . . . . . . . . . . . .  21
-     15.2.  Informative References . . . . . . . . . . . . . . . . .  23
-     15.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  24
+     14.1.  Message Content Suspicion  . . . . . . . . . . . . . . .  22
+   15. References  . . . . . . . . . . . . . . . . . . . . . . . . .  22
+     15.1.  Normative References . . . . . . . . . . . . . . . . . .  22
+     15.2.  Informative References . . . . . . . . . . . . . . . . .  24
+     15.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  25
    Appendix A.  Appendix A - Example Usage (Obsolete but retained
-                for illustrative purposes) . . . . . . . . . . . . .  24
-     A.1.  Example 1: Simple mailing list  . . . . . . . . . . . . .  24
+                for illustrative purposes) . . . . . . . . . . . . .  25
+     A.1.  Example 1: Simple mailing list  . . . . . . . . . . . . .  25
        A.1.1.  Here's the message as it exits the Origin:  . . . . .  25
-       A.1.2.  Message is then received at example.org . . . . . . .  25
-       A.1.3.  Example 1: Message received by Recipient  . . . . . .  27
-     A.2.  Example 2: Mailing list to forwarded mailbox  . . . . . .  28
-       A.2.1.  Here's the message as it exits the Origin:  . . . . .  28
-       A.2.2.  Message is then received at example.org . . . . . . .  29
-       A.2.3.  Example 2: Message received by Recipient  . . . . . .  33
-     A.3.  Example 3: Mailing list to forwarded mailbox with source   35
-       A.3.1.  Here's the message as it exits the Origin:  . . . . .  35
-       A.3.2.  Message is then received at example.org . . . . . . .  36
-       A.3.3.  Example 3: Message received by Recipient  . . . . . .  41
-   Appendix B.  Acknowledgements . . . . . . . . . . . . . . . . . .  43
-   Appendix C.  Comments and Feedback  . . . . . . . . . . . . . . .  44
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  44
+       A.1.2.  Message is then received at example.org . . . . . . .  26
+       A.1.3.  Example 1: Message received by Recipient  . . . . . .  28
+     A.2.  Example 2: Mailing list to forwarded mailbox  . . . . . .  29
+       A.2.1.  Here's the message as it exits the Origin:  . . . . .  29
+       A.2.2.  Message is then received at example.org . . . . . . .  30
+       A.2.3.  Example 2: Message received by Recipient  . . . . . .  34
+     A.3.  Example 3: Mailing list to forwarded mailbox with source   36
+       A.3.1.  Here's the message as it exits the Origin:  . . . . .  36
+       A.3.2.  Message is then received at example.org . . . . . . .  37
+       A.3.3.  Example 3: Message received by Recipient  . . . . . .  42
+   Appendix B.  Acknowledgements . . . . . . . . . . . . . . . . . .  44
+   Appendix C.  Comments and Feedback  . . . . . . . . . . . . . . .  45
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  45
 
 1.  Introduction
 
@@ -194,9 +194,9 @@ Internet-Draft                ARC-Protocol                     July 2017
    By contrast, this protocol seeks to have each signature be able to
    convey the following pieces of information:
 
-   1.  A further assertion that, at the time that same ADMD processed
-       the message, the various assertions already attached to the
-       message by other ADMDs were or were not valid;
+   1.  An assertion that, at the time that the intermediary ADMD
+       processed the message, the various assertions already attached to
+       the message by other ADMDs were or were not valid;
 
    2.  As with DKIM, an assertion that, for a passing signature, the
        domain name in the signature takes some responsibility for
@@ -209,7 +209,7 @@ Internet-Draft                ARC-Protocol                     July 2017
    This protocol accomplishes each of these by adding a new header field
    to the message for each of them, as follows:
 
-   o  ARC-Authentication-Results: (referred to below as "AAR") virtually
+   o  ARC-Authentication-Results (referred to below as "AAR"): virtually
       identical in syntax to an Authentication-Results field [RFC7601],
       this field records the results of all message authentication
       checks done by the recording ADMD at the time the message arrived.
@@ -226,12 +226,12 @@ Andersen, et al.        Expires January 22, 2018                [Page 4]
 Internet-Draft                ARC-Protocol                     July 2017
 
 
-   o  ARC-Message-Signature: (referred to below as "AMS") virtually
+   o  ARC-Message-Signature (referred to below as "AMS"): virtually
       identical in syntax to DKIM-Signature, this field contains the
       assertions about the message header and body as they existed at
       the time of handling by the ADMD adding it; and
 
-   o  ARC-Seal: (referred to below as "AS") highly similar in structure
+   o  ARC-Seal (referred to below as "AS"): highly similar in structure
       and format to a DKIM-Signature, this field applies a digital
       signature that protects the integrity of all three of these new
       fields when they are added by an ADMD, plus all instances of these
@@ -325,7 +325,7 @@ Internet-Draft                ARC-Protocol                     July 2017
 
    o  There is an "i" tag, as described in Section 4; and
 
-   o  Two additional pieces of information MAY be added (see
+   o  Two (or more) additional pieces of information MAY be added (see
       Section 5.1.1).
 
    The instance identifier MUST be separated from the rest of the
@@ -357,8 +357,8 @@ Internet-Draft                ARC-Protocol                     July 2017
    transit through a series of mediators and to facilitate
    troubleshooting of problematic sources by sending organizations,
    three additional fields of data SHOULD be added to the normal A-R
-   content, dependent on the presence of DKIM-Signature or ARC set(s)
-   and if available to the ADMD which is recording the A-R:
+   content, dependent on the presence of DKIM-Signature and/or ARC
+   set(s) and if available to the ADMD which is recording the A-R:
 
    o  source.ip - The connecting client IP address from which the
       message is received; and
@@ -401,14 +401,14 @@ Internet-Draft                ARC-Protocol                     July 2017
 
    o  There is no "v" tag.
 
-   o  ARC-Seal header fields MUST never be included in the content
-      covered by the signature in this header field.
+   ARC-Seal header fields MUST never be included in the content covered
+   by the signature in this header field.
 
    The AMS SHOULD include any DKIM-Signature header fields already
    present on the message in the header fields covered by this
    signature.
 
-   The AMS header field MAY sign the AAR header fields.
+   The AMS header field MAY inclue (sign) the AAR header field(s).
 
    Authentication-Results header fields SHOULD NOT be included since
    they are likely to be deleted by downstream ADMDs (per Section XXX of
@@ -745,16 +745,16 @@ Internet-Draft                ARC-Protocol                     July 2017
    local_policy comment explanation containing the list of data
    discovered in the ARC evaluation (Section 9.6.1 and Section 5.1.1):
 
-<policy_evaluated>
-  <disposition>delivered</disposition>
-  <dkim>fail</dkim>
-  <spf>fail <comment>source.ip=10.0.0.1</comment></spf>
-  <reason>
-   <type>local_policy</type>
-   <comment>arc=pass ams[2].d=d2.example ams[2].s=s1 as[2].d=d2.example as[2].s=s2
-     as[1].d=d1.example as[1].s=s3</comment>
-  </reason>
-</policy_evaluated>
+ <policy_evaluated>
+   <disposition>delivered</disposition>
+   <dkim>fail</dkim>
+   <spf>fail <comment>source.ip=10.0.0.1</comment></spf>
+   <reason>
+    <type>local_policy</type>
+    <comment>arc=pass ams[2].d=d2.example ams[2].s=s1 as[2].d=d2.example
+      as[2].s=s2 as[1].d=d1.example as[1].s=s3</comment>
+   </reason>
+ </policy_evaluated>
 
    In the suggested sample, d2.example is the sealing domain for ARC[2]
    and d1.example is the sealing domain for ARC[1].
@@ -935,17 +935,17 @@ Internet-Draft                ARC-Protocol                     July 2017
 
    Licensing: Proprietary - Internal only
 
-   Implementation Notes: * Full functionality was demonstrated during
-   the interop testing on 2017-07-15.
+   Implementation Notes:
+
+   o  Full functionality was demonstrated during the interop testing on
+      2017-07-15.
 
    Contact Info: arc-discuss@dmarc.org [1]
 
-13.2.  AOL test reflector and internal tagging
 
-   Organization: AOL
 
-   Description: Internal prototype implementation with both debug
-   analysis and validating + sealing pass-through function
+
+
 
 
 
@@ -953,6 +953,13 @@ Andersen, et al.        Expires January 22, 2018               [Page 17]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
+
+13.2.  AOL test reflector and internal tagging
+
+   Organization: AOL
+
+   Description: Internal prototype implementation with both debug
+   analysis and validating + sealing pass-through function
 
    Status of Operation: Beta
 
@@ -962,8 +969,10 @@ Internet-Draft                ARC-Protocol                     July 2017
 
    Licensing: Proprietary - Internal only
 
-   Implementation Notes: * 2017-07-15: Full functionality verified
-   during the interop testing.
+   Implementation Notes:
+
+   o  2017-07-15: Full functionality verified during the interop
+      testing.
 
    Contact Info: arc-discuss@dmarc.org [2]
 
@@ -975,12 +984,14 @@ Internet-Draft                ARC-Protocol                     July 2017
 
    Status of Operation: Production
 
-   Coverage: * 2017-07-15: The internal test suite is incomplete, but
-   the command line developmental version of validator was demonstrated
-   to interoperate with the Google and AOL implementations during the
-   interop on 2017-07-15 and the released version passes the tests in
-   [ARC-TEST] (https://github.com/ValiMail/arc_test_suite) with both
-   python and python3.
+   Coverage:
+
+   o  2017-07-15: The internal test suite is incomplete, but the command
+      line developmental version of validator was demonstrated to
+      interoperate with the Google and AOL implementations during the
+      interop on 2017-07-15 and the released version passes the tests in
+      [ARC-TEST] (https://github.com/ValiMail/arc_test_suite) with both
+      python and python3.
 
    Licensing: Open/Other (same as dkimpy package = BCD version 2)
 
@@ -989,6 +1000,15 @@ Internet-Draft                ARC-Protocol                     July 2017
 13.4.  OpenARC
 
    Organization: TDP/Murray Kucherawy
+
+
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 18]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
    Description: Implemention of milter functionality related to the
    OpenDKIM and OpenDMARC packages
@@ -999,16 +1019,10 @@ Internet-Draft                ARC-Protocol                     July 2017
 
    Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)
 
-   Implementation Notes: * The build is FreeBSD oriented but some
-   packages have been built for easier deployment on RedHat-based Linux
-   platforms.
+   Implementation Notes:
 
-
-
-Andersen, et al.        Expires January 22, 2018               [Page 18]
-
-Internet-Draft                ARC-Protocol                     July 2017
-
+   o  The build is FreeBSD oriented but some packages have been built
+      for easier deployment on RedHat-based Linux platforms.
 
    o  2017-07-15: Testing showed problems with the hash calculation for
       the AMS header b= field.  Several other bugs were discovered and
@@ -1037,11 +1051,20 @@ Internet-Draft                ARC-Protocol                     July 2017
 
    Licensing: Same as mailman package - GPL
 
-   Implementation Notes: * Appears to work properly in at least one beta
-   deployment, but waiting on acceptance of the pull request into the
-   mainline of mailman development
+   Implementation Notes:
+
+   o  Appears to work properly in at least one beta deployment, but
+      waiting on acceptance of the pull request into the mainline of
+      mailman development
 
    Contact Info: https://www.gnu.org/software/mailman/contact.html
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 19]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
 13.6.  Copernica/MailerQ web-based validation
 
@@ -1055,20 +1078,18 @@ Internet-Draft                ARC-Protocol                     July 2017
 
    Licensing: On-line usage only
 
-   Implementation Notes: * Released 2016-10-24 * Requires full message
-   content to be pasted into a web form found at http://arc.mailerq.com/
-   (warning - https is not supported).  * An additional instance of an
+   Implementation Notes:
 
+   o  Released 2016-10-24
 
+   o  Requires full message content to be pasted into a web form found
+      at http://arc.mailerq.com/ (warning - https is not supported).
 
-Andersen, et al.        Expires January 22, 2018               [Page 19]
-
-Internet-Draft                ARC-Protocol                     July 2017
+   o  An additional instance of an ARC signature can be added if one is
+      willing to paste a private key into an unsecured web form.
 
-
-   ARC signature can be added if one is willing to paste a private key
-   into an unsecured web form.  * 2017-07-15: Testing shows that results
-   match the other implementations listed in this section.
+   o  2017-07-15: Testing shows that results match the other
+      implementations listed in this section.
 
    Contact Info: https://www.copernica.com/
 
@@ -1084,10 +1105,22 @@ Internet-Draft                ARC-Protocol                     July 2017
 
    Licensing: Open source
 
-   Implementation Notes: * 2017-06-12: Released with version 1.6.0 *
-   2017-07-15: Testing during the interop showed that the validation
-   functionality interoperated with the Google, AOL, dkimpy and MailerQ
-   implementations
+   Implementation Notes:
+
+   o  2017-06-12: Released with version 1.6.0
+
+   o  2017-07-15: Testing during the interop showed that the validation
+      functionality interoperated with the Google, AOL, dkimpy and
+      MailerQ implementations
+
+
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 20]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
    Contact Info: https://rspamd.com/doc/modules/arc.html and
    https://github.com/vstakhov/rspamd
@@ -1106,21 +1139,16 @@ Internet-Draft                ARC-Protocol                     July 2017
 
    Licensing: Open Source
 
-   Implementation Notes: * 2017-07-15: Validation functionality which
-   interoperates with Gmail, AOL, dkimpy was demonstrated; later in the
-   week of IETF99, the signing functionality was reported to be working
-   * 2017-07-20: ARC functionality has not yet been pushed back to the
-   github repo but should be showing up soon
+   Implementation Notes:
+
+   o  2017-07-15: Validation functionality which interoperates with
+      Gmail, AOL, dkimpy was demonstrated; later in the week of IETF99,
+      the signing functionality was reported to be working
+
+   o  2017-07-20: ARC functionality has not yet been pushed back to the
+      github repo but should be showing up soon
 
    Contact Info: https://github.com/fastmail/authentication_milter
-
-
-
-
-Andersen, et al.        Expires January 22, 2018               [Page 20]
-
-Internet-Draft                ARC-Protocol                     July 2017
-
 
 14.  Security Considerations
 
@@ -1142,6 +1170,13 @@ Internet-Draft                ARC-Protocol                     July 2017
        a failure is discovered.  The difficulty of forging the signature
        values should limit the extent of this load to domains under
        control of the attacker.
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 21]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
    2.  DKIM only does one DNS check per signature, while this one can do
        many (per chain).  Absent caching, slow DNS responses can cause
@@ -1171,13 +1206,6 @@ Internet-Draft                ARC-Protocol                     July 2017
               RFC2119, March 1997,
               <http://www.rfc-editor.org/info/rfc2119>.
 
-
-
-Andersen, et al.        Expires January 22, 2018               [Page 21]
-
-Internet-Draft                ARC-Protocol                     July 2017
-
-
    [RFC2142]  Crocker, D., "Mailbox Names for Common Services, Roles and
               Functions", RFC 2142, DOI 10.17487/RFC2142, May 1997,
               <http://www.rfc-editor.org/info/rfc2142>.
@@ -1198,6 +1226,13 @@ Internet-Draft                ARC-Protocol                     July 2017
               IANA Considerations Section in RFCs", RFC 5226, DOI
               10.17487/RFC5226, May 2008,
               <http://www.rfc-editor.org/info/rfc5226>.
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 22]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
    [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
               Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
@@ -1227,13 +1262,6 @@ Internet-Draft                ARC-Protocol                     July 2017
               RFC5863, May 2010,
               <http://www.rfc-editor.org/info/rfc5863>.
 
-
-
-Andersen, et al.        Expires January 22, 2018               [Page 22]
-
-Internet-Draft                ARC-Protocol                     July 2017
-
-
    [RFC6376]  Crocker, D., Ed., Hansen, T., Ed., and M. Kucherawy, Ed.,
               "DomainKeys Identified Mail (DKIM) Signatures", STD 76,
               RFC 6376, DOI 10.17487/RFC6376, September 2011,
@@ -1252,6 +1280,15 @@ Internet-Draft                ARC-Protocol                     July 2017
               Authorizing Use of Domains in Email, Version 1", RFC 7208,
               DOI 10.17487/RFC7208, April 2014,
               <http://www.rfc-editor.org/info/rfc7208>.
+
+
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 23]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
    [RFC7601]  Kucherawy, M., "Message Header Field for Indicating
               Message Authentication Status", RFC 7601, DOI 10.17487/
@@ -1282,14 +1319,6 @@ Internet-Draft                ARC-Protocol                     July 2017
               <https://tools.ietf.org/html/draft-ietf-dmarc-arc-usage-
               01>.
 
-
-
-
-Andersen, et al.        Expires January 22, 2018               [Page 23]
-
-Internet-Draft                ARC-Protocol                     July 2017
-
-
    [ENHANCED-STATUS]
               "IANA SMTP Enhanced Status Codes", n.d.,
               <http://www.iana.org/assignments/smtp-enhanced-status-
@@ -1304,6 +1333,18 @@ Internet-Draft                ARC-Protocol                     July 2017
               Message Authentication, Reporting, and Conformance
               (DMARC)", RFC 7489, DOI 10.17487/RFC7489, March 2015,
               <http://www.rfc-editor.org/info/rfc7489>.
+
+
+
+
+
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 24]
+
+Internet-Draft                ARC-Protocol                     July 2017
+
 
    [RFC7960]  Martin, F., Ed., Lear, E., Ed., Draegen. Ed., T., Zwicky,
               E., Ed., and K. Andersen, Ed., "Interoperability Issues
@@ -1334,6 +1375,7 @@ Appendix A.  Appendix A - Example Usage (Obsolete but retained for
 
 A.1.  Example 1: Simple mailing list
 
+A.1.1.  Here's the message as it exits the Origin:
 
 
 
@@ -1341,12 +1383,24 @@ A.1.  Example 1: Simple mailing list
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 24]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 25]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
-
-A.1.1.  Here's the message as it exits the Origin:
 
  Return-Path: <jqd@d1.example>
  Received: from [10.10.10.131] (w-x-y-z.dsl.static.isp.com [w.x.y.z])
@@ -1397,7 +1451,9 @@ A.1.2.1.  Example 1, Step A: Message forwarded to list members
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 25]
+
+
+Andersen, et al.        Expires January 22, 2018               [Page 26]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -1453,7 +1509,7 @@ Internet-Draft                ARC-Protocol                     July 2017
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 26]
+Andersen, et al.        Expires January 22, 2018               [Page 27]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -1509,7 +1565,7 @@ A.1.3.  Example 1: Message received by Recipient
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 27]
+Andersen, et al.        Expires January 22, 2018               [Page 28]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -1565,7 +1621,7 @@ A.2.1.  Here's the message as it exits the Origin:
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 28]
+Andersen, et al.        Expires January 22, 2018               [Page 29]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -1621,7 +1677,7 @@ A.2.2.1.  Example 2, Step A: Message forwarded to list members
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 29]
+Andersen, et al.        Expires January 22, 2018               [Page 30]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -1677,7 +1733,7 @@ Internet-Draft                ARC-Protocol                     July 2017
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 30]
+Andersen, et al.        Expires January 22, 2018               [Page 31]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -1733,7 +1789,7 @@ A.2.2.2.  Example 2, Step B: Message from list forwarded
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 31]
+Andersen, et al.        Expires January 22, 2018               [Page 32]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -1789,7 +1845,7 @@ Internet-Draft                ARC-Protocol                     July 2017
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 32]
+Andersen, et al.        Expires January 22, 2018               [Page 33]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -1845,7 +1901,7 @@ A.2.3.  Example 2: Message received by Recipient
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 33]
+Andersen, et al.        Expires January 22, 2018               [Page 34]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -1901,7 +1957,7 @@ Internet-Draft                ARC-Protocol                     July 2017
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 34]
+Andersen, et al.        Expires January 22, 2018               [Page 35]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -1957,7 +2013,7 @@ A.3.1.  Here's the message as it exits the Origin:
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 35]
+Andersen, et al.        Expires January 22, 2018               [Page 36]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -2013,7 +2069,7 @@ A.3.2.1.  Example 3, Step A: Message forwarded to list members with
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 36]
+Andersen, et al.        Expires January 22, 2018               [Page 37]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -2069,7 +2125,7 @@ Internet-Draft                ARC-Protocol                     July 2017
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 37]
+Andersen, et al.        Expires January 22, 2018               [Page 38]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -2125,7 +2181,7 @@ Internet-Draft                ARC-Protocol                     July 2017
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 38]
+Andersen, et al.        Expires January 22, 2018               [Page 39]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -2181,7 +2237,7 @@ A.3.2.2.  Example 3, Step B: Message from list forwarded with source
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 39]
+Andersen, et al.        Expires January 22, 2018               [Page 40]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -2237,7 +2293,7 @@ Internet-Draft                ARC-Protocol                     July 2017
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 40]
+Andersen, et al.        Expires January 22, 2018               [Page 41]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -2293,7 +2349,7 @@ A.3.3.  Example 3: Message received by Recipient
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 41]
+Andersen, et al.        Expires January 22, 2018               [Page 42]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -2349,7 +2405,7 @@ Received: from segv.d1.example (segv.d1.example [72.52.75.15])
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 42]
+Andersen, et al.        Expires January 22, 2018               [Page 43]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -2405,7 +2461,7 @@ Appendix B.  Acknowledgements
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 43]
+Andersen, et al.        Expires January 22, 2018               [Page 44]
 
 Internet-Draft                ARC-Protocol                     July 2017
 
@@ -2461,4 +2517,4 @@ Authors' Addresses
 
 
 
-Andersen, et al.        Expires January 22, 2018               [Page 44]
+Andersen, et al.        Expires January 22, 2018               [Page 45]

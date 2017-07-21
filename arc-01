@@ -201,9 +201,9 @@ applied.  The signatures themselves are generally independent of one another.
 By contrast, this protocol seeks to have each signature be able to convey the
 following pieces of information:
 
-1.  A further assertion that, at the time that same ADMD processed the message,
-the various assertions already attached to the message by other ADMDs were or
-were not valid;
+1.  An assertion that, at the time that the intermediary ADMD processed the
+message, the various assertions already attached to the message by other ADMDs
+were or were not valid;
 
 2.  As with DKIM, an assertion that, for a passing signature, the domain name
 in the signature takes some responsibility for handling of the message and that
@@ -215,17 +215,17 @@ by later handlers.
 This protocol accomplishes each of these by adding a new header field to the
 message for each of them, as follows:
 
-* ARC-Authentication-Results:  (referred to below as "AAR") virtually identical
+* ARC-Authentication-Results (referred to below as "AAR"): virtually identical
 in syntax to an Authentication-Results field {{RFC7601}}, this field records
 the results of all message authentication checks done by the recording ADMD at
 the time the message arrived. Additional information is added to this field 
 compared to a standard Authentication-Results field in order to support a more
 complete DMARC report (see {{aar-defn}});
-* ARC-Message-Signature:  (referred to below as "AMS") virtually identical in
+* ARC-Message-Signature (referred to below as "AMS"): virtually identical in
 syntax to DKIM-Signature, this field contains the assertions about the message
 header and body as they existed at the time of handling by the ADMD adding it;
 and 
-* ARC-Seal:  (referred to below as "AS") highly similar in structure and format
+* ARC-Seal (referred to below as "AS"): highly similar in structure and format
 to a DKIM-Signature, this field applies a digital signature that protects the
 integrity of all three of these new fields when they are added by an ADMD, plus
 all instances of these fields added by prior ADMDs.
@@ -302,7 +302,7 @@ and semantically identical to an Authentication-Results header field {{RFC7601}}
 as is the mechanism by which it is constructed, with the following exception:
 
 * There is an "i" tag, as described in {{i-defn}}; and
-* Two additional pieces of information MAY be added (see {{aar-new-info}}).
+* Two (or more) additional pieces of information MAY be added (see {{aar-new-info}}).
 
 The instance identifier MUST be separated from the rest of the Authentication-Results
 value contents with a semi-colon (';', 0x3b).
@@ -323,7 +323,7 @@ field would be generated. Because the AAR is designed for machine-based
 consumption over the course of a message's transit through a series of
 mediators and to facilitate troubleshooting of problematic sources by sending
 organizations, three additional fields of data SHOULD be added to the normal
-A-R content, dependent on the presence of DKIM-Signature or ARC set(s) and if
+A-R content, dependent on the presence of DKIM-Signature and/or ARC set(s) and if
 available to the ADMD which is recording the A-R:
 
 * source.ip - The connecting client IP address from which the message is received; and
@@ -343,13 +343,14 @@ mechanism by which it is constructed, with the following exceptions:
 
 * There is an "i" tag, as described in {{i-defn}}.
 * There is no "v" tag.
-* ARC-Seal header fields MUST never be included in the content covered
+
+ARC-Seal header fields MUST never be included in the content covered
 by the signature in this header field.
 
 The AMS SHOULD include any DKIM-Signature header fields already present on the
 message in the header fields covered by this signature.
 
-The AMS header field MAY sign the AAR header fields.
+The AMS header field MAY inclue (sign) the AAR header field(s).
 
 Authentication-Results header fields SHOULD NOT be included since they are
 likely to be deleted by downstream ADMDs (per Section XXX of {{RFC7601}}),
@@ -581,8 +582,8 @@ of data discovered in the ARC evaluation ({{arc-data}} and {{aar-new-info}}):
   &lt;spf>fail &lt;comment>source.ip=10.0.0.1&lt;/comment>&lt;/spf>
   &lt;reason>
    &lt;type>local_policy&lt;/type>
-   &lt;comment>arc=pass ams\[2].d=d2.example ams\[2].s=s1 as\[2].d=d2.example as\[2].s=s2 
-     as\[1].d=d1.example as\[1].s=s3&lt;/comment>
+   &lt;comment>arc=pass ams\[2].d=d2.example ams\[2].s=s1 as\[2].d=d2.example 
+     as\[2].s=s2 as\[1].d=d1.example as\[1].s=s3&lt;/comment>
   &lt;/reason>
 &lt;/policy_evaluated>
 ~~~~~~~~~~
@@ -737,6 +738,7 @@ test event which was held on 2017-07-15 & 16 at IETF99.
   Licensing: Proprietary - Internal only
 
   Implementation Notes: 
+
   * Full functionality was demonstrated during the interop testing on 2017-07-15.
 
   Contact Info: <arc-discuss@dmarc.org>
@@ -757,6 +759,7 @@ test event which was held on 2017-07-15 & 16 at IETF99.
   Licensing: Proprietary - Internal only
 
   Implementation Notes: 
+
   * 2017-07-15: Full functionality verified during the interop testing.
 
   Contact Info: <arc-discuss@dmarc.org>
@@ -770,6 +773,7 @@ test event which was held on 2017-07-15 & 16 at IETF99.
    Status of Operation: Production
 
    Coverage: 
+
    * 2017-07-15: The internal test suite is incomplete, but the command line
    developmental version of validator was demonstrated to interoperate with
    the Google and AOL implementations during the interop on 2017-07-15 and the
@@ -794,6 +798,7 @@ test event which was held on 2017-07-15 & 16 at IETF99.
   Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)
 
   Implementation Notes: 
+
   * The build is FreeBSD oriented but some packages have been built for
   easier deployment on RedHat-based Linux platforms.
 
@@ -823,6 +828,7 @@ test event which was held on 2017-07-15 & 16 at IETF99.
   Licensing: Same as mailman package - GPL
 
   Implementation Notes: 
+
   * Appears to work properly in at least one beta deployment, but
   waiting on acceptance of the pull request into the mainline of
   mailman development
@@ -842,6 +848,7 @@ test event which was held on 2017-07-15 & 16 at IETF99.
   Licensing: On-line usage only 
 
   Implementation Notes: 
+
   * Released 2016-10-24
   * Requires full message content to be pasted into a web form found at
 http://arc.mailerq.com/ (warning - https is not supported).
@@ -865,6 +872,7 @@ listed in this section.
   Licensing: Open source
 
   Implementation Notes: 
+
   * 2017-06-12: Released with version 1.6.0
   * 2017-07-15: Testing during the interop showed that the validation functionality 
   interoperated with the Google, AOL, dkimpy and MailerQ implementations
@@ -884,6 +892,7 @@ listed in this section.
   Licensing: Open Source
 
   Implementation Notes:
+
   * 2017-07-15: Validation functionality which interoperates with Gmail, AOL, dkimpy was demonstrated; later in
   the week of IETF99, the signing functionality was reported to be working
   * 2017-07-20: ARC functionality has not yet been pushed back to the github repo but should be showing up soon

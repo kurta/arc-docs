@@ -135,9 +135,9 @@ applied.  The signatures themselves are generally independent of one another.</t
 following pieces of information:</t>
 
 <t><list style="numbers">
-  <t>A further assertion that, at the time that same ADMD processed the message,
-the various assertions already attached to the message by other ADMDs were or
-were not valid;</t>
+  <t>An assertion that, at the time that the intermediary ADMD processed the
+message, the various assertions already attached to the message by other ADMDs
+were or were not valid;</t>
   <t>As with DKIM, an assertion that, for a passing signature, the domain name
 in the signature takes some responsibility for handling of the message and that
 the message is unchanged since that signature was applied;</t>
@@ -149,17 +149,17 @@ by later handlers.</t>
 message for each of them, as follows:</t>
 
 <t><list style="symbols">
-  <t>ARC-Authentication-Results:  (referred to below as “AAR”) virtually identical
+  <t>ARC-Authentication-Results (referred to below as “AAR”): virtually identical
 in syntax to an Authentication-Results field <xref target="RFC7601"/>, this field records
 the results of all message authentication checks done by the recording ADMD at
 the time the message arrived. Additional information is added to this field 
 compared to a standard Authentication-Results field in order to support a more
 complete DMARC report (see <xref target="aar-defn"/>);</t>
-  <t>ARC-Message-Signature:  (referred to below as “AMS”) virtually identical in
+  <t>ARC-Message-Signature (referred to below as “AMS”): virtually identical in
 syntax to DKIM-Signature, this field contains the assertions about the message
 header and body as they existed at the time of handling by the ADMD adding it;
 and</t>
-  <t>ARC-Seal:  (referred to below as “AS”) highly similar in structure and format
+  <t>ARC-Seal (referred to below as “AS”): highly similar in structure and format
 to a DKIM-Signature, this field applies a digital signature that protects the
 integrity of all three of these new fields when they are added by an ADMD, plus
 all instances of these fields added by prior ADMDs.</t>
@@ -243,7 +243,7 @@ as is the mechanism by which it is constructed, with the following exception:</t
 
 <t><list style="symbols">
   <t>There is an “i” tag, as described in <xref target="i-defn"/>; and</t>
-  <t>Two additional pieces of information MAY be added (see <xref target="aar-new-info"/>).</t>
+  <t>Two (or more) additional pieces of information MAY be added (see <xref target="aar-new-info"/>).</t>
 </list></t>
 
 <t>The instance identifier MUST be separated from the rest of the Authentication-Results
@@ -265,7 +265,7 @@ field would be generated. Because the AAR is designed for machine-based
 consumption over the course of a message’s transit through a series of
 mediators and to facilitate troubleshooting of problematic sources by sending
 organizations, three additional fields of data SHOULD be added to the normal
-A-R content, dependent on the presence of DKIM-Signature or ARC set(s) and if
+A-R content, dependent on the presence of DKIM-Signature and/or ARC set(s) and if
 available to the ADMD which is recording the A-R:</t>
 
 <t><list style="symbols">
@@ -292,14 +292,15 @@ mechanism by which it is constructed, with the following exceptions:</t>
 <t><list style="symbols">
   <t>There is an “i” tag, as described in <xref target="i-defn"/>.</t>
   <t>There is no “v” tag.</t>
-  <t>ARC-Seal header fields MUST never be included in the content covered
-by the signature in this header field.</t>
 </list></t>
+
+<t>ARC-Seal header fields MUST never be included in the content covered
+by the signature in this header field.</t>
 
 <t>The AMS SHOULD include any DKIM-Signature header fields already present on the
 message in the header fields covered by this signature.</t>
 
-<t>The AMS header field MAY sign the AAR header fields.</t>
+<t>The AMS header field MAY inclue (sign) the AAR header field(s).</t>
 
 <t>Authentication-Results header fields SHOULD NOT be included since they are
 likely to be deleted by downstream ADMDs (per Section XXX of <xref target="RFC7601"/>),
@@ -567,8 +568,8 @@ of data discovered in the ARC evaluation (<xref target="arc-data"/> and <xref ta
   <spf>fail <comment>source.ip=10.0.0.1</comment></spf>
   <reason>
    <type>local_policy</type>
-   <comment>arc=pass ams[2].d=d2.example ams[2].s=s1 as[2].d=d2.example as[2].s=s2 
-     as[1].d=d1.example as[1].s=s3</comment>
+   <comment>arc=pass ams[2].d=d2.example ams[2].s=s1 as[2].d=d2.example 
+     as[2].s=s2 as[1].d=d1.example as[1].s=s3</comment>
   </reason>
 </policy_evaluated>
 ]]></artwork></figure>
@@ -715,8 +716,11 @@ test event which was held on 2017-07-15 &amp; 16 at IETF99.</t>
 
 <t>Licensing: Proprietary - Internal only</t>
 
-<t>Implementation Notes: 
-  * Full functionality was demonstrated during the interop testing on 2017-07-15.</t>
+<t>Implementation Notes:</t>
+
+<t><list style="symbols">
+  <t>Full functionality was demonstrated during the interop testing on 2017-07-15.</t>
+</list></t>
 
 <t>Contact Info: <eref target="mailto:arc-discuss@dmarc.org">arc-discuss@dmarc.org</eref></t>
 
@@ -736,8 +740,11 @@ test event which was held on 2017-07-15 &amp; 16 at IETF99.</t>
 
 <t>Licensing: Proprietary - Internal only</t>
 
-<t>Implementation Notes: 
-  * 2017-07-15: Full functionality verified during the interop testing.</t>
+<t>Implementation Notes:</t>
+
+<t><list style="symbols">
+  <t>2017-07-15: Full functionality verified during the interop testing.</t>
+</list></t>
 
 <t>Contact Info: <eref target="mailto:arc-discuss@dmarc.org">arc-discuss@dmarc.org</eref></t>
 
@@ -750,12 +757,15 @@ test event which was held on 2017-07-15 &amp; 16 at IETF99.</t>
 
 <t>Status of Operation: Production</t>
 
-<t>Coverage: 
-   * 2017-07-15: The internal test suite is incomplete, but the command line
+<t>Coverage:</t>
+
+<t><list style="symbols">
+  <t>2017-07-15: The internal test suite is incomplete, but the command line
    developmental version of validator was demonstrated to interoperate with
    the Google and AOL implementations during the interop on 2017-07-15 and the
    released version passes the tests in <xref target="ARC-TEST"/>
    (https://github.com/ValiMail/arc_test_suite) with both python and python3.</t>
+</list></t>
 
 <t>Licensing: Open/Other (same as dkimpy package = BCD version 2)</t>
 
@@ -775,11 +785,11 @@ test event which was held on 2017-07-15 &amp; 16 at IETF99.</t>
 
 <t>Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)</t>
 
-<t>Implementation Notes: 
-  * The build is FreeBSD oriented but some packages have been built for
-  easier deployment on RedHat-based Linux platforms.</t>
+<t>Implementation Notes:</t>
 
 <t><list style="symbols">
+  <t>The build is FreeBSD oriented but some packages have been built for
+  easier deployment on RedHat-based Linux platforms.</t>
   <t>2017-07-15: Testing showed problems with the hash calculation for 
   the AMS header b= field. Several other bugs were discovered and were 
   either fixed during the following week of IETF meetings or are under
@@ -806,10 +816,13 @@ test event which was held on 2017-07-15 &amp; 16 at IETF99.</t>
 
 <t>Licensing: Same as mailman package - GPL</t>
 
-<t>Implementation Notes: 
-  * Appears to work properly in at least one beta deployment, but
+<t>Implementation Notes:</t>
+
+<t><list style="symbols">
+  <t>Appears to work properly in at least one beta deployment, but
   waiting on acceptance of the pull request into the mainline of
   mailman development</t>
+</list></t>
 
 <t>Contact Info: https://www.gnu.org/software/mailman/contact.html</t>
 
@@ -826,14 +839,17 @@ test event which was held on 2017-07-15 &amp; 16 at IETF99.</t>
 
 <t>Licensing: On-line usage only</t>
 
-<t>Implementation Notes: 
-  * Released 2016-10-24
-  * Requires full message content to be pasted into a web form found at
-http://arc.mailerq.com/ (warning - https is not supported).
-   * An additional instance of an ARC signature can be added if one is 
-willing to paste a private key into an unsecured web form.
-   * 2017-07-15: Testing shows that results match the other implementations
+<t>Implementation Notes:</t>
+
+<t><list style="symbols">
+  <t>Released 2016-10-24</t>
+  <t>Requires full message content to be pasted into a web form found at
+http://arc.mailerq.com/ (warning - https is not supported).</t>
+  <t>An additional instance of an ARC signature can be added if one is 
+willing to paste a private key into an unsecured web form.</t>
+  <t>2017-07-15: Testing shows that results match the other implementations
 listed in this section.</t>
+</list></t>
 
 <t>Contact Info: https://www.copernica.com/</t>
 
@@ -850,10 +866,13 @@ listed in this section.</t>
 
 <t>Licensing: Open source</t>
 
-<t>Implementation Notes: 
-  * 2017-06-12: Released with version 1.6.0
-  * 2017-07-15: Testing during the interop showed that the validation functionality 
+<t>Implementation Notes:</t>
+
+<t><list style="symbols">
+  <t>2017-06-12: Released with version 1.6.0</t>
+  <t>2017-07-15: Testing during the interop showed that the validation functionality 
   interoperated with the Google, AOL, dkimpy and MailerQ implementations</t>
+</list></t>
 
 <t>Contact Info: https://rspamd.com/doc/modules/arc.html and https://github.com/vstakhov/rspamd</t>
 
@@ -870,10 +889,13 @@ listed in this section.</t>
 
 <t>Licensing: Open Source</t>
 
-<t>Implementation Notes:
-  * 2017-07-15: Validation functionality which interoperates with Gmail, AOL, dkimpy was demonstrated; later in
-  the week of IETF99, the signing functionality was reported to be working
-  * 2017-07-20: ARC functionality has not yet been pushed back to the github repo but should be showing up soon</t>
+<t>Implementation Notes:</t>
+
+<t><list style="symbols">
+  <t>2017-07-15: Validation functionality which interoperates with Gmail, AOL, dkimpy was demonstrated; later in
+  the week of IETF99, the signing functionality was reported to be working</t>
+  <t>2017-07-20: ARC functionality has not yet been pushed back to the github repo but should be showing up soon</t>
+</list></t>
 
 <t>Contact Info: https://github.com/fastmail/authentication_milter</t>
 
