@@ -1298,16 +1298,16 @@ Internet-Draft                ARC-Protocol                     July 2017
 15.2.  Informative References
 
    [ARC-DRAFT-05]
-              Andersen, K., Rae-Grant, J., Long, B., Adams, T., and S.
-              Jones, "Authenticated Received Chain (ARC) Protocol
-              (I-D-06)", n.d., <https://tools.ietf.org/html/draft-ietf-
-              dmarc-arc-protocol-06>.
+              Andersen, K., Long, B., and S. Jones, "Authenticated
+              Received Chain (ARC) Protocol (I-D-06)", n.d.,
+              <https://tools.ietf.org/html/draft-ietf-dmarc-arc-
+              protocol-06>.
 
    [ARC-DRAFT-06]
-              Andersen, K., Rae-Grant, J., Long, B., Adams, T., and S.
-              Jones, "Authenticated Received Chain (ARC) Protocol
-              (I-D-05)", n.d., <https://tools.ietf.org/html/draft-ietf-
-              dmarc-arc-protocol-05>.
+              Andersen, K., Long, B., and S. Jones, "Authenticated
+              Received Chain (ARC) Protocol (I-D-05)", n.d.,
+              <https://tools.ietf.org/html/draft-ietf-dmarc-arc-
+              protocol-05>.
 
    [ARC-TEST]
               Blank, S., "ARC Test Suite", January 2017,
