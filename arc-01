@@ -306,7 +306,7 @@ The 'i' tag value can range from 1-1024 (inclusive).
 ARC implementations MUST support at least ten (10) ARC sets.
 
 An effective operational maximum will have to be developed through deployment
-experience in the field and will be documented within {{arc-usage}} once
+experience in the field and will be documented within {{ARC-USAGE}} once
 determined.
 
 ARC chains with more than the defined operational maximum count MAY be marked 
@@ -964,7 +964,10 @@ listed in this section.
 
 --- back
 
-# Appendix A - Design Requirements (from -06 and earlier versions)
+# Appendix A - Design Requirements 
+
+(This section is re-inserted for background information 
+from {{ARC-DRAFT-06}} and earlier versions.)
 
 The specification of the ARC framework is driven by the following high-level
 goals, security considerations, and practical operational requirements.
@@ -988,11 +991,13 @@ across trust boundaries.
 ARC is not a trust framework. Users of the ARC header fields are cautioned against
 making unsubstantiated conclusions when encountering a "broken" ARC sequence.
 
-# Appendix B - Example Usage (Obsolete but retained for illustrative purposes)
+# Appendix B - Example Usage 
 
 \[\[ Note: The following examples were mocked up early in the definition
 process for the spec. They no longer reflect the current definition and
-need various updates which will be included in the next draft. ]]
+need various updates which will be included in a future draft. ]]
+
+(Obsolete but retained for illustrative purposes)
 
 ## Example 1: Simple mailing list
 
