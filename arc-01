@@ -277,81 +277,121 @@ Specific references can be found below.
 
 # Protocol Elements {#protcol_elements}
 
-As with other domain authentication technologies (such as SPF, DKIM, and DMARC), ARC makes no claims 
-about the contents of the email message it has sealed. However, for a valid and passing ARC chain, 
-a Final Receiver is able to ascertain:
+As with other domain authentication technologies (such as SPF, DKIM, and
+DMARC), ARC makes no claims about the contents of the email message it has
+sealed. However, for a valid and passing ARC chain, a Final Receiver is able to
+ascertain:
 
-* all (participating) domains that claim responsibility for handling (and possibly) modifying the email message in transit;
+* all (participating) domains that claim responsibility for handling (and
+possibly) modifying the email message in transit;
+
 * trace information, including:
   * the {{RFC7601}} authentication results each participating ADMD saw;
   * and additional missing data needed to compile a DMARC report for the sending domain.
 
-Given this information, a Final Receiver is able to make a more-informed local policy decision regarding message delivery 
-to the end user in spite of a DMARC failure.
+Given this information, a Final Receiver is able to make a more-informed local
+policy decision regarding message delivery to the end user in spite of a DMARC
+failure.
 
-Every participant in an ARC Chain, except for the originating sender and Final Receiver, is both an ARC Validator (when receiving) and then an ARC Sealer (when sending a message onward). 
-The validated chain status as determined at message receipt must be passed to the sealer function in order for sealing to occur properly; how this is done is considered ADMD-specific and an implementation detail.
+Every participant in an ARC Chain, except for the originating sender and Final
+Receiver, is both an ARC Validator (when receiving) and then an ARC Sealer
+(when sending a message onward).  The validated chain status as determined at
+message receipt must be passed to the sealer function in order for sealing to
+occur properly; how this is done is considered ADMD-specific and an
+implementation detail.
 
-_INFORMATIONAL_: It is important to understand that validating and then immediately sealing a message leaves no room for message modification, and many early implementations of ARC did not initially work because both operations were performed in a single pass over the message.
+_INFORMATIONAL_: It is important to understand that validating and then
+immediately sealing a message leaves no room for message modification, and many
+early implementations of ARC did not initially work because both operations
+were performed in a single pass over the message.
 
-The following Protocol Elements are functional parts and design decisions related the protocol that are not specific to either Validators or Sealers, but ensure the ARC Chain conveys this information to a Final Receiver.
+The following Protocol Elements are functional parts and design decisions
+related the protocol that are not specific to either Validators or Sealers, but
+ensure the ARC Chain conveys this information to a Final Receiver.
 
 ## Chain of Custody
 
-At a high level, an ARC Chain represents a chain of custody of authentication and other trace information (AAR) surrounding a message, signed by each handler of the message. Each link in the chain (AMS) is designed to be brittle, insofar as it survives only until the next modification of the message. However, the overarching information around who added links and what they claimed responsibility for (AS) is designed to remain intact over the entirety of the chain.
+At a high level, an ARC Chain represents a chain of custody of authentication
+and other trace information (AAR) surrounding a message, signed by each handler
+of the message. Each link in the chain (AMS) is designed to be brittle, insofar
+as it survives only until the next modification of the message. However, the
+overarching information around who added links and what they claimed
+responsibility for (AS) is designed to remain intact over the entirety of the
+chain.
 
-The ARC chain can be conceptualized through analogy to the chain of custody for legal evidence. 
-The material evidence itself is sealed within an unbreachable bag (AMS) each time. 
-When handed to a new party, that party both vouches for the state of the received evidence 
-container (AAR) and signs for the evidence on a chain of custody report form (AS). As with all
-analogies, this one should not be taken to interpretive extremes, but primarily used as a 
-conceptual framework.
+The ARC chain can be conceptualized through analogy to the chain of custody for
+legal evidence.  The material evidence itself is sealed within an unbreachable
+bag (AMS) each time.  When handed to a new party, that party both vouches for
+the state of the received evidence container (AAR) and signs for the evidence
+on a chain of custody report form (AS). As with all analogies, this one should
+not be taken to interpretive extremes, but primarily used as a conceptual
+framework.
 
-An ARC chain that is valid and passing has the attributes listed above in {{#prococol_elements}}.
+An ARC chain that is valid and passing has the attributes listed above in
+{{#prococol_elements}}.
 
-An ARC chain that is invalid or does not pass can make none of these claims. Until ARC usage is widespread, there will continue to be intermediaries that modify messages but do not ARC seal. As with a failing DKIM signature ({{RFC6376}} Section-6.3), a failing ARC Chain SHOULD be treated the same as a message with no ARC Chain.  
-\[\[ NOTE TO WORKING GROUP: This paragraph probably is better places in Verifier actions. ]]
+An ARC chain that is invalid or does not pass can make none of these claims.
+Until ARC usage is widespread, there will continue to be intermediaries that
+modify messages but do not ARC seal. As with a failing DKIM signature
+({{RFC6376}} Section-6.3), a failing ARC Chain SHOULD be treated the same as a
+message with no ARC Chain.  \[\[ NOTE TO WORKING GROUP: This paragraph probably
+is better places in Verifier actions. ]]
 
 ## Participation is optional
 
-Validating an existing Chain and then adding your own ARC Set to a message allows you to claim responsibility for hanndling the message and modifications, if any, done by your ADMD to benefit message delivery downstream. However, no ADMD is obligated to perform these actions.
+Validating an existing Chain and then adding your own ARC Set to a message
+allows you to claim responsibility for hanndling the message and modifications,
+if any, done by your ADMD to benefit message delivery downstream. However, no
+ADMD is obligated to perform these actions.
 
 ## Only one ARC Chain (One Chain to Rule Them All)
 
-A message can have only one ARC Chain on it at a time. Once broken, the chain cannot be restarted, as the chain of custody is no longer valid and responsibility for the message has been lost.
+A message can have only one ARC Chain on it at a time. Once broken, the chain
+cannot be restarted, as the chain of custody is no longer valid and
+responsibility for the message has been lost.
 
 ## All Failures are Permanent
 
-Because ARC Chains are transmitted across multiple intermediaries, all errors, even temporary ones, become unrecoverable and are considered permanent.
+Because ARC Chains are transmitted across multiple intermediaries, all errors,
+even temporary ones, become unrecoverable and are considered permanent.
 
-Any error validating or sealing a chain, for whatever reason, MUST result in a "cv=fail" verdict.
+Any error validating or sealing a chain, for whatever reason, MUST result in a
+"cv=fail" verdict.
 
 ## Benign nature of an ARC Set
 
-Even when an ARC chain is valid and passes, its value is limited to very specific cases. An ARC Chain 
-is specifically designed to provide value to a Final Receiver evaluating message delivery in the context of a DMARC failure. 
-An ARC Chain in general, and each ARC Set in particular, provide additional information, and otherwise be benign. Specifically:
+Even when an ARC chain is valid and passes, its value is limited to very
+specific cases. An ARC Chain is specifically designed to provide value to a
+Final Receiver evaluating message delivery in the context of a DMARC failure.
+An ARC Chain in general, and each ARC Set in particular, provide additional
+information, and otherwise be benign. Specifically:
 
 * properly adding an ARC set to a message does not damage or invalidate an existing Chain, and
 * validating a message exposes no new threat vectors (see {{#dns_ops}}).
 
-_INFORMATIONAL_: 
-If an ADMD is unsure whether it will be re-emitting and/or modifying a message, it may elect to seal all inbound mail. 
-For complex or nested ADMD relationships such as found in some hosted mail solutions, this "inbound seal" can be used to 
-facilitate internal boundaries as well as properly convey incoming state to any egress MTAs that may need to assert
-a seal upon exit from the ADMD. Since these internal relationships are highly implementation dependent, this protocol 
-definition can not usefully explore such usage except to note that it is intentionally allowed within the scope of 
+_INFORMATIONAL_: If an ADMD is unsure whether it will be re-emitting and/or
+modifying a message, it may elect to seal all inbound mail.  For complex or
+nested ADMD relationships such as found in some hosted mail solutions, this
+"inbound seal" can be used to facilitate internal boundaries as well as
+properly convey incoming state to any egress MTAs that may need to assert a
+seal upon exit from the ADMD. Since these internal relationships are highly
+implementation dependent, this protocol definition can not usefully explore
+such usage except to note that it is intentionally allowed within the scope of
 this specification.
 
 ## Key Management
 
 The public keys for ARC header fields follow the same requirements, syntax and
-semantics as those for DKIM signatures, described in Section 3.6 of {{RFC6376}}.
-ARC places no requirements on the selectors and/or domains used for the ARC header field signatures.
+semantics as those for DKIM signatures, described in Section 3.6 of
+{{RFC6376}}.  ARC places no requirements on the selectors and/or domains used
+for the ARC header field signatures.
 
 ## Trace Information
 
-ARC includes trace information encoded in the AAR. While section {{#aar-defn}} defines what information must be provided, Sealing ADMDs may provide additional information, and Validating receivers may use or ignore this Trace information as they wish.
+ARC includes trace information encoded in the AAR. While section {{#aar-defn}}
+defines what information must be provided, Sealing ADMDs may provide additional
+information, and Validating receivers may use or ignore this Trace information
+as they wish.
 
 ## Instance ('i=') Tag {#i-defn}
 
@@ -363,7 +403,7 @@ integer, indicating the position in the ARC sequence this set occupies, where
 the first ARC set is numbered 1.  In ABNF terms:
 
        instance = [FWS] %x69 [FWS] "=" [FWS] position [FWS] ";"
-       position = 1*DIGIT
+       position = 1*2DIGIT ; 1 - 50
 
 Valid ARC sets must have exactly one instance of each header field for a given
 position value.
@@ -378,7 +418,7 @@ facilitate human inspection of the headers.
 
 ### Valid Range for Instance Tags {#i-hdr}
 
-The 'i' tag value can range from 1-1024 (inclusive).
+The 'i' tag value can range from 1-50 (inclusive).
 
 ARC implementations MUST support at least ten (10) ARC sets.
 
@@ -386,46 +426,59 @@ An effective operational maximum will have to be developed through deployment
 experience in the field and will be documented within {{ARC-USAGE}} once
 determined.
 
-ARC chains with more than the defined operational maximum count SHOULD be marked 
+ARC chains with more than the defined operational maximum count MUST be marked 
 with "cv=fail".
 
 # The ARC Header Fields
 
 ## ARC-Authentication-Results (AAR) {#aar-defn}
 
-The ARC-Authentication-Results header field is syntactically
-and semantically identical to an Authentication-Results header field (defined
-in Section 2.2 of {{RFC7601}} (A-R)), except for one mandatory addition and
-several optional data fields.  These deviations are:
+The ARC-Authentication-Results header field is syntactically and semantically
+identical to an Authentication-Results header field (defined in Section 2.2 of
+{{RFC7601}} (A-R)), except that several optional data fields SHOULD be added
+(\[\[ NOTE: these optional data fields are being proposed as amendments to
+{{RFC7601}} through a "bis" process. Depending on the sequencing for this
+specification and said "7601bis" work, it may be possible to drop the noted
+sections from this specification ]]) and the first element
+("Authentication-Results:") in authres-header is replaced with
+arc-authres-prefix as follows:
 
-* There is an "i" tag, as described in {{i-defn}}; and
-* Two (or more) additional pieces of information MAY be added (see {{aar-new-info}}).
+    arc-authres-header-prefix = "ARC-Authentication-Results:" [CFWS] arc-info
+    arc-info = instance *([CFWS] propspec) [CFWS] “;”
 
-The instance identifier MUST be separated from the rest of the Authentication-Results
-value contents with a semi-colon (';', 0x3b).
-
-The purpose of this header field is to incorporate into the record the success
-or failure of any authentication done on the message upstream of the
-participating ADMD that is validating and continuing the authentication chain.
+The purpose of this header field is to transmit the results of any
+authentication done on the message upstream to participating ADMDs validating
+and continuing the chain.
 
 The AAR MUST contain all A-R results from within the participating ADMD,
 regardless of how many A-R headers are on the message.
 
-### Additional Information for the AAR Header {#aar-new-info}
+### ptypes and properties for arc-info
 
-An ARC signer generates this field in the same way that a conventional A-R
-field would be generated. Because the AAR is designed for machine-based
-consumption over the course of a message's transit through a series of
-mediators and to facilitate troubleshooting of problematic sources by sending
-organizations, three additional fields of data SHOULD be added to the normal
-A-R content, dependent on the presence of DKIM-Signature and/or ARC set(s) and if
-available to the ADMD which is recording the A-R:
+\[\[ NOTE: This section is being proposed as an amendment to {{RFC7601}}
+through a "bis" process. Depending on the sequencing for this specification and
+said "7601bis" work, it may be possible to this section from this
+specification. ]]
 
-* smtp.client_id - The connecting client IP address from which the message was received;
-* header.ds - The domain/selector pair for each dkim signature on the
-message (header.ds=example.com,selector)
-* arc.closest_fail - The hop number of the most recent AMS that fails to
-validate, or 0 if all hops pass.
+Certain information pertinent to ascertaining message disposition can be lost
+in transit when messages are handled by intermediaries. For example, failing
+DKIM signatures are sometimes removed by MTAs, and most DKIM signatures on
+messages modified by intermediaries will fail. 
+
+The AAR, through these ptype-properties stamped in arc-info, provide a
+mechanism for this information to survive transit.
+
+The ptypes and properties defined in this section SHOULD be stamped in the AAR:
+
+* smtp.client-ip - The connecting client IP address from which the message is received.
+
+* header.ds - The domain/selector pair for each dkim signature on the message (header.ds=example.com,selector).
+Note that this is a concatenation of the header.d and header.s field values from \[\[ TODO: reference DKIM A-R method
+spec ]] separated by the comma character (0x2c). These values are joined into a single arc-info field value 
+in order to avoid indexing and correlation ambiguity between the possible multiple DKIM signatures which
+may be found on any given message.
+
+* arc.closest-fail - The hop number of the most recent AS that fails to validate, or 0 if all hops pass.
 
 ## ARC-Message-Signature (AMS) {#ams-defn}
 
