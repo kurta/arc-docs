@@ -275,7 +275,7 @@ specifies changes in syntax and semantics.
 Language, syntax, and other details are imported from DKIM {{RFC6376}}.
 Specific references can be found below.
 
-# Protocol Elements {#protcol_elements}
+# Protocol Elements {#protocol-elements}
 
 As with other domain authentication technologies (such as SPF, DKIM, and
 DMARC), ARC makes no claims about the contents of the email message it has
@@ -328,7 +328,7 @@ not be taken to interpretive extremes, but primarily used as a conceptual
 framework.
 
 An ARC chain that is valid and passing has the attributes listed above in
-{{#prococol_elements}}.
+{{protocol-elements}}.
 
 An ARC chain that is invalid or does not pass can make none of these claims.
 Until ARC usage is widespread, there will continue to be intermediaries that
@@ -367,7 +367,7 @@ An ARC Chain in general, and each ARC Set in particular, provide additional
 information, and otherwise be benign. Specifically:
 
 * properly adding an ARC set to a message does not damage or invalidate an existing Chain, and
-* validating a message exposes no new threat vectors (see {{#dns_ops}}).
+* validating a message exposes no new threat vectors (see {{dns-ops}}).
 
 _INFORMATIONAL_: If an ADMD is unsure whether it will be re-emitting and/or
 modifying a message, it may elect to seal all inbound mail.  For complex or
@@ -388,7 +388,7 @@ for the ARC header field signatures.
 
 ## Trace Information
 
-ARC includes trace information encoded in the AAR. While section {{#aar-defn}}
+ARC includes trace information encoded in the AAR. While section {{aar-defn}}
 defines what information must be provided, Sealing ADMDs may provide additional
 information, and Validating receivers may use or ignore this Trace information
 as they wish.
@@ -453,7 +453,7 @@ and continuing the chain.
 The AAR MUST contain all A-R results from within the participating ADMD,
 regardless of how many A-R headers are on the message.
 
-### ptypes and properties for arc-info
+### ptypes and properties for arc-info {#aar-new-info}
 
 \[\[ NOTE: This section is being proposed as an amendment to {{RFC7601}}
 through a "bis" process. Depending on the sequencing for this specification and
@@ -870,7 +870,7 @@ Inclusion of ARC sets in the header of emails may cause problems for some
 older or more constrained MTAs if they are unable to accept the greater 
 size of the header.
 
-## DNS Operations {#dns_ops}
+## DNS Operations {#dns-ops}
 
 Operators who receive a message bearing N ARC sets have to complete up to N+1 
 DNS queries to evaluate the chain (barring DNS redirection mechanisms which 

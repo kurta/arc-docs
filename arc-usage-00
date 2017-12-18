@@ -52,6 +52,7 @@ author:
 normative:
   RFC5321:
   RFC5322:
+  RFC6377:
   RFC7601:
   RFC5598:
 
@@ -74,8 +75,8 @@ informative:
     target: http://www.iana.org/assignments/smtp-enhanced-status-codes/smtp-enhanced-status-codes.xhtml
   ARC:
     title: Authenticated Received Chain (ARC) Protocol
-    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-04
-    date: 2017-06-20
+    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-10
+    date: 2017-12-19
     author:
       -
         ins: K. Andersen
@@ -86,9 +87,6 @@ informative:
       -
         ins: B. Long
         name: Brandon Long
-      -
-        ins: T. Adams
-        name: Trent Adams
       -
         ins: S. Jones
         name: Steven Jones
@@ -184,7 +182,7 @@ DKIM d= value is aligned with the rfc5322.From author domain.
 
 The intent of ARC is to be at most value-add and at worst benign. If ARC opens
 up significant new vectors for abuse - beyond DKIM replay attacks and other
-known issues ({{ID.ARC}} Security Considerations) inherent in the mail
+known issues ({{ARC}} Security Considerations) inherent in the mail
 protocols ARC is built upon - then ARC will be a failure.
 
 ## Open Questions
@@ -203,7 +201,7 @@ actors trying to craft or replay malicious chains.
 
 The longer an ARC Chain, the more queries that are needed to retrieve keys to
 validate the Chain. It is not believed this will be a security issue (see
-{{ID.ARC}}, Security Conditions --> DNS Attacks), but it is unclear how much
+{{ARC}}, Security Conditions --> DNS Attacks), but it is unclear how much
 overhead will truly be added.
 
 Data should be collected to better understand usable length and distribution of
