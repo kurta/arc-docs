@@ -1,8 +1,8 @@
 ---
 title: Recommended Usage of the Authenticated Received Chain (ARC)
 abbrev: ARC-USAGE
-docname: draft-ietf-dmarc-arc-usage-02
-date: 2017-06-20
+docname: draft-ietf-dmarc-arc-usage-03
+date: 2017-12-19
 
 # stand_alone: true
 
@@ -28,16 +28,6 @@ author:
         org: DMARC.org
         email: smj@crash.com
       -
-        ins: J. Rae-Grant
-        name: John Rae-Grant
-        org: Google
-        email: johnrg@google.com
-      -
-        ins: T. Adams
-        name: J. Trent Adams
-        org: Paypal
-        email: trent.adams@paypal.com
-      -
         ins: K. Andersen
         name: Kurt Andersen
         org: LinkedIn
@@ -47,6 +37,16 @@ author:
         code: 94043
         country: USA
         email: kurta@linkedin.com
+      -
+        ins: J. Rae-Grant
+        name: John Rae-Grant
+        org: Google
+        email: johnrg@google.com
+      -
+        ins: T. Adams
+        name: J. Trent Adams
+        org: Paypal
+        email: trent.adams@paypal.com
         role: editor
 
 normative:
@@ -158,7 +158,87 @@ to use those authentication results in the decision of whether or not
 to deliver the message, even though it failed to pass the usual
 authentication checks.
 
+# Evaluating the Efficacy of the ARC Protocol
 
+The ARC protocol is designed to mitigate some of the most common failure
+conditions for email which transits intermediary handlers en route to the
+final recipient. Some of these problems have happened due to the adoption
+of the DMARC protocol {{RFC7489}} and are listed in {{RFC6377}} and {{RFC7960}}.
+
+As the ARC protocol becomes standardized and implemented amongst 
+intermediary handlers, the following aspects should be evaluated in order to
+determine the success of the protocol in accomplishing the intended benefits.
+
+## Success Consideration
+
+Currently, many receivers have heuristic based overrides in place to attempt to
+rescue mail from intermediary-caused failures. Many of those overrides rely on
+inferrence rather than direct evidence. 
+
+ARC will be a success if, for ARC Sealed messages, receivers are able to
+implment ARC-based algorithmic decisions based on the direct evidence found
+within the ARC chain. This is especially relevant for DMARC processing when the
+DKIM d= value is aligned with the rfc5322.From author domain.
+
+## Failure Considerations
+
+The intent of ARC is to be at most value-add and at worst benign. If ARC opens
+up significant new vectors for abuse - beyond DKIM replay attacks and other
+known issues ({{ID.ARC}} Security Considerations) inherent in the mail
+protocols ARC is built upon - then ARC will be a failure.
+
+## Open Questions
+
+The following open questions are academic and have no clear answer at the time
+of the development of the protocol. However, wide-spread deployment should be
+able to gather the necessary data to conclusively answer some or all of them.
+
+### Value of ARC Seal (AS) Header
+
+Data should be collected to show if the ARC Seal (AS) provides value beyond the ARC
+Message Signature (AMS) for either making delivery decisions or catching malicious
+actors trying to craft or replay malicious chains.
+
+### DNS Overhead
+
+The longer an ARC Chain, the more queries that are needed to retrieve keys to
+validate the Chain. It is not believed this will be a security issue (see
+{{ID.ARC}}, Security Conditions --> DNS Attacks), but it is unclear how much
+overhead will truly be added.
+
+Data should be collected to better understand usable length and distribution of
+lengths found in valid ARC chains along with the the DNS impact of processing
+ARC chains.
+
+### What trace information is valuable
+
+There are several edge cases where the information in the AAR can make the
+difference between message delivery or rejection. For example, if there is a
+well known mailing list that ARC Seals but doesn’t do its own initial DMARC
+checks, a Final Receiver with this knowledge could make a delivery decision
+based upon the authentication information it sees in the corresponding AAR
+header.
+
+Certain trace information in the AAR is useful/necessary in the construction of
+DMARC reports. It would be beneficial to identify the value-add of having
+intermediary-handled mail flow information added into the DMARC reports going
+back to senders.
+
+Certain receivers believe the entire set of trace information would be valuable
+to feed into machine learning system to identify fraud and/or provide other
+signals related to message delivery.
+
+It is unclear what trace information will be valuable for all receivers,
+regardless of size.
+
+Data should be collected on what trace information receivers are using that
+provides useful signals that affect deliverability, and what portions of the
+trace data are left untouched or provide no useful information.
+
+Since many such systems are intentionly proprietary or confidential to prevent
+attack gaming, it may not be viable to reliably answer this particular
+question.  The evolving nature of attacks can also shift the landscape of
+"useful" information over time.
 
 
 # Guidance for Receivers/Validators
