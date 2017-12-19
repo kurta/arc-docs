@@ -380,9 +380,9 @@
 <link href="#rfc.section.3.1" rel="Chapter" title="3.1 Success Consideration"/>
 <link href="#rfc.section.3.2" rel="Chapter" title="3.2 Failure Considerations"/>
 <link href="#rfc.section.3.3" rel="Chapter" title="3.3 Open Questions"/>
-<link href="#rfc.section.3.3.1" rel="Chapter" title="3.3.1 Value of ARC Seal (AS) Header"/>
+<link href="#rfc.section.3.3.1" rel="Chapter" title="3.3.1 Value of the ARC-Seal (AS) Header"/>
 <link href="#rfc.section.3.3.2" rel="Chapter" title="3.3.2 DNS Overhead"/>
-<link href="#rfc.section.3.3.3" rel="Chapter" title="3.3.3 What trace information is valuable"/>
+<link href="#rfc.section.3.3.3" rel="Chapter" title="3.3.3 Distinguishing Valuable from Worthless Trace Information"/>
 <link href="#rfc.section.4" rel="Chapter" title="4 Guidance for Receivers/Validators"/>
 <link href="#rfc.section.4.1" rel="Chapter" title="4.1 What is the significance of an intact ARC chain?"/>
 <link href="#rfc.section.4.2" rel="Chapter" title="4.2 What exactly is an &#x201C;intact&#x201D; ARC chain?"/>
@@ -507,9 +507,9 @@
 <ul><li>3.1.   <a href="#rfc.section.3.1">Success Consideration</a></li>
 <li>3.2.   <a href="#rfc.section.3.2">Failure Considerations</a></li>
 <li>3.3.   <a href="#rfc.section.3.3">Open Questions</a></li>
-<ul><li>3.3.1.   <a href="#rfc.section.3.3.1">Value of ARC Seal (AS) Header</a></li>
+<ul><li>3.3.1.   <a href="#rfc.section.3.3.1">Value of the ARC-Seal (AS) Header</a></li>
 <li>3.3.2.   <a href="#rfc.section.3.3.2">DNS Overhead</a></li>
-<li>3.3.3.   <a href="#rfc.section.3.3.3">What trace information is valuable</a></li>
+<li>3.3.3.   <a href="#rfc.section.3.3.3">Distinguishing Valuable from Worthless Trace Information</a></li>
 </ul></ul><li>4.   <a href="#rfc.section.4">Guidance for Receivers/Validators</a></li>
 <ul><li>4.1.   <a href="#rfc.section.4.1">What is the significance of an intact ARC chain?</a></li>
 <li>4.2.   <a href="#rfc.section.4.2">What exactly is an &#8220;intact&#8221; ARC chain?</a></li>
@@ -559,24 +559,24 @@
 <p id="rfc.section.3.p.1">The ARC protocol is designed to mitigate some of the most common failure conditions for email which transits intermediary handlers en route to the final recipient. Some of these problems have happened due to the adoption of the DMARC protocol <a href="#RFC7489">[RFC7489]</a> and are listed in <a href="#RFC6377">[RFC6377]</a> and <a href="#RFC7960">[RFC7960]</a>.</p>
 <p id="rfc.section.3.p.2">As the ARC protocol becomes standardized and implemented amongst intermediary handlers, the following aspects should be evaluated in order to determine the success of the protocol in accomplishing the intended benefits.</p>
 <h1 id="rfc.section.3.1"><a href="#rfc.section.3.1">3.1.</a> <a href="#success-consideration" id="success-consideration">Success Consideration</a></h1>
-<p id="rfc.section.3.1.p.1">Currently, many receivers have heuristic based overrides in place to attempt to rescue mail from intermediary-caused failures. Many of those overrides rely on inferrence rather than direct evidence.</p>
-<p id="rfc.section.3.1.p.2">ARC will be a success if, for ARC Sealed messages, receivers are able to implment ARC-based algorithmic decisions based on the direct evidence found within the ARC chain. This is especially relevant for DMARC processing when the DKIM d= value is aligned with the rfc5322.From author domain.</p>
+<p id="rfc.section.3.1.p.1">Currently, many receivers have heuristically determined overrides in order to rescue mail from intermediary-caused failures. Many of those overrides rely on inferrence rather than direct evidence.</p>
+<p id="rfc.section.3.1.p.2">ARC will be a success if, for ARC sealed messages, receivers are able to implment ARC-based algorithmic decisions based on the direct evidence found within the ARC chain. This is especially relevant for DMARC processing when the DKIM d= value is aligned with the rfc5322.From author domain.</p>
 <h1 id="rfc.section.3.2"><a href="#rfc.section.3.2">3.2.</a> <a href="#failure-considerations" id="failure-considerations">Failure Considerations</a></h1>
-<p id="rfc.section.3.2.p.1">The intent of ARC is to be at most value-add and at worst benign. If ARC opens up significant new vectors for abuse - beyond DKIM replay attacks and other known issues (<a href="#ARC">[ARC]</a> Security Considerations) inherent in the mail protocols ARC is built upon - then ARC will be a failure.</p>
+<p id="rfc.section.3.2.p.1">The intent of ARC is to be at most value-add and at worst benign. If ARC opens up significant new vectors for abuse (see <a href="#ARC">[ARC]</a> Security Considerations) then this protocol will be a failure. Note that weaknesses inherent in the mail protocols ARC is built upon (such as DKIM replay attacks and other known issues) are not new vectors which can be attributed to this specification.</p>
 <h1 id="rfc.section.3.3"><a href="#rfc.section.3.3">3.3.</a> <a href="#open-questions" id="open-questions">Open Questions</a></h1>
 <p id="rfc.section.3.3.p.1">The following open questions are academic and have no clear answer at the time of the development of the protocol. However, wide-spread deployment should be able to gather the necessary data to conclusively answer some or all of them.</p>
-<h1 id="rfc.section.3.3.1"><a href="#rfc.section.3.3.1">3.3.1.</a> <a href="#value-of-arc-seal-as-header" id="value-of-arc-seal-as-header">Value of ARC Seal (AS) Header</a></h1>
-<p id="rfc.section.3.3.1.p.1">Data should be collected to show if the ARC Seal (AS) provides value beyond the ARC Message Signature (AMS) for either making delivery decisions or catching malicious actors trying to craft or replay malicious chains.</p>
+<h1 id="rfc.section.3.3.1"><a href="#rfc.section.3.3.1">3.3.1.</a> <a href="#value-of-the-arc-seal-as-header" id="value-of-the-arc-seal-as-header">Value of the ARC-Seal (AS) Header</a></h1>
+<p id="rfc.section.3.3.1.p.1">Data should be collected to show if the ARC-Seal (AS) provides value beyond the ARC Message Signature (AMS) for either making delivery decisions or catching malicious actors trying to craft or replay malicious chains.</p>
 <h1 id="rfc.section.3.3.2"><a href="#rfc.section.3.3.2">3.3.2.</a> <a href="#dns-overhead" id="dns-overhead">DNS Overhead</a></h1>
-<p id="rfc.section.3.3.2.p.1">The longer an ARC Chain, the more queries that are needed to retrieve keys to validate the Chain. It is not believed this will be a security issue (see <a href="#ARC">[ARC]</a>, Security Conditions &#8211;&gt; DNS Attacks), but it is unclear how much overhead will truly be added.</p>
+<p id="rfc.section.3.3.2.p.1">Longer ARC chains will require more queries to retrieve the keys for validating the chain. While this is not believed to be a security issue (see <a href="#ARC">[ARC]</a>, Security Conditions &#8211;&gt; DNS Attacks), it is unclear how much overhead will truly be added. This is similar to some of the initial processing and query load concerns which were debated at the time of the DKIM specification development.</p>
 <p id="rfc.section.3.3.2.p.2">Data should be collected to better understand usable length and distribution of lengths found in valid ARC chains along with the the DNS impact of processing ARC chains.</p>
-<h1 id="rfc.section.3.3.3"><a href="#rfc.section.3.3.3">3.3.3.</a> <a href="#what-trace-information-is-valuable" id="what-trace-information-is-valuable">What trace information is valuable</a></h1>
-<p id="rfc.section.3.3.3.p.1">There are several edge cases where the information in the AAR can make the difference between message delivery or rejection. For example, if there is a well known mailing list that ARC Seals but doesn&#8217;t do its own initial DMARC checks, a Final Receiver with this knowledge could make a delivery decision based upon the authentication information it sees in the corresponding AAR header.</p>
+<h1 id="rfc.section.3.3.3"><a href="#rfc.section.3.3.3">3.3.3.</a> <a href="#distinguishing-valuable-from-worthless-trace-information" id="distinguishing-valuable-from-worthless-trace-information">Distinguishing Valuable from Worthless Trace Information</a></h1>
+<p id="rfc.section.3.3.3.p.1">There are several edge cases where the information in the AAR can make the difference between message delivery or rejection. For example, if there is a well known mailing list that ARC seals but doesn&#8217;t do its own initial DMARC enforcement, a Final Receiver with this knowledge could make a delivery decision based upon the authentication information it sees in the corresponding AAR header.</p>
 <p id="rfc.section.3.3.3.p.2">Certain trace information in the AAR is useful/necessary in the construction of DMARC reports. It would be beneficial to identify the value-add of having intermediary-handled mail flow information added into the DMARC reports going back to senders.</p>
-<p id="rfc.section.3.3.3.p.3">Certain receivers believe the entire set of trace information would be valuable to feed into machine learning system to identify fraud and/or provide other signals related to message delivery.</p>
+<p id="rfc.section.3.3.3.p.3">Certain receivers believe the entire set of trace information would be valuable to feed into machine learning systems to identify fraud and/or provide other signals related to message delivery.</p>
 <p id="rfc.section.3.3.3.p.4">It is unclear what trace information will be valuable for all receivers, regardless of size.</p>
 <p id="rfc.section.3.3.3.p.5">Data should be collected on what trace information receivers are using that provides useful signals that affect deliverability, and what portions of the trace data are left untouched or provide no useful information.</p>
-<p id="rfc.section.3.3.3.p.6">Since many such systems are intentionly proprietary or confidential to prevent attack gaming, it may not be viable to reliably answer this particular question.  The evolving nature of attacks can also shift the landscape of &#8220;useful&#8221; information over time.</p>
+<p id="rfc.section.3.3.3.p.6">Since many such systems are intentionly proprietary or confidential to prevent gaming by abusers, it may not be viable to reliably answer this particular question.  The evolving nature of attacks can also shift the landscape of &#8220;useful&#8221; information over time.</p>
 <h1 id="rfc.section.4"><a href="#rfc.section.4">4.</a> <a href="#guidance-for-receiversvalidators" id="guidance-for-receiversvalidators">Guidance for Receivers/Validators</a></h1>
 <h1 id="rfc.section.4.1"><a href="#rfc.section.4.1">4.1.</a> <a href="#what-is-the-significance-of-an-intact-arc-chain" id="what-is-the-significance-of-an-intact-arc-chain">What is the significance of an intact ARC chain?</a></h1>
 <p id="rfc.section.4.1.p.1">An intact ARC chain conveys authentication results like SPF and DKIM as observed by the first ARC participant. In cases where the message no longer produces passing results for DKIM, SPF, or DMARC but an intact ARC chain is present, the message receiver may choose to use the contents of the ARC-Authentication-Results header field in determining how to handle the message.</p>

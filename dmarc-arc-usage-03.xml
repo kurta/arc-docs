@@ -146,11 +146,11 @@ determine the success of the protocol in accomplishing the intended benefits.</t
 
 <section anchor="success-consideration" title="Success Consideration">
 
-<t>Currently, many receivers have heuristic based overrides in place to attempt to
+<t>Currently, many receivers have heuristically determined overrides in order to
 rescue mail from intermediary-caused failures. Many of those overrides rely on
 inferrence rather than direct evidence.</t>
 
-<t>ARC will be a success if, for ARC Sealed messages, receivers are able to
+<t>ARC will be a success if, for ARC sealed messages, receivers are able to
 implment ARC-based algorithmic decisions based on the direct evidence found
 within the ARC chain. This is especially relevant for DMARC processing when the
 DKIM d= value is aligned with the rfc5322.From author domain.</t>
@@ -159,9 +159,10 @@ DKIM d= value is aligned with the rfc5322.From author domain.</t>
 <section anchor="failure-considerations" title="Failure Considerations">
 
 <t>The intent of ARC is to be at most value-add and at worst benign. If ARC opens
-up significant new vectors for abuse - beyond DKIM replay attacks and other
-known issues (<xref target="ARC"/> Security Considerations) inherent in the mail
-protocols ARC is built upon - then ARC will be a failure.</t>
+up significant new vectors for abuse (see <xref target="ARC"/> Security Considerations) then
+this protocol will be a failure. Note that weaknesses inherent in the mail
+protocols ARC is built upon (such as DKIM replay attacks and other known issues)
+are not new vectors which can be attributed to this specification.</t>
 
 </section>
 <section anchor="open-questions" title="Open Questions">
@@ -170,31 +171,33 @@ protocols ARC is built upon - then ARC will be a failure.</t>
 of the development of the protocol. However, wide-spread deployment should be
 able to gather the necessary data to conclusively answer some or all of them.</t>
 
-<section anchor="value-of-arc-seal-as-header" title="Value of ARC Seal (AS) Header">
+<section anchor="value-of-the-arc-seal-as-header" title="Value of the ARC-Seal (AS) Header">
 
-<t>Data should be collected to show if the ARC Seal (AS) provides value beyond the ARC
+<t>Data should be collected to show if the ARC-Seal (AS) provides value beyond the ARC
 Message Signature (AMS) for either making delivery decisions or catching malicious
 actors trying to craft or replay malicious chains.</t>
 
 </section>
 <section anchor="dns-overhead" title="DNS Overhead">
 
-<t>The longer an ARC Chain, the more queries that are needed to retrieve keys to
-validate the Chain. It is not believed this will be a security issue (see
-<xref target="ARC"/>, Security Conditions –&gt; DNS Attacks), but it is unclear how much
-overhead will truly be added.</t>
+<t>Longer ARC chains will require more queries to retrieve the keys for 
+validating the chain. While this is not believed to be a security issue (see
+<xref target="ARC"/>, Security Conditions –&gt; DNS Attacks), it is unclear how much
+overhead will truly be added. This is similar to some of the initial processing
+and query load concerns which were debated at the time of the DKIM specification
+development.</t>
 
 <t>Data should be collected to better understand usable length and distribution of
 lengths found in valid ARC chains along with the the DNS impact of processing
 ARC chains.</t>
 
 </section>
-<section anchor="what-trace-information-is-valuable" title="What trace information is valuable">
+<section anchor="distinguishing-valuable-from-worthless-trace-information" title="Distinguishing Valuable from Worthless Trace Information">
 
 <t>There are several edge cases where the information in the AAR can make the
 difference between message delivery or rejection. For example, if there is a
-well known mailing list that ARC Seals but doesn’t do its own initial DMARC
-checks, a Final Receiver with this knowledge could make a delivery decision
+well known mailing list that ARC seals but doesn’t do its own initial DMARC
+enforcement, a Final Receiver with this knowledge could make a delivery decision
 based upon the authentication information it sees in the corresponding AAR
 header.</t>
 
@@ -204,7 +207,7 @@ intermediary-handled mail flow information added into the DMARC reports going
 back to senders.</t>
 
 <t>Certain receivers believe the entire set of trace information would be valuable
-to feed into machine learning system to identify fraud and/or provide other
+to feed into machine learning systems to identify fraud and/or provide other
 signals related to message delivery.</t>
 
 <t>It is unclear what trace information will be valuable for all receivers,
@@ -215,7 +218,7 @@ provides useful signals that affect deliverability, and what portions of the
 trace data are left untouched or provide no useful information.</t>
 
 <t>Since many such systems are intentionly proprietary or confidential to prevent
-attack gaming, it may not be viable to reliably answer this particular
+gaming by abusers, it may not be viable to reliably answer this particular
 question.  The evolving nature of attacks can also shift the landscape of
 “useful” information over time.</t>
 

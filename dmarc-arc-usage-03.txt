@@ -73,9 +73,10 @@ Table of Contents
      3.1.  Success Consideration . . . . . . . . . . . . . . . . . .   4
      3.2.  Failure Considerations  . . . . . . . . . . . . . . . . .   5
      3.3.  Open Questions  . . . . . . . . . . . . . . . . . . . . .   5
-       3.3.1.  Value of ARC Seal (AS) Header . . . . . . . . . . . .   5
+       3.3.1.  Value of the ARC-Seal (AS) Header . . . . . . . . . .   5
        3.3.2.  DNS Overhead  . . . . . . . . . . . . . . . . . . . .   5
-       3.3.3.  What trace information is valuable  . . . . . . . . .   5
+       3.3.3.  Distinguishing Valuable from Worthless Trace
+               Information . . . . . . . . . . . . . . . . . . . . .   5
    4.  Guidance for Receivers/Validators . . . . . . . . . . . . . .   6
      4.1.  What is the significance of an intact ARC chain?  . . . .   6
      4.2.  What exactly is an "intact" ARC chain?  . . . . . . . . .   6
@@ -83,13 +84,13 @@ Table of Contents
            chain?  . . . . . . . . . . . . . . . . . . . . . . . . .   7
      4.4.  What does the absence of an ARC chain in a message mean?    7
      4.5.  What reasonable conclusions can you draw based upon
-           seeing lots of mail with ARC chains?  . . . . . . . . . .   7
+           seeing lots of mail with ARC chains?  . . . . . . . . . .   8
      4.6.  What if none of the intermediaries have been seen
            previously? . . . . . . . . . . . . . . . . . . . . . . .   8
      4.7.  What about ARC chains where some intermediaries are known
            and others are not? . . . . . . . . . . . . . . . . . . .   8
      4.8.  What should message handlers do when they detect
-           malicious content in messages where ARC is present? . . .   8
+           malicious content in messages where ARC is present? . . .   9
      4.9.  What feedback does a sender or domain owner get about ARC
            when it is applied to their messages? . . . . . . . . . .   9
      4.10. What prevents a malicious actor from removing the ARC
@@ -101,11 +102,10 @@ Table of Contents
            Intermediary? . . . . . . . . . . . . . . . . . . . . . .  10
        5.2.1.  More specifically a participating ARC intermediary
                must do the following:  . . . . . . . . . . . . . . .  10
-     5.3.  Should every MTA be an ARC participant? . . . . . . . . .  10
+     5.3.  Should every MTA be an ARC participant? . . . . . . . . .  11
      5.4.  What should an intermediary do in the case of an invalid
            or "broken" ARC chain?  . . . . . . . . . . . . . . . . .  11
      5.5.  What should I do in the case where there is no ARC chain
-           present in a message? . . . . . . . . . . . . . . . . . .  11
 
 
 
@@ -114,19 +114,20 @@ Jones, et al.             Expires June 22, 2018                 [Page 2]
 Internet-Draft                  ARC-USAGE                  December 2017
 
 
+           present in a message? . . . . . . . . . . . . . . . . . .  11
      5.6.  How could ARC affect my reputation as an intermediary?  .  11
      5.7.  What can I do to influence my reputation as an
-           intermediary? . . . . . . . . . . . . . . . . . . . . . .  11
+           intermediary? . . . . . . . . . . . . . . . . . . . . . .  12
    6.  Guidance for Originators  . . . . . . . . . . . . . . . . . .  12
      6.1.  Where can I find out more information?  . . . . . . . . .  12
      6.2.  How/where can I test interoperabililty for my
            implementation? . . . . . . . . . . . . . . . . . . . . .  12
      6.3.  How can ARC impact my email?  . . . . . . . . . . . . . .  12
-     6.4.  How can ARC impact my reputation as a message sender? . .  12
+     6.4.  How can ARC impact my reputation as a message sender? . .  13
      6.5.  Can I tell intermediaries not to use ARC? . . . . . . . .  13
    7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
      7.1.  Normative References  . . . . . . . . . . . . . . . . . .  13
-     7.2.  Informative References  . . . . . . . . . . . . . . . . .  13
+     7.2.  Informative References  . . . . . . . . . . . . . . . . .  14
      7.3.  URIs  . . . . . . . . . . . . . . . . . . . . . . . . . .  14
    Appendix A.  GLOSSARY . . . . . . . . . . . . . . . . . . . . . .  14
    Appendix B.  References . . . . . . . . . . . . . . . . . . . . .  17
@@ -160,8 +161,7 @@ Internet-Draft                  ARC-USAGE                  December 2017
    inserted an Authentication-Results header field it was most likely
    stripped and/or replaced by the next message receiver.
 
-   If the mailing list implemented ARC, it would record the contents of
-   the Authentication-Results header field in the ARC-Authentication-
+
 
 
 
@@ -170,6 +170,8 @@ Jones, et al.             Expires June 22, 2018                 [Page 3]
 Internet-Draft                  ARC-USAGE                  December 2017
 
 
+   If the mailing list implemented ARC, it would record the contents of
+   the Authentication-Results header field in the ARC-Authentication-
    Results header field.  It would then create an an ARC-Message-
    Signature header field, which includes a cryptographic signature of
    the message itself, and then an ARC-Seal header field, which includes
@@ -209,15 +211,13 @@ Internet-Draft                  ARC-USAGE                  December 2017
 
 3.1.  Success Consideration
 
-   Currently, many receivers have heuristic based overrides in place to
-   attempt to rescue mail from intermediary-caused failures.  Many of
+   Currently, many receivers have heuristically determined overrides in
+   order to rescue mail from intermediary-caused failures.  Many of
    those overrides rely on inferrence rather than direct evidence.
 
-   ARC will be a success if, for ARC Sealed messages, receivers are able
+   ARC will be a success if, for ARC sealed messages, receivers are able
    to implment ARC-based algorithmic decisions based on the direct
    evidence found within the ARC chain.  This is especially relevant for
-   DMARC processing when the DKIM d= value is aligned with the
-   rfc5322.From author domain.
 
 
 
@@ -226,13 +226,17 @@ Jones, et al.             Expires June 22, 2018                 [Page 4]
 Internet-Draft                  ARC-USAGE                  December 2017
 
 
+   DMARC processing when the DKIM d= value is aligned with the
+   rfc5322.From author domain.
+
 3.2.  Failure Considerations
 
    The intent of ARC is to be at most value-add and at worst benign.  If
-   ARC opens up significant new vectors for abuse - beyond DKIM replay
-   attacks and other known issues ([ARC] Security Considerations)
-   inherent in the mail protocols ARC is built upon - then ARC will be a
-   failure.
+   ARC opens up significant new vectors for abuse (see [ARC] Security
+   Considerations) then this protocol will be a failure.  Note that
+   weaknesses inherent in the mail protocols ARC is built upon (such as
+   DKIM replay attacks and other known issues) are not new vectors which
+   can be attributed to this specification.
 
 3.3.  Open Questions
 
@@ -241,38 +245,34 @@ Internet-Draft                  ARC-USAGE                  December 2017
    deployment should be able to gather the necessary data to
    conclusively answer some or all of them.
 
-3.3.1.  Value of ARC Seal (AS) Header
+3.3.1.  Value of the ARC-Seal (AS) Header
 
-   Data should be collected to show if the ARC Seal (AS) provides value
+   Data should be collected to show if the ARC-Seal (AS) provides value
    beyond the ARC Message Signature (AMS) for either making delivery
    decisions or catching malicious actors trying to craft or replay
    malicious chains.
 
 3.3.2.  DNS Overhead
 
-   The longer an ARC Chain, the more queries that are needed to retrieve
-   keys to validate the Chain.  It is not believed this will be a
-   security issue (see [ARC], Security Conditions -> DNS Attacks), but
-   it is unclear how much overhead will truly be added.
+   Longer ARC chains will require more queries to retrieve the keys for
+   validating the chain.  While this is not believed to be a security
+   issue (see [ARC], Security Conditions -> DNS Attacks), it is unclear
+   how much overhead will truly be added.  This is similar to some of
+   the initial processing and query load concerns which were debated at
+   the time of the DKIM specification development.
 
    Data should be collected to better understand usable length and
    distribution of lengths found in valid ARC chains along with the the
    DNS impact of processing ARC chains.
 
-3.3.3.  What trace information is valuable
+3.3.3.  Distinguishing Valuable from Worthless Trace Information
 
    There are several edge cases where the information in the AAR can
    make the difference between message delivery or rejection.  For
-   example, if there is a well known mailing list that ARC Seals but
-   doesn't do its own initial DMARC checks, a Final Receiver with this
-   knowledge could make a delivery decision based upon the
+   example, if there is a well known mailing list that ARC seals but
+   doesn't do its own initial DMARC enforcement, a Final Receiver with
+   this knowledge could make a delivery decision based upon the
    authentication information it sees in the corresponding AAR header.
-
-   Certain trace information in the AAR is useful/necessary in the
-   construction of DMARC reports.  It would be beneficial to identify
-   the value-add of having intermediary-handled mail flow information
-   added into the DMARC reports going back to senders.
-
 
 
 
@@ -282,8 +282,13 @@ Jones, et al.             Expires June 22, 2018                 [Page 5]
 Internet-Draft                  ARC-USAGE                  December 2017
 
 
+   Certain trace information in the AAR is useful/necessary in the
+   construction of DMARC reports.  It would be beneficial to identify
+   the value-add of having intermediary-handled mail flow information
+   added into the DMARC reports going back to senders.
+
    Certain receivers believe the entire set of trace information would
-   be valuable to feed into machine learning system to identify fraud
+   be valuable to feed into machine learning systems to identify fraud
    and/or provide other signals related to message delivery.
 
    It is unclear what trace information will be valuable for all
@@ -295,7 +300,7 @@ Internet-Draft                  ARC-USAGE                  December 2017
    useful information.
 
    Since many such systems are intentionly proprietary or confidential
-   to prevent attack gaming, it may not be viable to reliably answer
+   to prevent gaming by abusers, it may not be viable to reliably answer
    this particular question.  The evolving nature of attacks can also
    shift the landscape of "useful" information over time.
 
@@ -325,11 +330,6 @@ Internet-Draft                  ARC-USAGE                  December 2017
    handled the message between ARC intermediaries but did not alter the
    message in a way that invalidated the most recent ARC-Message-
    Signature present at that time, the chain would still be considered
-   intact by the next ARC participant, and recorded as such in the ARC-
-   Seal header field they insert.
-
-   Message receivers may make local policy decisions about whether to
-   use the contents of the ARC-Authentication-Results header field in
 
 
 
@@ -338,6 +338,11 @@ Jones, et al.             Expires June 22, 2018                 [Page 6]
 Internet-Draft                  ARC-USAGE                  December 2017
 
 
+   intact by the next ARC participant, and recorded as such in the ARC-
+   Seal header field they insert.
+
+   Message receivers may make local policy decisions about whether to
+   use the contents of the ARC-Authentication-Results header field in
    cases where a message no longer passes DKIM, DMARC, and/or SPF
    checks.  Whether an ARC chain is intact can be used to inform that
    local policy decision.
@@ -377,13 +382,8 @@ Internet-Draft                  ARC-USAGE                  December 2017
    absent, there is nothing extra that ARC requires the final recipient
    to do.
 
-4.5.  What reasonable conclusions can you draw based upon seeing lots of
-      mail with ARC chains?
 
-   With sufficient history, ARC can be used to augment DMARC
-   authentication policy (i.e. a message could fail DMARC, but validated
-   ARC information and therefore could be considered as validly
-   authenticated as reported by the first ARC participant).
+
 
 
 
@@ -393,6 +393,14 @@ Jones, et al.             Expires June 22, 2018                 [Page 7]
 
 Internet-Draft                  ARC-USAGE                  December 2017
 
+
+4.5.  What reasonable conclusions can you draw based upon seeing lots of
+      mail with ARC chains?
+
+   With sufficient history, ARC can be used to augment DMARC
+   authentication policy (i.e. a message could fail DMARC, but validated
+   ARC information and therefore could be considered as validly
+   authenticated as reported by the first ARC participant).
 
    If the validator does content analysis and reputation tracking, the
    ARC participants in a message can be credited or discredited for good
@@ -431,6 +439,17 @@ Internet-Draft                  ARC-USAGE                  December 2017
    intermediaries may have manipulated the message or injected bad
    content.
 
+
+
+
+
+
+
+Jones, et al.             Expires June 22, 2018                 [Page 8]
+
+Internet-Draft                  ARC-USAGE                  December 2017
+
+
 4.8.  What should message handlers do when they detect malicious content
       in messages where ARC is present?
 
@@ -442,14 +461,6 @@ Internet-Draft                  ARC-USAGE                  December 2017
    In such cases it is difficult to determine where the malicious
    content may have been injected.  What ARC can do in such cases is
    verify that a given intermediary or message handler did in fact
-
-
-
-Jones, et al.             Expires June 22, 2018                 [Page 8]
-
-Internet-Draft                  ARC-USAGE                  December 2017
-
-
    handle the message as indicated in the header fields.  In such cases
    a message recipient who maintains a reputation system about email
    senders may wish to incorporate this information as an additional
@@ -487,6 +498,14 @@ Internet-Draft                  ARC-USAGE                  December 2017
 
    In the first case, the bad actor has succeeded in manipulating the
    message but they have attached a verifiable signature identifying
+
+
+
+Jones, et al.             Expires June 22, 2018                 [Page 9]
+
+Internet-Draft                  ARC-USAGE                  December 2017
+
+
    themselves.  While not an ideal situation, it is something they are
    already able to do without ARC involved, but now a signature linked
    to the domain responsible for the manipulation is present.
@@ -497,14 +516,6 @@ Internet-Draft                  ARC-USAGE                  December 2017
    actor.  But again, a bad actor can similarly manipulate a sequence of
    RFC5322.Received header fields today without ARC, but with ARC that
    bad actor has verifiably identified themselves.
-
-
-
-
-Jones, et al.             Expires June 22, 2018                 [Page 9]
-
-Internet-Draft                  ARC-USAGE                  December 2017
-
 
 5.  Guidance for Intermediaries
 
@@ -543,6 +554,14 @@ Internet-Draft                  ARC-USAGE                  December 2017
    5.  Generate a new ARC Seal and add it to the message according to
        the ARC specification.
 
+
+
+
+Jones, et al.             Expires June 22, 2018                [Page 10]
+
+Internet-Draft                  ARC-USAGE                  December 2017
+
+
 5.3.  Should every MTA be an ARC participant?
 
    Generally speaking, ARC is designed to operate at the ADMD level.
@@ -552,15 +571,6 @@ Internet-Draft                  ARC-USAGE                  December 2017
    field.  But when it is determined that the message is being sent on
    outside of that ADMD, that is when the ADMD should add itself to the
    ARC chain - before sending the message outside of the ADMD.
-
-
-
-
-
-Jones, et al.             Expires June 22, 2018                [Page 10]
-
-Internet-Draft                  ARC-USAGE                  December 2017
-
 
    Some organizations may operate multiple ADMDs, with more or less
    independence between them.  While they should make a determination
@@ -598,6 +608,16 @@ Internet-Draft                  ARC-USAGE                  December 2017
    elements may amplify or attenuate such signals, depending on the
    circumstances.
 
+
+
+
+
+
+Jones, et al.             Expires June 22, 2018                [Page 11]
+
+Internet-Draft                  ARC-USAGE                  December 2017
+
+
    Reputation systems are complex and usually specific to a given
    message receiver, and a meaningful discussion of such a broad topic
    is beyond the scope of this document.
@@ -610,13 +630,6 @@ Internet-Draft                  ARC-USAGE                  December 2017
    implementing ARC on all traffic it handles might receive some
    reputational benefit by making it easier to detect when their
    involvement in conveying bad traffic has been "forged."
-
-
-
-Jones, et al.             Expires June 22, 2018                [Page 11]
-
-Internet-Draft                  ARC-USAGE                  December 2017
-
 
    As mentioned previously reputation systems are very complex and
    usually specific to a given message receiver, and a meaningful
@@ -653,6 +666,14 @@ Internet-Draft                  ARC-USAGE                  December 2017
    potentially deciding to deliver the message even though a DMARC check
    did not pass.
 
+
+
+
+Jones, et al.             Expires June 22, 2018                [Page 12]
+
+Internet-Draft                  ARC-USAGE                  December 2017
+
+
    The net result for domain owners and senders is that ARC may allow
    messages routed through participating ARC intermediaries to be
    delivered, even though those messages would not have been delivered
@@ -666,14 +687,6 @@ Internet-Draft                  ARC-USAGE                  December 2017
    point that may be used as an input to such reputation systems.
    Messages deemed to have good content may provide a positive signal
    for the sending domain and the intermediaries that handled it, while
-
-
-
-Jones, et al.             Expires June 22, 2018                [Page 12]
-
-Internet-Draft                  ARC-USAGE                  December 2017
-
-
    messages with bad content may provide a negative signal for the
    sending domain and the intermediaries that handled it.  Intact and
    valid ARC elements may amplify or attenuate such signals, depending
@@ -708,6 +721,15 @@ Internet-Draft                  ARC-USAGE                  December 2017
               Mailing Lists", BCP 167, RFC 6377, DOI 10.17487/RFC6377,
               September 2011, <https://www.rfc-editor.org/info/rfc6377>.
 
+
+
+
+
+Jones, et al.             Expires June 22, 2018                [Page 13]
+
+Internet-Draft                  ARC-USAGE                  December 2017
+
+
    [RFC7601]  Kucherawy, M., "Message Header Field for Indicating
               Message Authentication Status", RFC 7601, DOI 10.17487/
               RFC7601, August 2015, <https://www.rfc-editor.org/info/
@@ -719,16 +741,6 @@ Internet-Draft                  ARC-USAGE                  December 2017
               "Authenticated Received Chain (ARC) Protocol", December
               2017, <https://tools.ietf.org/html/draft-ietf-dmarc-arc-
               protocol-10>.
-
-
-
-
-
-
-Jones, et al.             Expires June 22, 2018                [Page 13]
-
-Internet-Draft                  ARC-USAGE                  December 2017
-
 
    [ENHANCED-STATUS]
               "IANA SMTP Enhanced Status Codes", n.d.,
@@ -767,6 +779,13 @@ Appendix A.  GLOSSARY
       different roles, all handling email for several different domains
       representing parts of the university.
 
+
+
+Jones, et al.             Expires June 22, 2018                [Page 14]
+
+Internet-Draft                  ARC-USAGE                  December 2017
+
+
    ARC  ARC is an acronym: Authentication Results Chain - see also [ARC]
 
    ARC-Seal  An [RFC5322] message header field formed in compliance with
@@ -778,13 +797,6 @@ Appendix A.  GLOSSARY
       specification.  It includes certain content about the message as
       it was received and manipulated by the intermediary who inserted
       it.
-
-
-
-Jones, et al.             Expires June 22, 2018                [Page 14]
-
-Internet-Draft                  ARC-USAGE                  December 2017
-
 
    ARC-Authentication-Results (also abbreviated as "AAR")  An [RFC5322]
       message header field formed in compliance with the [ARC]
@@ -821,6 +833,15 @@ Internet-Draft                  ARC-USAGE                  December 2017
 
    Mail/Message Transfer Agent (MTA)  This refers to software that sends
       and receives email messsages across a network with other MTAs.
+
+
+
+
+Jones, et al.             Expires June 22, 2018                [Page 15]
+
+Internet-Draft                  ARC-USAGE                  December 2017
+
+
       Often run on dedicated servers, common examples are Exim,
       Microsoft Exchange, Postfix, and Sendmail.
 
@@ -834,14 +855,6 @@ Internet-Draft                  ARC-USAGE                  December 2017
       ultimate recipient of the message, or subvert the network controls
       and infrastructure of the Message Receiver.  Typical examples
       would be a spammer who forges content or attributes of a message
-
-
-
-Jones, et al.             Expires June 22, 2018                [Page 15]
-
-Internet-Draft                  ARC-USAGE                  December 2017
-
-
       in order to evade anti-spam measures, or an entity that adds an
       attachment containing a virus to a message.
 
@@ -876,6 +889,15 @@ Internet-Draft                  ARC-USAGE                  December 2017
       whereas other organizations might choose to use commercial
       products or free services.
 
+
+
+
+
+Jones, et al.             Expires June 22, 2018                [Page 16]
+
+Internet-Draft                  ARC-USAGE                  December 2017
+
+
    Reputation Service Provider  A Reputation Service Provider would be a
       source of reputation information about a message sender.  In this
       context, the DNSBL services offered by Spamhaus would allow them
@@ -887,16 +909,6 @@ Internet-Draft                  ARC-USAGE                  December 2017
       by the Internet Engineering Task Force (IETF), they are de facto
       standards for various methods of communicating or collaborating
       over the Internet.
-
-
-
-
-
-
-Jones, et al.             Expires June 22, 2018                [Page 16]
-
-Internet-Draft                  ARC-USAGE                  December 2017
-
 
    RFC5321 - Simple Mail Transfer Protocol  This document describes the
       protocol used to transfer email messages between Message Transfer
@@ -935,6 +947,13 @@ Authors' Addresses
    Email: smj@crash.com
 
 
+
+
+Jones, et al.             Expires June 22, 2018                [Page 17]
+
+Internet-Draft                  ARC-USAGE                  December 2017
+
+
    Kurt Andersen
    LinkedIn
    2029 Stierlin Ct.
@@ -942,16 +961,6 @@ Authors' Addresses
    USA
 
    Email: kurta@linkedin.com
-
-
-
-
-
-
-
-Jones, et al.             Expires June 22, 2018                [Page 17]
-
-Internet-Draft                  ARC-USAGE                  December 2017
 
 
    John Rae-Grant
@@ -964,15 +973,6 @@ Internet-Draft                  ARC-USAGE                  December 2017
    Paypal
 
    Email: trent.adams@paypal.com
-
-
-
-
-
-
-
-
-
 
 
 
