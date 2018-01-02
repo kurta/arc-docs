@@ -401,6 +401,15 @@ defines what information must be provided, sealing ADMDs may provide additional
 information, and validating receivers may use or ignore this trace information
 as they wish.
 
+### Instance Tags
+
+See section {{i-defn}}
+
+### Chain Validation Status
+
+See section {{cv-defn}}
+
+
 # The ARC Header Fields
 
 ## Instance ('i=') Tag {#i-defn}
@@ -656,6 +665,9 @@ status as determined in {{cv-calc}}, and instance number N+1.
 
 ## Relationship between DKIM-Signature and AMS signing scopes {#dkim-arc}
 
+\[\[ SB-11: replace with "ARC MUST be the last signer of the message; otherwise it cannot be validated on receipt." in the signer actions section.
+KA: Concern that this still does not address the risk of DKIM-Signatures covering ARC chains. ]]
+
 DKIM-Signatures SHOULD never sign any ARC header fields.
 
 \[\[ KA: Response to Dave's concern: If DKIM covers ARC and ARC covers DKIM, 
@@ -663,6 +675,8 @@ which comes first? The chicken or the egg? I'm open to alternate ways to
 phrase this without opening the "modifying the DKIM spec" can of worms. ]]
 
 ## Assessing Chain Validity Violations
+
+\[\[ SB-11: move to protocol elements ]]
 
 Email transit can produce broken signatures for a wide variety of benign
 reasons.  This includes possibly breaking one or more ARC signatures.
@@ -677,6 +691,8 @@ any message having a valid chain of ARC header sets.
 
 ## Marking and Sealing "cv=fail" (Invalid) Chains {#seal-failed}
 
+\[\[ SB-11: move to signer actions ]]
+
 The header fields signed by the AS header field b= value in the case of a 
 chain failure MUST be only the matching 'i=' instance headers created by the MTA
 which detected the malformed chain, as if this newest ARC set was the only set
@@ -684,10 +700,14 @@ present.
 
 ## Handling DNS Problems While Validating ARC {#dns-arc}
 
+\[\[ SB-11: move to verifier actions ]]
+
 DNS-based failures to verify a chain are treated no differently than any other
 ARC violation. They result in a "cv=fail" verdict.
 
 ## Responding to ARC Validity Violations
+
+\[\[ SB-11: move to verifier actions ]]
 
 If a receiver determines that the ARC chain has failed, the
 receiver MAY signal the breakage through the extended SMTP response code 5.7.7 {{RFC3463}} 
