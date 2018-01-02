@@ -51,6 +51,12 @@ author:
         org: ValiMail
         role: editor
         email: seth@valimail.com
+      -
+        ins: M. Kucherawy
+        name: Murray Kucherawy
+        org: TDP
+        role: editor
+        email: superuser@gmail.com
 
 normative:
   RFC1345:
