@@ -1011,28 +1011,25 @@ test event which was held on 2017-07-15 & 16 at IETF99.
   * The build is FreeBSD oriented but some packages have been built for
   easier deployment on RedHat-based Linux platforms.
 
-  * 2017-07-15: Testing showed problems with the hash calculation for 
-  the AMS header b= field. Several other bugs were discovered and were 
-  either fixed during the following week of IETF meetings or are under
-  active repair.
-
   * Some issues still exist when deploying in a chained milter 
   arrangement (such as OpenSPF --> OpenDKIM --> OpenDMARC --> OpenARC)
   with coordination between the stages. When deployed in a "sandwich" 
   configuration around an MLM, there is no effective mechanism to 
   convey trust from the ingress (validator) to egress (signer) instances.
+  (_NOTE_: this is expected to resolved with a new release of OpenDMARC
+  expected in January 2018.)
 
   Contact Info: <arc-discuss@dmarc.org>
 
-## Mailman 3.1+ patch
+## Mailman 3.2 patch
 
   Organization: Mailman development team
 
-  Description: Integrated ARC capabilities within the Mailman 3.1+ package
+  Description: Integrated ARC capabilities within the Mailman 3.2 package
 
   Status of Operation: Patch submitted 
 
-  Coverage: Unknown
+  Coverage: Based on OpenARC
 
   Licensing: Same as mailman package - GPL
 
@@ -1088,11 +1085,29 @@ listed in this section.
 
   Contact Info: https://rspamd.com/doc/modules/arc.html and https://github.com/vstakhov/rspamd
 
+## PERL MAIL::DKIM module
+
+  Organization: FastMail
+
+  Description: Email domain authentication (sign and/or verify) module, previously included SPF / DKIM / DMARC, now has ARC added
+
+  Status of Operation: Production, deployment usage unknown
+
+  Coverage: Built to support {{&SELF}}
+
+  Licensing: Open Source
+
+  Implementation Notes:
+
+  * 2017-12-15: v0.50 released with full test set passing for ARC
+
+  Contact Info: http://search.cpan.org/~mbradshaw/Mail-DKIM-0.50/
+
 ## PERL Mail::Milter::Authentication module 
 
   Organization: FastMail
 
-  Description: Email domain authentication milter, previously included SPF / DKIM / DMARC, now has ARC added
+  Description: Email domain authentication milter, uses MAIL::DKIM (see above)
 
   Status of Operation: Intial validation completed during IETF99 hackathon with some follow-on work during the week
 
@@ -1107,6 +1122,42 @@ listed in this section.
   * 2017-07-20: ARC functionality has not yet been pushed back to the github repo but should be showing up soon
 
   Contact Info: https://github.com/fastmail/authentication_milter
+
+## Oracle Messaging Server
+
+  Organization: Oracle
+
+  Description: 
+
+  Status of Operation: Intial development work during IETF99 hackathon. Status since then unknown.
+
+  Coverage: Built to support {{&ARC-06}}
+
+  Licensing: Unknown
+
+  Implementation Notes:
+
+  * Status since the work done in July 2017 is unknown.
+
+  Contact Info: 
+
+## MessageSystems Momentum
+
+  Organization: MessageSystems/SparkPost
+
+  Description: OpenARC integration into the LUA-enabled Momentum processing space
+
+  Status of Operation: Beta
+
+  Coverage: Built to support {{&ARC-06}}
+
+  Licensing: Unknown
+
+  Implementation Notes:
+
+  * Initial deployments for validation expected in early 2018.
+
+  Contact Info: 
 
 
 --- back
