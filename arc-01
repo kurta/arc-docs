@@ -489,11 +489,9 @@ The ptypes and properties defined in this section SHOULD be stamped in the AAR:
 
 * smtp.client-ip - The connecting client IP address from which the message is received;
 
-* header.ds - The domain/selector pair for each DKIM signature on the message (header.ds=example.com,selector).
-Note that this is a concatenation of the header.d and header.s field values from \[\[ TODO: reference DKIM A-R method
-spec ]] separated by the comma character (0x2c). These values are joined into a single arc-info field value 
-in order to avoid indexing and correlation ambiguity between the possible multiple DKIM signatures which
-may be found on any given message;
+* header.d - Defined in {{RFC6376}} section 7.2
+
+* header.s - Defined in {{RFC6376}} section 7.2
 
 * arc.closest-fail - The hop number of the most recent AS that fails to validate, or 0 if all hops pass.
 
