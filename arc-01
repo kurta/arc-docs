@@ -894,6 +894,16 @@ used to provide input to local policy engines in cases where DMARC
 validation fails (due to mediation impacting SPF attribution, DKIM validity
 or alignment).
 
+Note that a passing ARC chain may not adequately mean that the message
+is safe because:
+
+  1. You have to trust all signatories; and
+
+  2. Even trusted systems may have become compromised or may not properly authenticate
+messages, so even with a chain of trusted participants, the message
+might still never have authenticated in the first place (which is why you
+have the AAR to inspect) or could have been subject to unintended modifications.
+
 # Implementation Status {#implstat}
 
 \[\[ Note: For minimizing section number references when the RFC 
