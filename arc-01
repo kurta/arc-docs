@@ -1141,6 +1141,24 @@ listed in this section.
 
   Contact Info: https://github.com/fastmail/authentication_milter
 
+## Sympa List Manager
+
+  Organization: Sympa Dev Community
+
+  Description: Work in progress
+
+  Status of Operation: Work in progress
+
+  Coverage: unknown
+
+  Licensing: open source
+
+  Implementation Notes:
+
+  * 2018-01-05: Tracked as https://github.com/sympa-community/sympa/issues/153
+
+  Contact Info: https://github.com/sympa-community
+
 ## Oracle Messaging Server
 
   Organization: Oracle
