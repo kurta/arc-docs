@@ -11,7 +11,7 @@ area: art
 wg: DMARC Working Group
 kw: Internet-Draft
 submission: IETF
-cat: std
+cat: exp
 
 coding: utf-8
 pi:    # can use array (if all yes) or hash here
@@ -99,59 +99,31 @@ entity:
 
 The Authenticated Received Chain (ARC) protocol creates a mechanism whereby a
 series of handlers of an email message can conduct authentication of the email
-message as it passes among them on the way to its destination, and record the
-status of that authentication at each step along the handling path, for use by
-the final recipient in making choices about the disposition of the message.
-Changes in the message that might break DKIM or DMARC can be identified through the ARC
-set of header fields.
+message as it passes among them on the way to its destination.
+
+Initial development of ARC has been done with a single allowed signing
+algorithm, but parallel work in the DCRUP working group
+(https://datatracker.ietf.org/wg/dcrup/about/) is expanding the supported
+algorithms. This specification defines how to extend ARC for multiple signing
+algorithms.
 
 --- middle
 # Introduction {#intro}
 
-Modern email authentication techniques such as the Sender Policy Framework
-(SPF) {{RFC7208}} and DomainKeys Identified Mail (DKIM) [RFC6376] have become
-common.  
-However, their end-to-end utility is limited by the effects of intermediaries 
-along the transmission path, which either are not listed (for SPF) or 
-which break digital signatures (for DKIM).
-These issues are described in substantial detail in those
-protocols' defining documents as well as in {{RFC6377}} and {{RFC7960}}.
+The Authenticated Received Chain (ARC) protocol adds a traceable chain of 
+signatures that cover the handling of an email message through a chain of
+intermediary handlers.
 
-Technologies that build upon the use of SPF and DKIM can reduce the success of
-fraudulent email campaigns.  To this end, Domain-based Mail Authentication,
-Reporting and Compliance (DMARC) {{RFC7489}}, validates the domain of the
-RFC5322.From author header field.
-However its use along email transmission paths that have independent
-intermediaries, such as some forwarders and essentially all mailing list
-services, produces false positive rejections that are problematic, both for the
-message authors, the intermediary service(s), and for those they are 
-interacting with.
-
-What is needed is a mechanism by which legitimate alteration of a message,
-which invalidates associated SPF and DKIM information, does not ultimately
-result in a rejection of an email message on delivery.  
-Authenticated Receive Chain (ARC) builds upon DKIM mechanisms to provide a
-sequence of signatures that are more survivable than DKIM's and that provide a
-view of the handling sequence for a message, especially the points where
-alterations of the content might have occurred.
-Equipped with this more complete
-information, the recipient system(s) can make a more informed handling choice,
-reducing or eliminating the false negatives inherent in use of DKIM and/or SPF
-themselves.
+Initial development of ARC has been done with a single allowed signing
+algorithm, but parallel work in the DCRUP working group
+(https://datatracker.ietf.org/wg/dcrup/about/) is expanding the supported
+algorithms. This specification defines how to extend ARC for multiple signing
+algorithms.
 
 # Overview {#overview}
 
-In DKIM, every participating signing agent attaches a signature that is based
-on the some of the content of the message, local policy, and the domain name of the
-participating Administrative Management Domain (ADMD).  Any verifier can
-process such a signature; a verified signature means 
-that the domain referenced in the DKIM-Signture's "d=" parameter has some
-responsibility for handling the message.  An artifact of using digital
-signature technology for this means that verification also ensures that
-the message content that
-was "covered" by the signature has not been altered since the signature was
-applied.  The signatures themselves are generally independent of one another.
-
+In order to phase in new signing algorithms, this specification identifies how
+signers and validators MUST process ARC sets found in email messages.
 
 # Definitions and Terminology
 
@@ -165,20 +137,29 @@ Because many of the core concepts and definitions are found in {{RFC5598}},
 readers SHOULD to be familiar with the contents of {{RFC5598}}, and in
 particular, the potential roles of intermediaries in the delivery of email.
 
-Syntax descriptions use Augmented BNF (ABNF) {{RFC5234}}. 
-
 # Supporting Alternate Signing Algorithms {#alt-sign}
 
-\[\[ Note: Some additional development of this section is needed. ]]
+During a period where multiple algorithms are allowed, all of the statements in
+the ARC spec which refer to "exactly one set of ARC headers per instance" need
+to be understood as "at least one set per instance and no more than one set per
+instance per algorithm".
 
-In the following branch diagrams, each algorithm is represented by an 'A' or
-'B' at each hop to depict the ARC chain that develops over a five hop scenario.
-'x' represents a hop that does not support that algorithm.
+# General Approach
 
-Note that during a transitional period where multiple algorithms are allowed, 
-all of the statements in this spec which refer to "exactly one set of ARC headers
-per instance" need to be understood as "at least one set per instance and no more 
-than one instance-set per algorithm".
+## Signers
+
+Signers MUST initiate ARC signing of messages with all supported algorithms that 
+they are capable of using.
+
+Signers MUST continue ARC chains with all supported algorithms that 
+they are capable of using.
+
+## Validators
+
+Validators MUST use the longest ARC chain on the message for which they can 
+interpret the signing algorithm.
+
+# Phases of Algorithm Evolution
 
 ## Introductory Period
 
@@ -210,7 +191,7 @@ sets with any obsoleted algorithm.
 # Privacy Considerations
 
 No unique privacy considerations are introduced by this specification beyond those
-of the base {{ID.ARC}} protocol.
+of the base {{ARC-DRAFT-11}} protocol.
 
 # IANA Considerations
 
@@ -219,7 +200,7 @@ No new IANA considerations are introduced by this specification.
 # Security Considerations {#sec-con}
 
 No new security considerations are introduced by this specification beyond those
-of the base {{ID.ARC}} protocol.
+of the base {{ARC-DRAFT-11}} protocol.
 
 --- back
 
