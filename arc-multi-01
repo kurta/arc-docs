@@ -1,0 +1,244 @@
+---
+title: Using Multiple Signing Algorithms with the ARC (Authenticated Received Chain) Protocol
+abbrev: ARC-Multi
+docname: draft-ietf-dmarc-arc-multi-01
+date: 2018-01-22
+
+# stand_alone: true
+
+ipr: trust200902
+area: art
+wg: DMARC Working Group
+kw: Internet-Draft
+submission: IETF
+cat: std
+
+coding: utf-8
+pi:    # can use array (if all yes) or hash here
+#  - toc
+#  - sortrefs
+#  - symrefs
+  toc: yes
+  sortrefs:   # defaults to yes
+  symrefs: yes
+
+author:
+      -
+        ins: K. Andersen
+        name: Kurt Andersen
+        org: LinkedIn
+        street: 1000 West Maude Ave
+        city: Sunnyvale
+        region: California
+        code: 94085
+        country: USA
+        email: kurta@linkedin.com
+      -
+        ins: S. Blank
+        name: Seth Blank
+        org: ValiMail
+        role: editor
+        email: seth@valimail.com
+      -
+        ins: J. Levine
+        name: John Levine
+        org: Taugh Networks
+        role: editor
+        email: TBD
+
+normative:
+  RFC1345:
+  RFC5234:
+  RFC5321:
+  RFC5322:
+  RFC3463:
+  RFC7601:
+  RFC7208:
+  RFC6651:
+  RFC5863:
+  RFC6377:
+  RFC5585:
+  RFC6376:
+  RFC4686:
+  RFC5598:
+  RFC5226:
+  RFC2142:
+  RFC2606:
+  RFC3463:
+  RFC2119:
+
+informative:
+  RFC6982:
+  RFC7489:
+  RFC7960:
+  ENHANCED-STATUS: 
+    title: IANA SMTP Enhanced Status Codes
+    target: http://www.iana.org/assignments/smtp-enhanced-status-codes/smtp-enhanced-status-codes.xhtml
+  ARC-DRAFT-11:
+    title: Authenticated Received Chain (ARC) Protocol (I-D-11)
+    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-11
+    author:
+      -
+        ins: K. Andersen
+        name: Kurt Andersen
+      -
+        ins: B. Long
+        name: Brandon Long
+      -
+        ins: S. Jones
+        name: Steven Jones
+
+entity:
+      SELF: "[I-D.ARC-MULTI]"
+
+# --- note_IESG_Note
+#
+# bla bla bla
+
+--- abstract
+
+The Authenticated Received Chain (ARC) protocol creates a mechanism whereby a
+series of handlers of an email message can conduct authentication of the email
+message as it passes among them on the way to its destination, and record the
+status of that authentication at each step along the handling path, for use by
+the final recipient in making choices about the disposition of the message.
+Changes in the message that might break DKIM or DMARC can be identified through the ARC
+set of header fields.
+
+--- middle
+# Introduction {#intro}
+
+Modern email authentication techniques such as the Sender Policy Framework
+(SPF) {{RFC7208}} and DomainKeys Identified Mail (DKIM) [RFC6376] have become
+common.  
+However, their end-to-end utility is limited by the effects of intermediaries 
+along the transmission path, which either are not listed (for SPF) or 
+which break digital signatures (for DKIM).
+These issues are described in substantial detail in those
+protocols' defining documents as well as in {{RFC6377}} and {{RFC7960}}.
+
+Technologies that build upon the use of SPF and DKIM can reduce the success of
+fraudulent email campaigns.  To this end, Domain-based Mail Authentication,
+Reporting and Compliance (DMARC) {{RFC7489}}, validates the domain of the
+RFC5322.From author header field.
+However its use along email transmission paths that have independent
+intermediaries, such as some forwarders and essentially all mailing list
+services, produces false positive rejections that are problematic, both for the
+message authors, the intermediary service(s), and for those they are 
+interacting with.
+
+What is needed is a mechanism by which legitimate alteration of a message,
+which invalidates associated SPF and DKIM information, does not ultimately
+result in a rejection of an email message on delivery.  
+Authenticated Receive Chain (ARC) builds upon DKIM mechanisms to provide a
+sequence of signatures that are more survivable than DKIM's and that provide a
+view of the handling sequence for a message, especially the points where
+alterations of the content might have occurred.
+Equipped with this more complete
+information, the recipient system(s) can make a more informed handling choice,
+reducing or eliminating the false negatives inherent in use of DKIM and/or SPF
+themselves.
+
+# Overview {#overview}
+
+In DKIM, every participating signing agent attaches a signature that is based
+on the some of the content of the message, local policy, and the domain name of the
+participating Administrative Management Domain (ADMD).  Any verifier can
+process such a signature; a verified signature means 
+that the domain referenced in the DKIM-Signture's "d=" parameter has some
+responsibility for handling the message.  An artifact of using digital
+signature technology for this means that verification also ensures that
+the message content that
+was "covered" by the signature has not been altered since the signature was
+applied.  The signatures themselves are generally independent of one another.
+
+
+# Definitions and Terminology
+
+This section defines terms used in the rest of the document. 
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in {{RFC2119}}. 
+
+Because many of the core concepts and definitions are found in {{RFC5598}},
+readers SHOULD to be familiar with the contents of {{RFC5598}}, and in
+particular, the potential roles of intermediaries in the delivery of email.
+
+Syntax descriptions use Augmented BNF (ABNF) {{RFC5234}}. 
+
+# Supporting Alternate Signing Algorithms {#alt-sign}
+
+\[\[ Note: Some additional development of this section is needed. ]]
+
+In the following branch diagrams, each algorithm is represented by an 'A' or
+'B' at each hop to depict the ARC chain that develops over a five hop scenario.
+'x' represents a hop that does not support that algorithm.
+
+Note that during a transitional period where multiple algorithms are allowed, 
+all of the statements in this spec which refer to "exactly one set of ARC headers
+per instance" need to be understood as "at least one set per instance and no more 
+than one instance-set per algorithm".
+
+## Introductory Period
+
+Intermediaries MUST be able to validate ARC chains built with either algorithm
+but MAY create ARC sets with either (or both) algorithm.
+
+The introductory period should be at least six (6) months.
+
+## Co-Existence Period
+
+Intermediaries MUST be able to validate ARC chains build with either algorithm
+and MUST create ARC sets with both algorithms.  Chains ending with either
+algorithm may be used for the result.
+
+## Deprecation Period
+
+ARC sets built with algorithms that are being deprecated MAY be considered
+valid within an ARC chain, however, intermediaries MUST NOT create additional
+sets with the deprecated algorithm.
+
+The deprecation period should be at least two (2) years.
+
+## Obsolescence Period
+
+ARC sets built with algorithms that are obsolete MUST NOT be considered
+valid within an ARC chain. Intermediaries MUST NOT create any
+sets with any obsoleted algorithm.
+
+# Privacy Considerations
+
+No unique privacy considerations are introduced by this specification beyond those
+of the base {{ID.ARC}} protocol.
+
+# IANA Considerations
+
+No new IANA considerations are introduced by this specification.
+
+# Security Considerations {#sec-con}
+
+No new security considerations are introduced by this specification beyond those
+of the base {{ID.ARC}} protocol.
+
+--- back
+
+# Acknowledgements
+
+This draft is the work of DMARC Working Group.
+
+Grateful appreciation is extended to the people who provided feedback through the discuss
+mailing list.
+
+# Comments and Feedback
+
+Please address all comments, discussions, and questions to <dmarc@ietf.org>. 
+
+
+--- fluff
+
+<!--  LocalWords:  received header email DMARC authentication authenticated
+-->
+<!--  LocalWords:  signature DKIM OAR authentication-results
+-->
+

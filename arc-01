@@ -129,6 +129,14 @@ informative:
       -
         ins: K. Andersen
         name: Kurt Andersen
+  ARC-MULTI:
+    title: Using Multiple Signing Algorithms with ARC 
+    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-multi-01
+    date: 2018-01
+    author:
+      -
+        ins: K. Andersen
+        name: Kurt Andersen
   ARC-TEST:
     title: ARC Test Suite
     target: https://github.com/ValiMail/arc_test_suite
@@ -493,7 +501,7 @@ The ptypes and properties defined in this section SHOULD be stamped in the AAR:
 
 * header.s - Defined in {{RFC6376}} section 7.2
 
-* arc.closest-fail - The hop number of the most recent AS that fails to validate, or 0 if all hops pass.
+* arc.oldest-pass - The instance number of the oldest AMS that still validates, or 0 if all pass.
 
 ## ARC-Message-Signature (AMS) {#ams-defn}
 
@@ -774,43 +782,7 @@ necessary accommodations.
 
 # Supporting Alternate Signing Algorithms {#alt-sign}
 
-\[\[ Note: Some additional development of this section is needed. ]]
-
-In the following branch diagrams, each algorithm is represented by an 'A' or
-'B' at each hop to depict the ARC chain that develops over a five hop scenario.
-'x' represents a hop that does not support that algorithm.
-
-Note that during a transitional period where multiple algorithms are allowed, 
-all of the statements in this spec which refer to "exactly one set of ARC headers
-per instance" need to be understood as "at least one set per instance and no more 
-than one instance-set per algorithm".
-
-## Introductory Period
-
-Intermediaries MUST be able to validate ARC chains built with either algorithm
-but MAY create ARC sets with either (or both) algorithm.
-
-The introductory period should be at least six (6) months.
-
-## Co-Existence Period
-
-Intermediaries MUST be able to validate ARC chains build with either algorithm
-and MUST create ARC sets with both algorithms.  Chains ending with either
-algorithm may be used for the result.
-
-## Deprecation Period
-
-ARC sets built with algorithms that are being deprecated MAY be considered
-valid within an ARC chain, however, intermediaries MUST NOT create additional
-sets with the deprecated algorithm.
-
-The deprecation period should be at least two (2) years.
-
-## Obsolescence Period
-
-ARC sets built with algorithms that are obsolete MUST NOT be considered
-valid within an ARC chain. Intermediaries MUST NOT create any
-sets with any obsoleted algorithm.
+This section has been moved out to {{ARC-MULTI}}
 
 # Privacy Considerations
 
@@ -834,6 +806,48 @@ This draft adds one item to the IANA "Email Authentication Methods" registry:
   Property: chain evaluation result
 
   Value: chain evaluation result status (see {{as-defn}})
+
+  Status: active
+
+  Version: 1
+
+* Method : dkim
+
+  Defined: {{&SELF}}
+
+  ptype: header
+
+  Property: selector
+
+  Value: value of signature "s" tag (see {{RFC6376}})
+
+  Status: active
+
+  Version: 1
+
+* Method : spf
+
+  Defined: {{&SELF}}
+
+  ptype: smtp
+
+  Property: client-ip
+
+  Value: the connecting client IP address from which the message is received
+
+  Status: active
+
+  Version: 1
+
+* Method : arc
+
+  Defined: {{&SELF}}
+
+  ptype: header
+
+  Property: oldest-pass
+
+  Value: the oldest instance with a still validating AMS signature
 
   Status: active
 
