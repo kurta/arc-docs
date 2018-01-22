@@ -575,8 +575,8 @@ a chain has failed validation (see {{seal-failed}}).
 
 # Verifier Actions {#cv-calc}
 
-The verifier takes the following steps to determine the current state of the
-ARC chain on the message. Canonicalization, hash functions, and signature
+A verifier takes the following steps to determine the state of the
+ARC chain on a message (cv value). Canonicalization, hash functions, and signature
 validation methods are imported from Section 5 of {{RFC6376}}.
 
 \[\[ Note: need markdown flag to have subordinate numbering distinction ]]
@@ -683,7 +683,8 @@ present.
 ## Relationship between DKIM-Signature and AMS signing scopes {#dkim-arc}
 
 \[\[ SB-11: replace with "ARC MUST be the last signer of the message; otherwise it cannot be validated on receipt." in the signer actions section.
-KA: Concern that this still does not address the risk of DKIM-Signatures covering ARC chains. ]]
+KA: Concern that this still does not address the risk of DKIM-Signatures covering ARC chains. 
+This does not seem like it fits in this section but it needs to go somewhere. ]]
 
 DKIM-Signatures SHOULD never sign any ARC header fields.
 
@@ -693,7 +694,11 @@ phrase this without opening the "modifying the DKIM spec" can of worms. ]]
 
 ## Assessing Chain Validity Violations
 
-\[\[ SB-11: move to protocol elements ]]
+\[\[ SB-11: move to protocol elements 
+
+KA: This seems a bit banal. I suspect that what receivers want is a section
+on using ARC to override DMARC failures. Would that be to brazen to insert 
+here instead? Or do we relegate that to the {{ARC-USAGE}} doc? ]]
 
 Email transit can produce broken signatures for a wide variety of benign
 reasons.  This includes possibly breaking one or more ARC signatures.
