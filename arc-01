@@ -1,8 +1,8 @@
 ---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-10
-date: 2017-12-19
+docname: draft-ietf-dmarc-arc-protocol-11
+date: 2018-01-22
 
 # stand_alone: true
 
@@ -11,7 +11,7 @@ area: art
 wg: DMARC Working Group
 kw: Internet-Draft
 submission: IETF
-cat: std
+cat: exp
 
 coding: utf-8
 pi:    # can use array (if all yes) or hash here
@@ -86,32 +86,27 @@ informative:
   ENHANCED-STATUS: 
     title: IANA SMTP Enhanced Status Codes
     target: http://www.iana.org/assignments/smtp-enhanced-status-codes/smtp-enhanced-status-codes.xhtml
-  ARC-DRAFT-06:
-    title: Authenticated Received Chain (ARC) Protocol (I-D-05)
-    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-05
+  ARC-DRAFT-10:
+    title: Authenticated Received Chain (ARC) Protocol (I-D-10)
+    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-10
     author:
       -
         ins: K. Andersen
         name: Kurt Andersen
-      -
-        ins: B. Long
-        name: Brandon Long
-      -
-        ins: S. Jones
-        name: Steven Jones
-  ARC-DRAFT-05:
+  ARC-DRAFT-06:
     title: Authenticated Received Chain (ARC) Protocol (I-D-06)
     target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-06
     author:
       -
         ins: K. Andersen
         name: Kurt Andersen
+  ARC-DRAFT-05:
+    title: Authenticated Received Chain (ARC) Protocol (I-D-05)
+    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-05
+    author:
       -
-        ins: B. Long
-        name: Brandon Long
-      -
-        ins: S. Jones
-        name: Steven Jones
+        ins: K. Andersen
+        name: Kurt Andersen
   ARC-USAGE:
     title: Recommended Usage of the ARC Headers
     target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-usage-01
@@ -433,9 +428,10 @@ the first ARC set is numbered 1.  In ABNF terms:
        position = 1*2DIGIT ; 1 - 50
 
 Valid ARC sets must have exactly one instance of each header field for a given
-position value.
-(Note that when multiple algorithms are supported, there is some nuance to this
-statement - see {{alt-sign}}.)
+position value and signing algorithm.  (Initial development of ARC is only being 
+done with a single allowed signing algorithm, but parallel work in the DCRUP working 
+group (https://datatracker.ietf.org/wg/dcrup/about/) is expanding that. For handling
+multiple signing algorithms, see {{ARC-MULTI}}.)
 
 Because the AMS and AS header field values are made up of tag-spec constructs,
 the i= tag may be found anywhere within the header field value, but is
@@ -782,7 +778,7 @@ necessary accommodations.
 
 # Supporting Alternate Signing Algorithms {#alt-sign}
 
-This section has been moved out to {{ARC-MULTI}}
+This section has been moved to {{ARC-MULTI}}
 
 # Privacy Considerations
 
@@ -1034,7 +1030,7 @@ test event which was held on 2017-07-15 & 16 at IETF99.
 
   Status of Operation: Beta
 
-  Coverage: Built to support {{ARC-DRAFT-06}}
+  Coverage: Built to support {{ARC-DRAFT-10}}
 
   Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)
 
@@ -1125,7 +1121,7 @@ listed in this section.
 
   Status of Operation: Production, deployment usage unknown
 
-  Coverage: Built to support {{&SELF}}
+  Coverage: Built to support {{ARC-DRAFT-10}}
 
   Licensing: Open Source
 
@@ -1181,7 +1177,7 @@ listed in this section.
 
   Status of Operation: Intial development work during IETF99 hackathon. Status since then unknown.
 
-  Coverage: Built to support {{&ARC-06}}
+  Coverage: Built to support {{ARC-DRAFT-06}}
 
   Licensing: Unknown
 
@@ -1199,7 +1195,7 @@ listed in this section.
 
   Status of Operation: Beta
 
-  Coverage: Built to support {{&ARC-06}}
+  Coverage: Built to support {{ARC-DRAFT-10}}
 
   Licensing: Unknown
 
