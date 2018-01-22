@@ -964,7 +964,7 @@ DKIM d= value is aligned with the rfc5322.From author domain.
 ## Failure Considerations
 
 The intent of ARC is to be at most value-add and at worst benign. If ARC opens
-up significant new vectors for abuse (see {{ARC}} Security Considerations) then
+up significant new vectors for abuse (see {{sec-con}}) then
 this protocol will be a failure. Note that weaknesses inherent in the mail
 protocols ARC is built upon (such as DKIM replay attacks and other known issues)
 are not new vectors which can be attributed to this specification.
@@ -983,12 +983,11 @@ actors trying to craft or replay malicious chains.
 
 ### DNS Overhead
 
-Longer ARC chains will require more queries to retrieve the keys for 
-validating the chain. While this is not believed to be a security issue (see
-{{ARC}}, Security Conditions --> DNS Attacks), it is unclear how much
-overhead will truly be added. This is similar to some of the initial processing
-and query load concerns which were debated at the time of the DKIM specification
-development.
+Longer ARC chains will require more queries to retrieve the keys for validating
+the chain. While this is not believed to be a security issue (see {{dns-ops}}),
+it is unclear how much overhead will truly be added. This is similar to some of
+the initial processing and query load concerns which were debated at the time
+of the DKIM specification development.
 
 Data should be collected to better understand usable length and distribution of
 lengths found in valid ARC chains along with the the DNS impact of processing
