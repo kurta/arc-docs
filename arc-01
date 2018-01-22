@@ -357,9 +357,9 @@ ADMD is obligated to perform these actions.
 
 ### Only one ARC Chain (One Chain to Rule Them All)
 
-A message can have only one ARC chain on it at a time. Once broken, the chain
-cannot be restarted, as the chain of custody is no longer valid and
-responsibility for the message has been lost.
+A message can have only one ARC chain on it at a time (see {{i-defn}}).  Once
+broken, the chain cannot be restarted, as the chain of custody is no longer
+valid and responsibility for the message has been lost.
 
 ### All Failures are Permanent
 
@@ -492,8 +492,6 @@ mechanism for this information to survive transit.
 The ptypes and properties defined in this section SHOULD be stamped in the AAR:
 
 * smtp.client-ip - The connecting client IP address from which the message is received;
-
-* header.d - Defined in {{RFC6376}} section 7.2
 
 * header.s - Defined in {{RFC6376}} section 7.2
 
@@ -637,6 +635,17 @@ trust boundary. The cv state may be recorded by sealing at the time of
 verification in an initial ARC set (for the ADMD) or may be recorded out of
 band depending on the architecture of the ADMD.
 
+## Handling DNS Problems While Validating ARC {#dns-arc}
+
+DNS-based failures to verify a chain are treated no differently than any other
+ARC violation. They result in a "cv=fail" verdict.
+
+## Responding to ARC Validity Violations During the SMTP Transaction
+
+If a receiver determines that the ARC chain has failed, the
+receiver MAY signal the breakage through the extended SMTP response code 5.7.7 {{RFC3463}} 
+"message integrity failure" {{ENHANCED-STATUS}} and corresponding SMTP response code.
+
 # Signer Actions
 
 \[\[ Note from Dave: This seems more like implementation guidance than
@@ -662,6 +671,12 @@ as defined in {{ams-defn}} above, using instance number N+1.
 general algorithm described in {{as-defn}} above, the chain validation
 status as determined in {{cv-calc}}, and instance number N+1.
 
+## Marking and Sealing "cv=fail" (Invalid) Chains {#seal-failed}
+
+The header fields signed by the AS header field b= value in the case of a 
+chain failure MUST be only the matching 'i=' instance headers created by the MTA
+which detected the malformed chain, as if this newest ARC set was the only set
+present. 
 
 # Usage of ARC and Chain Validity
 
@@ -690,30 +705,6 @@ ARC does not attempt to protect an entire message.  There are various ways
 that a message can still be problematic, in spite of having a valid ARC chain.
 Consequently, all normal, content-based analysis SHOULD still be performed on
 any message having a valid chain of ARC header sets.
-
-## Marking and Sealing "cv=fail" (Invalid) Chains {#seal-failed}
-
-\[\[ SB-11: move to signer actions ]]
-
-The header fields signed by the AS header field b= value in the case of a 
-chain failure MUST be only the matching 'i=' instance headers created by the MTA
-which detected the malformed chain, as if this newest ARC set was the only set
-present. 
-
-## Handling DNS Problems While Validating ARC {#dns-arc}
-
-\[\[ SB-11: move to verifier actions ]]
-
-DNS-based failures to verify a chain are treated no differently than any other
-ARC violation. They result in a "cv=fail" verdict.
-
-## Responding to ARC Validity Violations
-
-\[\[ SB-11: move to verifier actions ]]
-
-If a receiver determines that the ARC chain has failed, the
-receiver MAY signal the breakage through the extended SMTP response code 5.7.7 {{RFC3463}} 
-"message integrity failure" {{ENHANCED-STATUS}} and corresponding SMTP response code.
 
 # Recording and Reporting the Results of ARC Evaluation
 
@@ -960,6 +951,9 @@ Readers are advised to note that other implementations may exist.
 
 This information is known to be correct as of the seventh interoperability 
 test event which was held on 2017-07-15 & 16 at IETF99.
+
+For a few of the implementations, later status information was available as
+of December 2017.
 
 ## GMail test reflector and incoming validation
 
