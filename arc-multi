@@ -1,7 +1,7 @@
 ---
 title: Using Multiple Signing Algorithms with the ARC (Authenticated Received Chain) Protocol
 abbrev: ARC-Multi
-docname: draft-ietf-dmarc-arc-multi-01
+docname: draft-ietf-dmarc-arc-multi-00
 date: 2018-01-22
 
 # stand_alone: true
@@ -31,20 +31,28 @@ author:
         city: Sunnyvale
         region: California
         code: 94085
-        country: USA
+        country: US
         email: kurta@linkedin.com
       -
         ins: S. Blank
         name: Seth Blank
         org: ValiMail
+        street: Montgomery
+        city: San Francisco
+        state: California
+        country: US
         role: editor
         email: seth@valimail.com
       -
         ins: J. Levine
         name: John Levine
-        org: Taugh Networks
+        org: Taughannock Networks
+        street: PO Box 727
+        city: Trumansburg
+        state: New York
+        country: US
         role: editor
-        email: TBD
+        email: standards@taugh.com
 
 normative:
   RFC1345:
