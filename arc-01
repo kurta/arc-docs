@@ -618,6 +618,10 @@ algorithm stops here.
 5. If all seals pass validation, then the chain state is "pass", and the
 algorithm is complete.
 
+Whatever the end result of the verifier's checks via the algorithm specified
+above, the results MUST be added into the Authentication-Results header(s) for
+the ADMD.
+
 \[\[ Note from Dave: possibly delete the following paragraph as it is more
 usage/procedural than specification guidance. 
 
