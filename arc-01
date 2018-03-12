@@ -1,8 +1,8 @@
 ---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-11
-date: 2018-01-22
+docname: draft-ietf-dmarc-arc-protocol-11a
+date: 2018-03-10
 
 # stand_alone: true
 
@@ -152,11 +152,12 @@ entity:
 
 The Authenticated Received Chain (ARC) protocol creates a mechanism whereby a
 series of handlers of an email message can conduct authentication of the email
-message as it passes among them on the way to its destination, and record the
-status of that authentication at each step along the handling path, for use by
+message as it passes among them on the way to its destination, and create an
+attached, authenticated record of the status
+at each step along the handling path, for use by
 the final recipient in making choices about the disposition of the message.
-Changes in the message that might break DKIM or DMARC can be identified through the ARC
-set of header fields.
+Changes in the message that might break existing authentication mechanisms
+can be identified through the ARC set of header fields.
 
 --- middle
 # Introduction {#intro}
@@ -194,14 +195,16 @@ themselves.
 
 # Overview {#overview}
 
+\[\[ Demote to 1.1? ]]
+
 In DKIM, every participating signing agent attaches a signature that is based
 on the some of the content of the message, local policy, and the domain name of the
 participating Administrative Management Domain (ADMD).  Any verifier can
 process such a signature; a verified signature means 
-that the domain referenced in the DKIM-Signture's "d=" parameter has some
+that the domain referenced in the DKIM's "d=" parameter has some
 responsibility for handling the message.  An artifact of using digital
 signature technology for this means that verification also ensures that
-the message content that
+the portion of the message that
 was "covered" by the signature has not been altered since the signature was
 applied.  The signatures themselves are generally independent of one another.
 
@@ -211,15 +214,15 @@ By contrast, an ARC signature conveys the following pieces of information:
 message, the various assertions (DKIM-Signature(s) and/or ARC sets) 
 already attached to the message by other ADMDs were or were not valid;
 
-2.  As with DKIM, an assertion that, for a validated signature, the domain name
+2.  As with DKIM, an assertion that, for a validated ARC signature, the domain name
 in the signature takes some responsibility for handling of the message and that
 the message is unchanged since that signature was applied;
 
 3.  A further assertion that binds the ARC evaluation results into the 
 ARC chain sequence.
 
-This protocol accomplishes each of these by adding a new header field to the
-message for each of these pieces of information, as follows:
+This protocol accomplishes each of these by adding new header fields to the
+message with these pieces of information:
 
 * ARC-Authentication-Results (referred to below as "AAR"): virtually identical
 in syntax to an Authentication-Results field {{RFC7601}}, this field records
@@ -243,8 +246,17 @@ its destination.  Moreover, as described in {{i-defn}}, they each have an
 their original order can be preserved and the three related header fields can 
 be processed as a group.
 
+## Functional Elevator Pitch 
+
+\[\[ Assigned to Barry ]]
+
+## Technical Summary
+
+\[\[ possibly including a diagram ]]
 
 # Definitions and Terminology
+
+\[\[ Demote to 1.2 (see note on {{overview}} section) ]]
 
 This section defines terms used in the rest of the document. 
 
@@ -267,6 +279,8 @@ that this is in essence a cryptographically signed series of header fields that
 attest to the handling chain of a message much as Received fields always have.
 
 ## Referenced Definitions
+
+\[\[ Retain at 2nd level header - would become 1.3 ]]
 
 The following terms are defined in other RFCs. Those definitions can be found
 as follows:
@@ -291,15 +305,15 @@ DMARC), ARC makes no claims about the contents of the email message it has
 sealed. However, for a valid and passing ARC chain, a Final Receiver is able to
 ascertain:
 
-* all (participating) domains that claim responsibility for handling (and
-possibly) modifying the email message in transit;
+* all (participating) domains that claim responsibility for handling and
+possibly modifying the email message in transit;
 
 * trace information, including:
   * the {{RFC7601}} authentication results each participating ADMD saw; and
   * additional data needed to compile a DMARC report for the sending domain.
 
 Given this information, a Final Receiver is able to make a more-informed local
-policy decision regarding message delivery to the end user in spite of a DMARC
+policy decision regarding message delivery to the end user in spite of an authentication
 failure.
 
 Every participant in an ARC chain, except for the originating sender and Final
@@ -351,14 +365,14 @@ placed in Verifier actions. ]]
 ### Optional Participation 
 
 Validating an existing chain and then adding your own ARC set to a message
-allows you to claim responsibility for hanndling the message and modifications,
+allows you to claim responsibility for handling the message and modifications,
 if any, done by your ADMD to benefit message delivery downstream. However, no
 ADMD is obligated to perform these actions.
 
 ### Only one ARC Chain (One Chain to Rule Them All)
 
 A message can have only one ARC chain on it at a time (see {{i-defn}}).  Once
-broken, the chain cannot be restarted, as the chain of custody is no longer
+broken, the chain cannot be continued, as the chain of custody is no longer
 valid and responsibility for the message has been lost.
 
 ### All Failures are Permanent
@@ -373,7 +387,7 @@ Any error validating or sealing a chain, for whatever reason, MUST result in a
 
 Even when an ARC chain is valid and passes, its value is limited to very
 specific cases. An ARC chain is specifically designed to provide value to a
-Final Receiver evaluating message delivery in the context of a DMARC failure.
+Final Receiver evaluating message delivery in the context of an authentication failure.
 An ARC chain in general, and each ARC set in particular, provide additional
 information, and otherwise is benign. Specifically:
 
@@ -406,12 +420,17 @@ as they wish.
 
 ### Instance Tags
 
-See section {{i-defn}}
+ARC introduces an indicator to its header fields to show the order in which the
+header fields comprising an ARC set were added, and the specific members of
+an ARC Set.  This is known as an "instance", and the indicator is an "i=".
+That is, the members of the first ARC set affixed to a message will all include
+"i=1".  This is described in detail in section {{i-defn}}.
 
 ### Chain Validation Status
 
-See section {{cv-defn}}
-
+ARC introduces a mechanism, also via a new tag, which indicates the state of
+the ARC Chain at each step.  This is the "chain validation status".  This is
+described in detail in section {{cv-defn}}.
 
 # The ARC Header Fields
 
@@ -473,29 +492,6 @@ and continuing the chain.
 
 The AAR MUST contain all A-R results from within the participating ADMD,
 regardless of how many A-R headers are on the message.
-
-### ptypes and properties for arc-info {#aar-new-info}
-
-\[\[ NOTE: This section is being proposed as an amendment to {{RFC7601}}
-through a "bis" process. Depending on the sequencing for this specification and
-said "7601bis" work, it may be possible to this section from this
-specification. ]]
-
-Certain information pertinent to ascertaining message disposition can be lost
-in transit when messages are handled by intermediaries. For example, failing
-DKIM signatures are sometimes removed by MTAs, and most DKIM signatures on
-messages modified by intermediaries will fail. 
-
-The AAR, through these ptype-properties stamped in arc-info, provide a
-mechanism for this information to survive transit.
-
-The ptypes and properties defined in this section SHOULD be stamped in the AAR:
-
-* smtp.client-ip - The connecting client IP address from which the message is received;
-
-* header.s - Defined in {{RFC6376}} section 7.2
-
-* arc.oldest-pass - The instance number of the oldest AMS that still validates, or 0 if all pass.
 
 ## ARC-Message-Signature (AMS) {#ams-defn}
 
@@ -617,6 +613,8 @@ also Section {{dns-arc}} for failure case handling)
 algorithm stops here.
 5. If all seals pass validation, then the chain state is "pass", and the
 algorithm is complete.
+6. Results from the determination of this algorithm SHOULD be stamped in the
+Authentication-Results header
 
 Whatever the end result of the verifier's checks via the algorithm specified
 above, the results MUST be added into the Authentication-Results header(s) for
@@ -638,6 +636,21 @@ may be done later (potentially after message modification) within the same
 trust boundary. The cv state may be recorded by sealing at the time of
 verification in an initial ARC set (for the ADMD) or may be recorded out of
 band depending on the architecture of the ADMD.
+
+## ARC Authentication-Results Stamp
+
+Certain information pertinent to ascertaining message disposition can be lost
+in transit when messages are handled by intermediaries. For example, failing
+DKIM signatures are sometimes removed by MTAs, and most DKIM signatures on
+messages modified by intermediaries will fail. Stamping the following
+information in the A-R provides a mechanism for this information to survive
+transit.
+
+The ptypes and properties defined in this section SHOULD be stamped in the AR:
+
+- smtp.client-ip - The connecting client IP address from which the message is received;
+- header.s - Defined in {{RFC6376}} section 7.2 \[\[ TODO: verify section reference ]]
+- arc.oldest-pass - The instance number of the oldest AMS that still validates, or 0 if all pass.
 
 ## Handling DNS Problems While Validating ARC {#dns-arc}
 
