@@ -79,9 +79,6 @@ informative:
   RFC6982:
   RFC7489:
   RFC7960:
-  ENHANCED-STATUS: 
-    title: IANA SMTP Enhanced Status Codes
-    target: http://www.iana.org/assignments/smtp-enhanced-status-codes/smtp-enhanced-status-codes.xhtml
   ARC-DRAFT-11:
     title: Authenticated Received Chain (ARC) Protocol (I-D-11)
     target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-11
@@ -131,18 +128,18 @@ algorithms.
 # Overview {#overview}
 
 In order to phase in new signing algorithms, this specification identifies how
-signers and validators MUST process ARC sets found in email messages.
+signers and validators process ARC sets found in email messages.
 
 # Definitions and Terminology
 
 This section defines terms used in the rest of the document. 
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
 interpreted as described in {{RFC2119}}. 
 
 Because many of the core concepts and definitions are found in {{RFC5598}},
-readers SHOULD to be familiar with the contents of {{RFC5598}}, and in
+readers should to be familiar with the contents of {{RFC5598}}, and in
 particular, the potential roles of intermediaries in the delivery of email.
 
 # Supporting Alternate Signing Algorithms {#alt-sign}
@@ -156,16 +153,29 @@ instance per algorithm".
 
 ## Signers
 
-Signers MUST initiate ARC signing of messages with all supported algorithms that 
-they are capable of using.
+There is a separate independent signing chain for each signing algorithm.
+Hence, when creating an ARC signature, a signer MUST include only other
+signatures that use the same algorithm as the signature being created.
 
-Signers MUST continue ARC chains with all supported algorithms that 
-they are capable of using.
+Wnen signing a message with no previous ARC signatures, signers MUST sign using
+all supported algorithms.
+
+A signer MUST continue the longest ARC chain(s) in a message with all
+algorithms that it supports.  That is, if at least one of the longest chains
+uses an algorithm that a signer supports, the signer continues the chain(s).
+If none of the longest chains in a message use an algorithm supported by a
+signer, the signer MUST NOT extend any chains, even if a shorter chain does use
+a supported algorithm.
 
 ## Validators
 
-Validators MUST use the longest ARC chain on the message for which they can 
-interpret the signing algorithm.
+A validator MUST use the longest ARC chain(s) on the message.
+If a validator cannot interpret the signing algorithm on any of the longest chains,
+validation fails, evven if a shorter chain does use a supported algorithm.
+
+If there is more than one longest chain, the overall result reported can be that of of any of
+the validations.  The result used when extending an ARC chain MUST be the result
+from validating that chain.
 
 # Phases of Algorithm Evolution
 
