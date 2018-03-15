@@ -637,7 +637,7 @@ trust boundary. The cv state may be recorded by sealing at the time of
 verification in an initial ARC set (for the ADMD) or may be recorded out of
 band depending on the architecture of the ADMD.
 
-## ARC Authentication-Results Stamp
+## ARC Authentication-Results Stamp {#aar-new-info}
 
 Certain information pertinent to ascertaining message disposition can be lost
 in transit when messages are handled by intermediaries. For example, failing

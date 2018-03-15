@@ -1,8 +1,8 @@
 ---
 title: Using Multiple Signing Algorithms with the ARC (Authenticated Received Chain) Protocol
 abbrev: ARC-Multi
-docname: draft-ietf-dmarc-arc-multi-00
-date: 2018-01-22
+docname: draft-ietf-dmarc-arc-multi-01
+date: 2018-03-15
 
 # stand_alone: true
 
