@@ -125,6 +125,14 @@ informative:
       -
         ins: K. Andersen
         name: Kurt Andersen
+  7601bis:
+    title: Message Header Field for Indicating Message Authentication Status
+    target: https://datatracker.ietf.org/doc/draft-ietf-dmarc-rfc7601bis/
+    date: 2018-02-07
+    author:
+      -
+        ins: M. Kucherawy
+        name: Murray Kucherawy
   ARC-MULTI:
     title: Using Multiple Signing Algorithms with ARC 
     target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-multi-01
@@ -367,7 +375,7 @@ context.  Until ARC usage is widespread, intermediaries will continue to modify
 messages without ARC seals.  As with a failing DKIM signature ({{RFC6376}}
 Section-6.3), a failing ARC chain SHOULD be treated the same as a message with
 no ARC chain.  \[\[ NOTE TO WORKING GROUP: This paragraph probably is better
-placed in Verifier actions. ]]
+placed in Verifier actions. Ref (https://trac.ietf.org/trac/dmarc/ticket/10) ]]
 
 ### Optional Participation 
 
@@ -482,19 +490,18 @@ with "cv=fail".
 
 The ARC-Authentication-Results header field is syntactically and semantically
 identical to an Authentication-Results header field (defined in Section 2.2 of
-{{RFC7601}} (A-R)), except that several optional data fields SHOULD be added.
-(\[\[ NOTE: these optional data fields are being proposed as amendments to
-{{RFC7601}} through a "bis" process. Depending on the sequencing for this
-specification and said "7601bis" work, it may be possible to drop the noted
-sections from this specification. ]]) The first element
-("Authentication-Results:") in authres-header is replaced with
-arc-authres-prefix as follows:
+{{RFC7601bis}} (A-R)). Note that several optional data fields SHOULD be added 
+(smtp.client-ip, dkim header.s, arc.oldest-pass) to enable completeness for DMARC
+reporting.
+
+Formally, the header field is specified as follows using Augmented Backus-Naur
+Form ([ABNF]):
 
     arc-authres-header-prefix = "ARC-Authentication-Results:" [CFWS] arc-info
-    arc-info = instance *([CFWS] propspec) [CFWS] “;”
+    arc-info = instance *([CFWS] propspec) [CFWS] ";" authres-payload
 
 The purpose of this header field is to transmit the results of any
-authentication done on the message upstream to participating ADMDs validating
+authentication done on the message downstream to participating ADMDs validating
 and continuing the chain.
 
 The AAR MUST contain all A-R results from within the participating ADMD,
@@ -582,7 +589,8 @@ A verifier takes the following steps to determine the state of the
 ARC chain on a message (cv value). Canonicalization, hash functions, and signature
 validation methods are imported from Section 5 of {{RFC6376}}.
 
-\[\[ Note: need markdown flag to have subordinate numbering distinction ]]
+\[\[ Note: need markdown flag to have subordinate numbering distinction 
+(https://trac.ietf.org/trac/dmarc/ticket/11) ]]
 
 1. Collect all ARC sets currently on the message.  If there were none, the ARC
 state is "none" and the algorithm stops here.
@@ -627,16 +635,7 @@ Whatever the end result of the verifier's checks via the algorithm specified
 above, the results MUST be added into the Authentication-Results header(s) for
 the ADMD.
 
-\[\[ Note from Dave: possibly delete the following paragraph as it is more
-usage/procedural than specification guidance. 
-
-KA: It was added to clarify
-the separation of the verification and signing steps as some of the initial
-implementations failed to realize that they were not necessarily done in 
-one fell swoop. 
-
-KA (v-10): With the addition of the {protocol-elements} section, does the WG
-think that this can be reasonably removed from this location? ]]
+\[\[ See https://trac.ietf.org/trac/dmarc/ticket/12 regarding the final paragraph ]]
 
 The verifier should save the cv state for subsequent use by any sealing which
 may be done later (potentially after message modification) within the same
@@ -672,9 +671,7 @@ receiver MAY signal the breakage through the extended SMTP response code 5.7.7 {
 
 # Signer Actions
 
-\[\[ Note from Dave: This seems more like implementation guidance than
-specification detail. KA: see explanation just above referring to the 
-previous note. ]]
+\[\[ See https://trac.ietf.org/trac/dmarc/ticket/13 for critique ]]
 
 This section includes a specification of the actions an ARC signer
 takes when presented with a message.
@@ -706,23 +703,13 @@ present.
 
 ## Relationship between DKIM-Signature and AMS signing scopes {#dkim-arc}
 
-\[\[ SB-11: replace with "ARC MUST be the last signer of the message; otherwise it cannot be validated on receipt." in the signer actions section.
-KA: Concern that this still does not address the risk of DKIM-Signatures covering ARC chains. 
-This does not seem like it fits in this section but it needs to go somewhere. ]]
+\[\[ See https://trac.ietf.org/trac/dmarc/ticket/14 for critique of this section ]]
 
 DKIM-Signatures SHOULD never sign any ARC header fields.
 
-\[\[ KA: Response to Dave's concern: If DKIM covers ARC and ARC covers DKIM, 
-which comes first? The chicken or the egg? I'm open to alternate ways to 
-phrase this without opening the "modifying the DKIM spec" can of worms. ]]
-
 ## Assessing Chain Validity Violations
 
-\[\[ SB-11: move to protocol elements 
-
-KA: This seems a bit banal. I suspect that what receivers want is a section
-on using ARC to override DMARC failures. Would that be to brazen to insert 
-here instead? Or do we relegate that to the {{ARC-USAGE}} doc? ]]
+\[\[ https://trac.ietf.org/trac/dmarc/ticket/15 ]]
 
 Email transit can produce broken signatures for a wide variety of benign
 reasons.  This includes possibly breaking one or more ARC signatures.
@@ -763,11 +750,8 @@ and AAR headers per Section {{aar-new-info}}.
 
 ## DMARC Reporting of ARC Findings - Interim
 
-\[\[ Note: Discussion on the IETF DMARC-WG list has indicated some interest in more substantial
-reporting for analytic purposes. To support that effort, the following guidance is 
-provided only as an interim, minimal data set. A more complete reporting construct
-will be specified in a related spec - TBD. (see the additional fields
-specified in {{aar-new-info}}) ]]
+\[\[ Note: Move to separate document? https://trac.ietf.org/trac/dmarc/ticket/16 
+(see the additional fields specified in {{aar-new-info}}) ]]
 
 Receivers SHOULD indicate situations in which ARC evaluation influenced the
 results of their local policy determination. DMARC reporting of ARC-informed decisions
@@ -1050,10 +1034,6 @@ question.  The evolving nature of attacks can also shift the landscape of
 
 # Implementation Status {#implstat}
 
-\[\[ Note: For minimizing section number references when the RFC 
-editor removes this section, it has been moved to be the last section
-of the document before the Appendicies. ]]
-
 \[\[ Note to the RFC Editor: Please remove this section before 
 publication along with the reference to {{RFC6982}}. ]]
 
@@ -1296,9 +1276,9 @@ listed in this section.
 
   Implementation Notes:
 
-  * Status since the work done in July 2017 is unknown.
+  * 2018-01: Protocol handling components are completed, but crypto is not yet functional.
 
-  Contact Info: 
+  Contact Info: Chris Newman
 
 ## MessageSystems Momentum
 
@@ -1352,7 +1332,8 @@ making unsubstantiated conclusions when encountering a "broken" ARC sequence.
 
 \[\[ Note: The following examples were mocked up early in the definition
 process for the spec. They no longer reflect the current definition and
-need various updates which will be included in a future draft. ]]
+need various updates which will be included in a future draft. 
+(https://trac.ietf.org/trac/dmarc/ticket/17) ]]
 
 (Obsolete but retained for illustrative purposes)
 
