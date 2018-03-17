@@ -125,7 +125,7 @@ informative:
       -
         ins: K. Andersen
         name: Kurt Andersen
-  7601bis:
+  D-7601bis:
     title: Message Header Field for Indicating Message Authentication Status
     target: https://datatracker.ietf.org/doc/draft-ietf-dmarc-rfc7601bis/
     date: 2018-02-07
@@ -512,7 +512,7 @@ with "cv=fail".
 
 The ARC-Authentication-Results header field is syntactically and semantically
 identical to an Authentication-Results header field (defined in Section 2.2 of
-{{RFC7601bis}} (A-R)). Note that several optional data fields SHOULD be added 
+{{D-7601bis}} (A-R)). Note that several optional data fields SHOULD be added 
 (smtp.client-ip, dkim header.s, arc.oldest-pass) to enable completeness for DMARC
 reporting.
 
