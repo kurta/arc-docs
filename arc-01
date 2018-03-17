@@ -522,7 +522,10 @@ by the signature in this header field.
 The AMS SHOULD include any DKIM-Signature header fields already present on the
 message in the header fields covered by this signature.
 
-The AMS header field MAY include (sign) the AAR header field(s).
+The AMS header field SHOULD not include (sign) the AAR header field(s). 
+(Early drafts of this protocol and some older examples included the AAR header(s)
+within the signing scope for the AMS, but ambiguity regarding which of the 
+potentially multiple AAR headers (one per ARC set) argues against such practice.)
 
 Authentication-Results header fields SHOULD NOT be included since they are
 likely to be deleted by downstream ADMDs (per Section XXX of {{RFC7601}}),
