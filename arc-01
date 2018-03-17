@@ -2,7 +2,7 @@
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
 docname: draft-ietf-dmarc-arc-protocol-11b
-date: 2018-03-19
+date: 2018-03-17
 
 # stand_alone: true
 
@@ -59,23 +59,13 @@ author:
         email: superuser@gmail.com
 
 normative:
-  RFC1345:
   RFC5234:
-  RFC5321:
-  RFC5322:
   RFC3463:
   RFC7601:
   RFC7208:
-  RFC6651:
-  RFC5863:
   RFC6377:
-  RFC5585:
   RFC6376:
-  RFC4686:
   RFC5598:
-  RFC5226:
-  RFC2142:
-  RFC2606:
   RFC3463:
   RFC2119:
   RFC8174:
