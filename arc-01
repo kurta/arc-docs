@@ -194,7 +194,7 @@ What is needed is a mechanism by which legitimate alteration of a message,
 which invalidates associated SPF and DKIM information, does not ultimately
 result in a rejection of an email message on delivery.  
 Authenticated Receive Chain (ARC) builds upon DKIM mechanisms to provide a
-sequence of signatures that are more survivable than DKIM's and that provide a
+sequence of signatures that provide a
 view of the handling sequence for a message, especially the points where
 alterations of the content might have occurred.
 Equipped with this more complete
@@ -202,15 +202,45 @@ information, the recipient system(s) can make a more informed handling choice,
 reducing or eliminating the false negatives inherent in use of DKIM and/or SPF
 themselves.
 
-# Overview {#overview}
+## Overview {#overview}
 
 ARC provides a "chain of custody" for a message, allowing each entity that
 handles the message to see what entities handled it before, and to see what the
-authentication status of the message was at each step in the handling.
+authentication status of the message was at each step in the handling.  The
+handling entity can then put its own entry into the chain of custody and then
+relay the message to the next handler.
 
-## High Level Summary
+When the message reaches final delivery, the decision to accept and deliver the
+message, or, alternatively, to reject, discard, or quarantine it, can take the
+chain of custody into account, applying local policy in addition to policies
+advertised by the (purported) sending domain.  Consider, for example, this
+scenario:
 
-\[\[ Demote to 1.1? ]]
+1. A sender from mysender.example posts a message to a mailing list hosted at
+listmania.example.  
+2. The mailing list modifies the message by prepending the list name to the
+subject line, then sends it to the subscribers.  
+3. One of the subscribers is alice@mail.service.example, which receives the
+message from listmania.example.
+
+Assuming the original message was DKIM-signed and mysender.example published
+an SPF record, the handling by the mailing list will break the DKIM signature
+because of the message modification, and the forwarding will cause SPF check
+to fail in the next step.  But listmania.example can add ARC headers to the
+message to add itself to the document's chain of custody.  When
+mail.service.example sees the message, it can see that SPF and DKIM validation
+fail, but it can also see that both of these succeeded when they were checked
+by listmania.example, and can verify listmania's assertion.
+
+As part of its evaluation of the message for delivery, mail.service.example can
+see that mysender.example publishes a DMARC policy asking that unauthenticated
+messages be rejected.  But is can also see the assertion by listmania.example
+that the message was correctly authenticated when the message arrived there,
+and if it accepts that assertion and that modifications made were benign, it
+can deliver the message, rather than reject it, based on the additional
+information that ARC has provided.
+
+### High Level Summary
 
 In DKIM, every participating signing agent attaches a signature that is based
 on the some of the content of the message, local policy, and the domain name of the
@@ -261,17 +291,11 @@ its destination.  Moreover, as described in {{i-defn}}, they each have an
 their original order can be preserved and the three related header fields can 
 be processed as a group.
 
-## Functional Elevator Pitch 
+### Technical Summary
 
-\[\[ Assigned to Barry ]]
+\[\[ possibly including a diagram - this may not be needed any more ]]
 
-## Technical Summary
-
-\[\[ possibly including a diagram ]]
-
-# Definitions and Terminology
-
-\[\[ Demote to 1.2 (see note on {{overview}} section) ]]
+## Definitions and Terminology
 
 This section defines terms used in the rest of the document. 
 
@@ -285,17 +309,15 @@ particular, the potential roles of intermediaries in the delivery of email.
 
 Syntax descriptions use Augmented BNF (ABNF) {{RFC5234}}. 
 
-* "ARC set" - A single group of the header fields introduced in {{overview}} is called an "ARC
-set". 
-* "ARC chain" - The complete sequence of these groups (ARC sets) is called an "Authenticated
-Received Chain" or merely an "ARC chain".  Although the "Received" header field is
+* "ARC set" - A single group of the header fields introduced in {{overview}} is 
+called an "ARC set". 
+* "ARC chain" - The complete sequence of these groups (ARC sets) is called an 
+"ARC chain".  Although the "Received" header field is
 typically not included in the signed content, the name is based on the notion
 that this is in essence a cryptographically signed series of header fields that
 attest to the handling chain of a message much as Received fields always have.
 
 ## Referenced Definitions
-
-\[\[ Retain at 2nd level header - would become 1.3 ]]
 
 The following terms are defined in other RFCs. Those definitions can be found
 as follows:
@@ -601,7 +623,7 @@ state is "none" and the algorithm stops here.
 of each of the
 three ARC-specific header fields), then the chain state is "fail" and the
 algorithm stops here.
-   1. To avoid the overhead of unnecessary computation and delay from crypto 
+   a. To avoid the overhead of unnecessary computation and delay from crypto 
 and DNS operations, the cv value for all ARC-Seal(s)
 MAY be checked at this point. If any of the values are "fail", then the overall 
 state of the chain is "fail" and the algorithm stops here.
@@ -610,24 +632,24 @@ highest instance number.  If this verification fails, then the chain state is
 "fail" and the algorithm stops here.
 4. For each ARC-Seal from the "N"th instance to the first, apply the following
 logic:
-    1. If the value of the "cv" tag on that seal is "fail", the chain state is
+    a. If the value of the "cv" tag on that seal is "fail", the chain state is
 "fail" and the algorithm stops here. (This step SHOULD be skipped if the earlier step (2.1)
 was performed)
-    2. In Boolean nomenclature: if ((i == 1 && cv != "none") or (cv == "none" && i != 1))
+    b. In Boolean nomenclature: if ((i == 1 && cv != "none") or (cv == "none" && i != 1))
 then the chain state is "fail" and the algorithm stops here (note that the
 ordering of the logic is structured for short-circuit evaluation).
-    3. Initialize a hash function corresponding to the "a" tag of the ARC-Seal.
-    4. Compute the canonicalized form of the ARC header fields, in the order
+    c. Initialize a hash function corresponding to the "a" tag of the ARC-Seal.
+    d. Compute the canonicalized form of the ARC header fields, in the order
 described in {{implicit-as-h}}, using the "relaxed" header
 canonicalization defined in Section 3.4.2 of {{RFC6376}}.  Pass the canonicalized
 result to the hash function.
-    5. Retrieve the final digest from the hash function.
-    6. Retrieve the public key identified by the "s" and "d" tags in the
+    e. Retrieve the final digest from the hash function.
+    f. Retrieve the public key identified by the "s" and "d" tags in the
 ARC-Seal, as described in {{key-mgmt}}.
-    7. Determine whether the signature portion ("b" tag) of the ARC-Seal and
+    g. Determine whether the signature portion ("b" tag) of the ARC-Seal and
 the digest computed above are valid according to the public key. (See
 also Section {{dns-arc}} for failure case handling)
-    8. If the signature is not valid, the chain state is "fail" and the
+    h. If the signature is not valid, the chain state is "fail" and the
 algorithm stops here.
 5. If all seals pass validation, then the chain state is "pass", and the
 algorithm is complete.
