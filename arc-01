@@ -1,8 +1,8 @@
 ---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-11a
-date: 2018-03-10
+docname: draft-ietf-dmarc-arc-protocol-11b
+date: 2018-03-19
 
 # stand_alone: true
 
@@ -78,6 +78,7 @@ normative:
   RFC2606:
   RFC3463:
   RFC2119:
+  RFC8174:
 
 informative:
   RFC6982:
@@ -195,6 +196,12 @@ themselves.
 
 # Overview {#overview}
 
+ARC provides a "chain of custody" for a message, allowing each entity that
+handles the message to see what entities handled it before, and to see what the
+authentication status of the message was at each step in the handling.
+
+## High Level Summary
+
 \[\[ Demote to 1.1? ]]
 
 In DKIM, every participating signing agent attaches a signature that is based
@@ -262,7 +269,7 @@ This section defines terms used in the rest of the document.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-interpreted as described in {{RFC2119}}. 
+interpreted as described in {{RFC2119}}{{RFC8174}}. 
 
 Because many of the core concepts and definitions are found in {{RFC5598}},
 readers SHOULD to be familiar with the contents of {{RFC5598}}, and in
@@ -305,8 +312,8 @@ DMARC), ARC makes no claims about the contents of the email message it has
 sealed. However, for a valid and passing ARC chain, a Final Receiver is able to
 ascertain:
 
-* all (participating) domains that claim responsibility for handling and
-possibly modifying the email message in transit;
+* all (participating) domains that claim responsibility for handling (and
+possibly modifying) the email message in transit;
 
 * trace information, including:
   * the {{RFC7601}} authentication results each participating ADMD saw; and
@@ -649,7 +656,7 @@ transit.
 The ptypes and properties defined in this section SHOULD be stamped in the AR:
 
 - smtp.client-ip - The connecting client IP address from which the message is received;
-- header.s - Defined in {{RFC6376}} section 7.2 \[\[ TODO: verify section reference ]]
+- header.s - Defined in {{RFC6376}} section 7.2
 - arc.oldest-pass - The instance number of the oldest AMS that still validates, or 0 if all pass.
 
 ## Handling DNS Problems While Validating ARC {#dns-arc}
