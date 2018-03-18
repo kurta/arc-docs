@@ -1,8 +1,8 @@
 ---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-11b
-date: 2018-03-17
+docname: draft-ietf-dmarc-arc-protocol-12
+date: 2018-03-18
 
 # stand_alone: true
 
@@ -115,7 +115,7 @@ informative:
       -
         ins: K. Andersen
         name: Kurt Andersen
-  D-7601bis:
+  I-D-7601bis:
     title: Message Header Field for Indicating Message Authentication Status
     target: https://datatracker.ietf.org/doc/draft-ietf-dmarc-rfc7601bis/
     date: 2018-02-07
@@ -207,9 +207,9 @@ advertised by the (purported) sending domain.  Consider, for example, this
 scenario:
 
 1. A sender from mysender.example posts a message to a mailing list hosted at
-listmania.example.  
+listmania.example;  
 2. The mailing list modifies the message by prepending the list name to the
-subject line, then sends it to the subscribers.  
+subject line, then sends it to the subscribers;  
 3. One of the subscribers is alice@mail.service.example, which receives the
 message from listmania.example.
 
@@ -387,7 +387,7 @@ context.  Until ARC usage is widespread, intermediaries will continue to modify
 messages without ARC seals.  As with a failing DKIM signature ({{RFC6376}}
 Section-6.3), a failing ARC chain SHOULD be treated the same as a message with
 no ARC chain.  \[\[ NOTE TO WORKING GROUP: This paragraph probably is better
-placed in Verifier actions. Ref (https://trac.ietf.org/trac/dmarc/ticket/10) ]]
+placed in Verifier actions. Ref [issue 10](https://trac.ietf.org/trac/dmarc/ticket/10) ]]
 
 ### Optional Participation 
 
@@ -400,7 +400,9 @@ ADMD is obligated to perform these actions.
 
 A message can have only one ARC chain on it at a time (see {{i-defn}}).  Once
 broken, the chain cannot be continued, as the chain of custody is no longer
-valid and responsibility for the message has been lost.
+valid and responsibility for the message has been lost. For further discussion
+of this topic and the designed restriction which prevents chain continuation or 
+re-establishment, see {{ARC-USAGE}}.
 
 ### All Failures are Permanent
 
@@ -475,8 +477,8 @@ the first ARC set is numbered 1.  In ABNF terms:
 
 Valid ARC sets must have exactly one instance of each header field for a given
 position value and signing algorithm.  (Initial development of ARC is only being 
-done with a single allowed signing algorithm, but parallel work in the DCRUP working 
-group (https://datatracker.ietf.org/wg/dcrup/about/) is expanding that. For handling
+done with a single allowed signing algorithm, but parallel work in the [DCRUP working 
+group](https://datatracker.ietf.org/wg/dcrup/about/) is expanding that. For handling
 multiple signing algorithms, see {{ARC-MULTI}}.)
 
 Because the AMS and AS header field values are made up of tag-spec constructs,
@@ -502,12 +504,11 @@ with "cv=fail".
 
 The ARC-Authentication-Results header field is syntactically and semantically
 identical to an Authentication-Results header field (defined in Section 2.2 of
-{{D-7601bis}} (A-R)). Note that several optional data fields SHOULD be added 
+{{I-D-7601bis}} (A-R)). Note that several optional data fields SHOULD be added 
 (smtp.client-ip, dkim header.s, arc.oldest-pass) to enable completeness for DMARC
 reporting.
 
-Formally, the header field is specified as follows using Augmented Backus-Naur
-Form ([ABNF]):
+Formally, the header field is specified as follows using ABNF {{RFC5234}}:
 
     arc-authres-header-prefix = "ARC-Authentication-Results:" [CFWS] arc-info
     arc-info = instance *([CFWS] propspec) [CFWS] ";" authres-payload
@@ -526,7 +527,8 @@ semantically identical to a DKIM-Signature header field {{RFC6376}},
 with the following exceptions:
 
 * There is an "i" tag, as described in {{i-defn}}.
-* There is no "v" tag.
+* There is no "v" tag defined for the AMS header. As required for undefined
+tags, if seen, it MUST be ignored.
 
 ARC-Seal header fields MUST NOT be included in the content covered
 by the signature in this header field.
@@ -605,7 +607,7 @@ ARC chain on a message (cv value). Canonicalization, hash functions, and signatu
 validation methods are imported from Section 5 of {{RFC6376}}.
 
 \[\[ Note: need markdown flag to have subordinate numbering distinction 
-(https://trac.ietf.org/trac/dmarc/ticket/11) ]]
+[issue 11](https://trac.ietf.org/trac/dmarc/ticket/11) ]]
 
 1. Collect all ARC sets currently on the message.  If there were none, the ARC
 state is "none" and the algorithm stops here.
@@ -643,14 +645,14 @@ also Section {{dns-arc}} for failure case handling)
 algorithm stops here.
 5. If all seals pass validation, then the chain state is "pass", and the
 algorithm is complete.
-6. Results from the determination of this algorithm SHOULD be stamped in the
+6. Results from the determination of this algorithm SHOULD be recorded in the
 Authentication-Results header
 
 Whatever the end result of the verifier's checks via the algorithm specified
 above, the results MUST be added into the Authentication-Results header(s) for
 the ADMD.
 
-\[\[ See https://trac.ietf.org/trac/dmarc/ticket/12 regarding the final paragraph ]]
+\[\[ See [issue 12](https://trac.ietf.org/trac/dmarc/ticket/12) regarding the final paragraph ]]
 
 The verifier should save the cv state for subsequent use by any sealing which
 may be done later (potentially after message modification) within the same
@@ -667,7 +669,7 @@ messages modified by intermediaries will fail. Stamping the following
 information in the A-R provides a mechanism for this information to survive
 transit.
 
-The ptypes and properties defined in this section SHOULD be stamped in the AR:
+The ptypes and properties defined in this section SHOULD be recorded in the AR:
 
 - smtp.client-ip - The connecting client IP address from which the message is received;
 - header.s - Defined in {{RFC6376}} section 7.2
@@ -686,7 +688,7 @@ receiver MAY signal the breakage through the extended SMTP response code 5.7.7 {
 
 # Signer Actions
 
-\[\[ See https://trac.ietf.org/trac/dmarc/ticket/13 for critique ]]
+\[\[ See [issue 13](https://trac.ietf.org/trac/dmarc/ticket/13) for critique ]]
 
 This section includes a specification of the actions an ARC signer
 takes when presented with a message.
@@ -718,13 +720,13 @@ present.
 
 ## Relationship between DKIM-Signature and AMS signing scopes {#dkim-arc}
 
-\[\[ See https://trac.ietf.org/trac/dmarc/ticket/14 for critique of this section ]]
+\[\[ See [issue 14](https://trac.ietf.org/trac/dmarc/ticket/14) for critique of this section ]]
 
 DKIM-Signatures SHOULD never sign any ARC header fields.
 
 ## Assessing Chain Validity Violations
 
-\[\[ https://trac.ietf.org/trac/dmarc/ticket/15 ]]
+\[\[ [Issue 15](https://trac.ietf.org/trac/dmarc/ticket/15) ]]
 
 Email transit can produce broken signatures for a wide variety of benign
 reasons.  This includes possibly breaking one or more ARC signatures.
@@ -765,7 +767,7 @@ and AAR headers per Section {{aar-new-info}}.
 
 ## DMARC Reporting of ARC Findings - Interim
 
-\[\[ Note: Move to separate document? https://trac.ietf.org/trac/dmarc/ticket/16 
+\[\[ Note: [Move to separate document?](https://trac.ietf.org/trac/dmarc/ticket/16)
 (see the additional fields specified in {{aar-new-info}}) ]]
 
 Receivers SHOULD indicate situations in which ARC evaluation influenced the
@@ -1123,7 +1125,7 @@ of December 2017.
    developmental version of validator was demonstrated to interoperate with
    the Google and AOL implementations during the interop on 2017-07-15 and the
    released version passes the tests in {{ARC-TEST}}
-   (https://github.com/ValiMail/arc_test_suite) with both python and python3.
+   [arc_test_suite](https://github.com/ValiMail/arc_test_suite) with both python and python3.
 
    Licensing: Open/Other (same as dkimpy package = BCD version 2)
 
@@ -1348,7 +1350,7 @@ making unsubstantiated conclusions when encountering a "broken" ARC sequence.
 \[\[ Note: The following examples were mocked up early in the definition
 process for the spec. They no longer reflect the current definition and
 need various updates which will be included in a future draft. 
-(https://trac.ietf.org/trac/dmarc/ticket/17) ]]
+[Issue 17](https://trac.ietf.org/trac/dmarc/ticket/17) ]]
 
 (Obsolete but retained for illustrative purposes)
 
