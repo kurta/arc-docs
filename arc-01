@@ -59,15 +59,14 @@ author:
         email: superuser@gmail.com
 
 normative:
-  RFC5234:
-  RFC3463:
-  RFC7601:
-  RFC7208:
-  RFC6377:
-  RFC6376:
-  RFC5598:
-  RFC3463:
   RFC2119:
+  RFC3463:
+  RFC5234:
+  RFC5598:
+  RFC6376:
+  RFC6377:
+  RFC7208:
+  RFC7601:
   RFC8174:
 
 informative:
@@ -291,7 +290,7 @@ This section defines terms used in the rest of the document.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-interpreted as described in {{BCP 14}}{{RFC2119}}{{RFC8174}}. 
+interpreted as described in BCP14 ({{RFC2119}}{{RFC8174}}). 
 
 Because many of the core concepts and definitions are found in {{RFC5598}},
 readers should to be familiar with the contents of {{RFC5598}}, and in
