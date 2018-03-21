@@ -1,8 +1,8 @@
 ---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-12
-date: 2018-03-18
+docname: draft-ietf-dmarc-arc-protocol-13
+date: 2018-03-21
 
 # stand_alone: true
 
@@ -163,12 +163,11 @@ can be identified through the ARC set of header fields.
 
 Modern email authentication techniques such as the Sender Policy Framework
 (SPF) {{RFC7208}} and DomainKeys Identified Mail (DKIM) [RFC6376] have become
-common.  
-However, their end-to-end utility is limited by the effects of intermediaries 
-along the transmission path, which either are not listed (for SPF) or 
-which break digital signatures (for DKIM).
-These issues are described in substantial detail in those
-protocols' defining documents as well as in {{RFC6377}} and {{RFC7960}}.
+common. However, their end-to-end utility is limited by the effects of
+intermediaries along the transmission path, which either are not listed (for
+SPF) or which break digital signatures (for DKIM).  These issues are described
+in substantial detail in those protocols' defining documents as well as in
+{{RFC6377}} and {{RFC7960}}.
 
 Technologies that build upon the use of SPF and DKIM can reduce the success of
 fraudulent email campaigns.  To this end, Domain-based Mail Authentication,
@@ -189,8 +188,8 @@ view of the handling sequence for a message, especially the points where
 alterations of the content might have occurred.
 Equipped with this more complete
 information, the recipient system(s) can make a more informed handling choice,
-reducing or eliminating the false negatives inherent in use of DKIM and/or SPF
-themselves.
+reducing or eliminating the rejections that would occur with the
+use of DKIM and/or SPF alone.
 
 ## Overview {#overview}
 
@@ -215,7 +214,7 @@ message from listmania.example.
 
 Assuming the original message was DKIM-signed and mysender.example published
 an SPF record, the handling by the mailing list will break the DKIM signature
-because of the message modification, and the forwarding will cause SPF check
+because of the message modification, and the forwarding will cause the SPF check
 to fail in the next step.  But listmania.example can add ARC headers to the
 message to add itself to the document's chain of custody.  When
 mail.service.example sees the message, it can see that SPF and DKIM validation
@@ -234,52 +233,53 @@ information that ARC has provided.
 
 In DKIM, every participating signing agent attaches a signature that is based
 on the some of the content of the message, local policy, and the domain name of the
-participating Administrative Management Domain (ADMD).  Any verifier can
+signing agent's Administrative Management Domain (ADMD).  Any verifier can
 process such a signature; a verified signature means 
-that the domain referenced in the DKIM's "d=" parameter has some
+that the domain referenced in the signature's "d=" parameter has some
 responsibility for handling the message.  An artifact of using digital
 signature technology for this means that verification also ensures that
 the portion of the message that
 was "covered" by the signature has not been altered since the signature was
 applied.  The signatures themselves are generally independent of one another.
 
-By contrast, an ARC signature conveys the following pieces of information:
+In contrast, a validated ARC signature conveys the following pieces of information:
 
 1.  An assertion that, at the time that the intermediary ADMD processed the
-message, the various assertions (DKIM-Signature(s) and/or ARC sets) 
+message, the various assertions (SPF, DKIM-Signature(s) and/or ARC sets) 
 already attached to the message by other ADMDs were or were not valid;
 
 2.  As with DKIM, an assertion that, for a validated ARC signature, the domain name
 in the signature takes some responsibility for handling of the message and that
-the message is unchanged since that signature was applied;
+the covered content of message is unchanged since that signature was applied;
 
 3.  A further assertion that binds the ARC evaluation results into the 
 ARC chain sequence.
 
-This protocol accomplishes each of these by adding new header fields to the
-message with these pieces of information:
+The ARC protocol accomplishes this by adding an "ARC Set" of three new header
+fields to the message as follows:
 
-* ARC-Authentication-Results (referred to below as "AAR"): virtually identical
+1. ARC-Authentication-Results (referred to below as "AAR"): virtually identical
 in syntax to an Authentication-Results field {{RFC7601}}, this field records
 the results of all message authentication checks done by the recording ADMD at
 the time the message arrived. Additional information is placed in this field 
 compared to a standard Authentication-Results field in order to support a more
 complete DMARC report (see {{aar-defn}});
-* ARC-Message-Signature (referred to below as "AMS"): virtually identical in
+2. ARC-Message-Signature (referred to below as "AMS"): virtually identical in
 syntax to DKIM-Signature, this field contains the signature about the message
-header and body as they existed at the time of handling by the ADMD adding it;
+header and body as they existed at the time of handling by the ADMD adding it
+(including any modifications made by the sealing ADMD);
 and 
-* ARC-Seal (referred to below as "AS"): highly similar in structure and format
+3. ARC-Seal (referred to below as "AS"): highly similar in structure and format
 to a DKIM-Signature, this field applies a digital signature that protects the
 integrity of all three of these new fields when they are added by an ADMD, plus
 all instances of these fields added by prior ADMDs.
 
-A distinguishing feature of all of these is that an ARC participant always adds
-all of them before relaying a message to the next handling agent en route to
+An ARC participant always adds all of these header fields 
+before relaying a message to the next handling agent _en route_ to
 its destination.  Moreover, as described in {{i-defn}}, they each have an
-"instance" number that increases with each ADMD in the handling chain so that
+"instance number" that increases with each ADMD in the handling chain so that
 their original order can be preserved and the three related header fields can 
-be processed as a group.
+be processed as a set.
 
 ### Technical Summary
 
@@ -290,24 +290,27 @@ be processed as a group.
 This section defines terms used in the rest of the document. 
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-interpreted as described in {{RFC2119}}{{RFC8174}}. 
+"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in {{BCP 14}}{{RFC2119}}{{RFC8174}}. 
 
 Because many of the core concepts and definitions are found in {{RFC5598}},
-readers SHOULD to be familiar with the contents of {{RFC5598}}, and in
+readers should to be familiar with the contents of {{RFC5598}}, and in
 particular, the potential roles of intermediaries in the delivery of email.
 
 Syntax descriptions use Augmented BNF (ABNF) {{RFC5234}}. 
 
-* "ARC set" - A single group of the header fields introduced in {{overview}} is 
-called an "ARC set". 
-* "ARC chain" - The complete sequence of these groups (ARC sets) is called an 
-"ARC chain".  Although the "Received" header field is
-typically not included in the signed content, the name is based on the notion
-that this is in essence a cryptographically signed series of header fields that
-attest to the handling chain of a message much as Received fields always have.
+### Terms defined and used in this document
 
-## Referenced Definitions
+* "ARC-Authentication-Results" (AAR) - an ARC header field described in {{aar-defn}}.
+* "ARC-Message-Signature" (AMS) - an ARC header field described in {{ams-defn}}.
+* "ARC-Seal" (AS) - an ARC header field described in {{as-defn}}.
+* "ARC Set" - A single group of the header fields introduced in {{overview}} is 
+called an "ARC Set". 
+* "ARC Chain" - the complete sequence of ARC Sets for a message. The ARC Chain
+represents a “chain of custody” for the message, recording its authentication
+status at each ARC-compliant ADMD that handled the message.
+
+### Referenced Definitions
 
 The following terms are defined in other RFCs. Those definitions can be found
 as follows:
@@ -660,12 +663,12 @@ trust boundary. The cv state may be recorded by sealing at the time of
 verification in an initial ARC set (for the ADMD) or may be recorded out of
 band depending on the architecture of the ADMD.
 
-## ARC Authentication-Results Stamp {#aar-new-info}
+## ARC Authentication-Results Information {#aar-new-info}
 
 Certain information pertinent to ascertaining message disposition can be lost
 in transit when messages are handled by intermediaries. For example, failing
 DKIM signatures are sometimes removed by MTAs, and most DKIM signatures on
-messages modified by intermediaries will fail. Stamping the following
+messages modified by intermediaries will fail. Recording the following
 information in the A-R provides a mechanism for this information to survive
 transit.
 
@@ -674,6 +677,10 @@ The ptypes and properties defined in this section SHOULD be recorded in the AR:
 - smtp.client-ip - The connecting client IP address from which the message is received;
 - header.s - Defined in {{RFC6376}} section 7.2
 - arc.oldest-pass - The instance number of the oldest AMS that still validates, or 0 if all pass.
+
+\[\[ Also see [issue 20](https://trac.ietf.org/trac/dmarc/ticket/20) for another possible 
+field to be added and [issue 21](https://trac.ietf.org/trac/dmarc/ticket/21) re which 
+document should define these for IANA action. ]]
 
 ## Handling DNS Problems While Validating ARC {#dns-arc}
 
@@ -712,7 +719,7 @@ status as determined in {{cv-calc}}, and instance number N+1.
 ## Marking and Sealing "cv=fail" (Invalid) Chains {#seal-failed}
 
 The header fields signed by the AS header field b= value in the case of a 
-chain failure MUST be only the matching 'i=' instance headers created by the MTA
+chain failure MUST be only the matching instance headers created by the MTA
 which detected the malformed chain, as if this newest ARC set was the only set
 present. 
 
@@ -808,6 +815,9 @@ Anonymous remailers will probably not find this compatible with their operating 
 
 # IANA Considerations
 
+\[\[ See [issue 21](https://trac.ietf.org/trac/dmarc/ticket/21) regarding which 
+document should be definitive for these fields. ]]
+
 This specification adds three new header fields as defined below.
 
 ## Authentication-Results Method Registry Update 
@@ -826,8 +836,6 @@ This draft adds one item to the IANA "Email Authentication Methods" registry:
 
   Status: active
 
-  Version: 1
-
 * Method : dkim
 
   Defined: {{&SELF}}
@@ -839,8 +847,6 @@ This draft adds one item to the IANA "Email Authentication Methods" registry:
   Value: value of signature "s" tag (see {{RFC6376}})
 
   Status: active
-
-  Version: 1
 
 * Method : spf
 
@@ -854,8 +860,6 @@ This draft adds one item to the IANA "Email Authentication Methods" registry:
 
   Status: active
 
-  Version: 1
-
 * Method : arc
 
   Defined: {{&SELF}}
@@ -867,8 +871,6 @@ This draft adds one item to the IANA "Email Authentication Methods" registry:
   Value: the oldest instance with a still validating AMS signature
 
   Status: active
-
-  Version: 1
 
 ## Definitions of the ARC header fields
 
@@ -1022,7 +1024,7 @@ ARC chains.
 
 There are several edge cases where the information in the AAR can make the
 difference between message delivery or rejection. For example, if there is a
-well known mailing list that ARC seals but doesn’t do its own initial DMARC
+well known mailing list that ARC seals but doesn't do its own initial DMARC
 enforcement, a Final Receiver with this knowledge could make a delivery decision
 based upon the authentication information it sees in the corresponding AAR
 header.
@@ -1311,7 +1313,7 @@ listed in this section.
 
   Implementation Notes:
 
-  * Initial deployments for validation expected in early 2018.
+  * Initial deployments for validation expected in mid-2018.
 
   Contact Info: 
 
