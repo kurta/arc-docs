@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<?rfc toc="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc compact="yes"?>
+<rfc category="info" docName="draft-andersen-historic-4406-etal-00" ipr="trust200902" updates="4405, 4406, 4407">
+ <front>
+   <title abbrev="">Status Change for RFCs 4405, 4406, 4407 to Historic</title>
+
+   <author initials="K." surname="Andersen"
+	   fullname="Kurt Andersen">
+      <organization>LinkedIn</organization>
+
+      <address>
+	 <postal>
+	    <street>1000 West Maude</street>
+	    <city>Sunnyvale</city>
+	    <region>CA</region>
+	    <code>94085</code>
+	 </postal>
+	    
+	 <phone>+1 208 252 5488</phone>
+	 <email>kurta@linkedin.com</email>
+      </address>
+   </author>
+
+   <date month="March" year="2018" />
+
+   <abstract> 
+       <t>In 2006, two experiments were started for email
+       authentication: Sender Policy Framework (SPF, <xref target="RFC4408">RFC 4408</xref>) 
+       and Sender ID (<xref target="RFC4406">RFC 4406</xref>, supported by RFCs 
+       <xref target="RFC4405">4405</xref> and <xref target="RFC4407">4407</xref>).  
+       After eight years of experimental data (<xref target="RFC6686">RFC 6686</xref>), 
+       it was clear that SPF remained in widespread use while
+       Sender ID did not.  <xref target="RFC7208">RFC 7208</xref> moved SPF from 
+       Experimental status to Proposed
+       Standard.  This document acknowledges that Sender ID did not pass its
+       experiment, and changes the status of RFCs <xref target="RFC4405">4405</xref>, 
+       <xref target="RFC4406">4406</xref>, and <xref target="RFC4407">4407</xref> to Historic.
+       </t>
+   </abstract>
+ </front>
+
+ <middle>
+   <section anchor="body" title="Reasoning">
+       <t>In 2006, two experiments were started for email
+       authentication: Sender Policy Framework (SPF, <xref target="RFC4408">RFC 4408</xref>) 
+       and Sender ID (<xref target="RFC4406">RFC 4406</xref>, supported by RFCs 
+       <xref target="RFC4405">4405</xref> and <xref target="RFC4407">4407</xref>).  
+       After eight years of experimental data (<xref target="RFC6686">RFC 6686</xref>), 
+       it was clear that SPF remained in widespread use while
+       Sender ID did not.  <xref target="RFC7208">RFC 7208</xref> moved SPF from 
+       Experimental status to Proposed
+       Standard.  This document acknowledges that Sender ID did not pass its
+       experiment, and changes the status of RFCs <xref target="RFC4405">4405</xref>, 
+       <xref target="RFC4406">4406</xref>, and <xref target="RFC4407">4407</xref> to Historic.
+       </t>
+   </section>
+   
+ </middle>
+
+ <back>
+   <references title="Normative References">
+      <?rfc include="reference.RFC.4408" ?>
+      <?rfc include="reference.RFC.4405" ?>
+      <?rfc include="reference.RFC.4406" ?>
+      <?rfc include="reference.RFC.4407" ?>
+      <?rfc include="reference.RFC.6686" ?>
+      <?rfc include="reference.RFC.7208" ?>
+   </references>
+
+ </back>
+</rfc>
