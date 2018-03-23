@@ -1,7 +1,7 @@
 ---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-13
+docname: draft-ietf-dmarc-arc-protocol-13a
 date: 2018-03-21
 
 # stand_alone: true
@@ -674,7 +674,8 @@ transit.
 The ptypes and properties defined in this section SHOULD be recorded in the AR:
 
 - smtp.client-ip - The connecting client IP address from which the message is received;
-- header.s - Defined in {{RFC6376}} section 7.2
+- smtp.header.5322from-domain - Defined in {{RFC5322}} 
+- dkim.header.s - Defined in {{RFC6376}} section 7.2
 - arc.oldest-pass - The instance number of the oldest AMS that still validates, or 0 if all pass.
 
 \[\[ Also see [issue 20](https://trac.ietf.org/trac/dmarc/ticket/20) for another possible 
@@ -835,15 +836,15 @@ This draft adds one item to the IANA "Email Authentication Methods" registry:
 
   Status: active
 
-* Method : dkim
+* Method : smtp
 
   Defined: {{&SELF}}
 
   ptype: header
 
-  Property: selector
+  Property: 5322.from-domain
 
-  Value: value of signature "s" tag (see {{RFC6376}})
+  Value: Domain from RFC5322.from header field value (see {{RFC5322}})
 
   Status: active
 
