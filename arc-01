@@ -385,14 +385,6 @@ conceptual framework.
 An ARC chain that is valid and passing has the attributes listed above in
 {{protocol-elements}}.
 
-Recipients of an ARC chain that is invalid or does not pass SHOULD NOT draw
-negative conclusions without a good understanding of the wider handling
-context.  Until ARC usage is widespread, intermediaries will continue to modify
-messages without ARC seals.  As with a failing DKIM signature ({{RFC6376}}
-Section-6.3), a failing ARC chain SHOULD be treated the same as a message with
-no ARC chain.  \[\[ NOTE TO WORKING GROUP: This paragraph probably is better
-placed in Verifier actions. Ref [issue 10](https://trac.ietf.org/trac/dmarc/ticket/10) ]]
-
 ### Optional Participation 
 
 Validating an existing chain and then adding your own ARC set to a message
@@ -643,13 +635,17 @@ algorithm is complete.
 MUST be added into the Authentication-Results header(s) for
 the ADMD.
 
-\[\[ See [issue 12](https://trac.ietf.org/trac/dmarc/ticket/12) regarding the final paragraph ]]
-
-The verifier should save the cv state for subsequent use by any sealing which
-may be done later (potentially after message modification) within the same
-trust boundary. The cv state may be recorded by sealing at the time of
+The cv state may be recorded by sealing at the time of
 verification in an initial ARC set (for the ADMD) or may be recorded out of
 band depending on the architecture of the ADMD.
+
+_INFORMATIONAL_: Recipients of an ARC chain that is invalid or does not pass SHOULD NOT draw
+negative conclusions without a good understanding of the wider handling
+context.  Until ARC usage is widespread, intermediaries will continue to modify
+messages without ARC seals.  As with a failing DKIM signature ({{RFC6376}}
+Section-6.3), a failing ARC chain SHOULD be treated the same as a message with
+no ARC chain.  \[\[ NOTE TO WORKING GROUP: This paragraph was moved here per
+[issue 10](https://trac.ietf.org/trac/dmarc/ticket/10) ]]
 
 ## Authentication-Results Information {#aar-new-info}
 
