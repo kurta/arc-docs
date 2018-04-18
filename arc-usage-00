@@ -1,8 +1,8 @@
 ---
 title: Recommended Usage of the Authenticated Received Chain (ARC)
 abbrev: ARC-USAGE
-docname: draft-ietf-dmarc-arc-usage-04
-date: 2018-01-22
+docname: draft-ietf-dmarc-arc-usage-04a
+date: 2018-04-18
 
 # stand_alone: true
 
@@ -206,18 +206,26 @@ not to take ARC information into account at all.
 
 ## What is the significance of an invalid (“broken”) ARC chain?
 
-An ARC chain is not considered to be valid if the signatures in the
-ARC-Seal header fields cannot be verified. For example the remote server
+An ARC chain is broken if the signatures in the
+ARC-Seal header fields cannot be verified or if the most recent AMS
+can not be verified. For example the remote server
 delivering the message to the local ADMD is not reflected in any ARC
 header fields, perhaps because they have not implemented ARC, but they
 modified the message such that ARC and DKIM signatures already in the
 message were invalidated.
 
-In such cases the ARC-Authentication-Results header field should not have
-any influence on the disposition of the message. For example, a
+In case of a broken ARC chain, the message should be treated the same
+as if there was no ARC chain at all.
+For example, a
 message that fails under DMARC and has an invalid ARC chain would be
 subject to that DMARC policy, which may cause it to be quarantined or
 rejected.
+
+Email transit can produce broken signatures for a wide variety of
+benign reasons.  This includes possibly breaking one or more ARC
+signatures.  Therefore, receivers need to be wary of ascribing motive
+to such breakage although patterns of common behaviour may provide
+some basis for adjusting local policy decisions.
 
 
 ## What does the absence of an ARC chain in a message mean?

@@ -5,7 +5,7 @@
 <?rfc sortrefs="yes"?>
 <?rfc symrefs="yes"?>
 <?rfc compact="yes"?>
-<rfc category="info" docName="draft-andersen-historic-4406-etal-00" ipr="trust200902" updates="4405, 4406, 4407">
+<rfc category="info" docName="draft-andersen-historic-4406-etal-01" ipr="trust200902" updates="4405, 4406, 4407">
  <front>
    <title abbrev="">Status Change for RFCs 4405, 4406, 4407 to Historic</title>
 
@@ -29,15 +29,7 @@
    <date month="March" year="2018" />
 
    <abstract> 
-       <t>In 2006, two experiments were started for email
-       authentication: Sender Policy Framework (SPF, <xref target="RFC4408">RFC 4408</xref>) 
-       and Sender ID (<xref target="RFC4406">RFC 4406</xref>, supported by RFCs 
-       <xref target="RFC4405">4405</xref> and <xref target="RFC4407">4407</xref>).  
-       After eight years of experimental data (<xref target="RFC6686">RFC 6686</xref>), 
-       it was clear that SPF remained in widespread use while
-       Sender ID did not.  <xref target="RFC7208">RFC 7208</xref> moved SPF from 
-       Experimental status to Proposed
-       Standard.  This document acknowledges that Sender ID did not pass its
+       <t>This document acknowledges that Sender ID did not pass its
        experiment, and changes the status of RFCs <xref target="RFC4405">4405</xref>, 
        <xref target="RFC4406">4406</xref>, and <xref target="RFC4407">4407</xref> to Historic.
        </t>
