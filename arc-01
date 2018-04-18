@@ -1,8 +1,8 @@
 ---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-13a
-date: 2018-03-21
+docname: draft-ietf-dmarc-arc-protocol-13b
+date: 2018-04-18
 
 # stand_alone: true
 
@@ -48,7 +48,7 @@ author:
       -
         ins: S. Blank
         name: Seth Blank
-        org: ValiMail
+        org: Valimail
         role: editor
         email: seth@valimail.com
       -
@@ -132,7 +132,7 @@ informative:
         name: Kurt Andersen
   ARC-TEST:
     title: ARC Test Suite
-    target: https://github.com/ValiMail/arc_test_suite
+    target: https://github.com/Valimail/arc_test_suite
     date: 2017-01
     author:
       -
@@ -170,17 +170,18 @@ in substantial detail in those protocols' defining documents as well as in
 
 Technologies that build upon the use of SPF and DKIM can reduce the success of
 fraudulent email campaigns.  To this end, Domain-based Mail Authentication,
-Reporting and Compliance (DMARC) {{RFC7489}}, validates the domain of the
-RFC5322.From author header field.
+Reporting and Conformance (DMARC) {{RFC7489}}, validates the domain of the
+RFC5322.From header field.
 However its use along email transmission paths that have independent
 intermediaries, such as some forwarders and essentially all mailing list
 services, produces false positive rejections that are problematic, both for the
 message authors, the intermediary service(s), and for those they are 
 interacting with.
 
-What is needed is a mechanism by which legitimate alteration of a message,
-which invalidates associated SPF and DKIM information, does not ultimately
-result in a rejection of an email message on delivery.  
+{{RFC7960}} documented the need for a mechanism which would survive legitimate
+alteration of a message, in spite of breaking the associated SPF and DKIM
+information so that the end receiver system(s) can avoid those false positive
+rejections on delivery.
 Authenticated Receive Chain (ARC) builds upon DKIM mechanisms to provide a
 sequence of signatures that provide a
 view of the handling sequence for a message, especially the points where
@@ -342,8 +343,9 @@ possibly modifying) the email message in transit;
   * additional data needed to compile a DMARC report for the sending domain.
 
 Given this information, a Final Receiver is able to make a more-informed local
-policy decision regarding message delivery to the end user in spite of an authentication
-failure.
+policy decision regarding message delivery to the end user in spite of an
+authentication failure and to inform the message orgination system(s) through
+the DMARC report(s).
 
 Every participant in an ARC chain, except for the originating sender and Final
 Receiver, is both an ARC Validator (when receiving) and then an ARC Sealer
@@ -412,7 +414,7 @@ Because ARC chains are transmitted across multiple intermediaries, all errors,
 even temporary ones, become unrecoverable and are considered permanent.
 
 Any error validating or sealing a chain, for whatever reason, MUST result in a
-"cv=fail" verdict.
+"cv=fail" verdict as documented in {{cv-defn}}.
 
 ### Benign nature of an ARC Set
 
@@ -467,8 +469,9 @@ described in detail in section {{cv-defn}}.
 
 ## Instance ('i=') Tag {#i-defn}
 
-The header fields comprising a single ARC set are identified by the presence of
-a string in the value portion of the header field that complies with
+The header fields comprising a single ARC set are identified by a common
+"instance" tag value. The instance tag is a string in each header field value
+that complies with
 the "tag-spec" ABNF found in Section 3.2 of {{RFC6376}}.  The tag-name is 
 "i" and the value is the text representation of a positive
 integer, indicating the position in the ARC sequence this set occupies, where
@@ -477,8 +480,8 @@ the first ARC set is numbered 1.  In ABNF terms:
        instance = [FWS] %x69 [FWS] "=" [FWS] position [FWS] ";"
        position = 1*2DIGIT ; 1 - 50
 
-Valid ARC sets must have exactly one instance of each header field for a given
-position value and signing algorithm.  (Initial development of ARC is only being 
+Valid ARC sets must have exactly one instance of each header field (of three) for a given
+instance value and signing algorithm.  (Initial development of ARC is only being 
 done with a single allowed signing algorithm, but parallel work in the [DCRUP working 
 group](https://datatracker.ietf.org/wg/dcrup/about/) is expanding that. For handling
 multiple signing algorithms, see {{ARC-MULTI}}.)
@@ -515,10 +518,6 @@ Formally, the header field is specified as follows using ABNF {{RFC5234}}:
     arc-authres-header-prefix = "ARC-Authentication-Results:" [CFWS] arc-info
     arc-info = instance *([CFWS] propspec) [CFWS] ";" authres-payload
 
-The purpose of this header field is to transmit the results of any
-authentication done on the message downstream to participating ADMDs validating
-and continuing the chain.
-
 The AAR MUST contain all A-R results from within the participating ADMD,
 regardless of how many A-R headers are on the message.
 
@@ -538,18 +537,11 @@ by the signature in this header field.
 The AMS SHOULD include any DKIM-Signature header fields already present on the
 message in the header fields covered by this signature.
 
-The AMS header field SHOULD not include (sign) the AAR header field(s). 
-(Early drafts of this protocol and some older examples included the AAR header(s)
-within the signing scope for the AMS, but ambiguity regarding which of the 
-potentially multiple AAR headers (one per ARC set) argues against such practice.)
+The AMS header field SHOULD NOT include the AAR header field(s). 
 
-Authentication-Results header fields SHOULD NOT be included since they are
+Authentication-Results header fields MUST NOT be included since they are
 likely to be deleted by downstream ADMDs (per Section XXX of {{RFC7601}}),
 thereby breaking the AMS signature.
-
-As with a DKIM-Signature, the purpose of this header field is to allow the ADMD
-generating it to take some responsibility for handling this message as it
-progresses toward delivery.
 
 ## ARC-Seal (AS) {#as-defn}
 
@@ -559,16 +551,16 @@ similar to a DKIM-Signature field, with the following exceptions:
 *  There is an "i" tag, as described in {{i-defn}}.
 *  The ARC-Seal covers none of the body content of the message.  It only covers
 specific header fields.  (See below: {{implicit-as-h}}.)  As a result, no body
-canonicalization is done.  Further, only "relaxed" header canonicalization
-(Section 3.4.2 of {{RFC6376}}) is used.
-*  The only supported tags are "i" ({{i-defn}} supercedes the {{RFC6376}} 
-definition), and "a", "b", "d, "s", "t". The latter 5 tag definitions are 
-copied from Section 3.5 of {{RFC6376}}.
+canonicalization is done.  
+* Only "relaxed" header canonicalization (Section 3.4.2 of {{RFC6376}}) is used.
+*  The only supported tags are "i" (from {{i-defn}} of this document),
+and "a", "b", "d, "s", "t"
+from Section 3.5 of {{RFC6376}}.
 *  An additional tag, "cv" is defined.  (See below: {{cv-defn}})
 
 ### The 'cv' Tag {#cv-defn}
 
-A new tag "cv" (chain validation) indicates the the outcome of evaluating the
+A new tag "cv" (chain validation) indicates the outcome of evaluating the
 existing ARC chain upon arrival at the ADMD that is adding this header field.
 It accepts one of three possible values:
 
@@ -587,7 +579,7 @@ In ABNF terms:
 
 The ARC-Seal signs a canonicalized form of the ARC set header values.  The ARC
 set header values are compiled in increasing instance order, starting at 1,
-and inclue the set being added at the time of sealing the message.
+and include the set being added at the time of sealing the message.
 
 Within a set, the header fields are listed in the following order:
 
@@ -597,7 +589,7 @@ Within a set, the header fields are listed in the following order:
 
 Where the ARC-Seal is the one being generated, it is input to the hash
 function in its final form except with an empty "b=" value, in the same manner
-by which a DKIM-Signature signs itself.
+by which a DKIM-Signature signs itself ({{RFC6376}}, section 3.7).
 
 Note that the signing scope for the ARC-Seal is modified in the situation where
 a chain has failed validation (see {{seal-failed}}).
@@ -617,7 +609,7 @@ state is "none" and the algorithm stops here.
 of each of the
 three ARC-specific header fields), then the chain state is "fail" and the
 algorithm stops here.
-   a. To avoid the overhead of unnecessary computation and delay from crypto 
+  a. To avoid the overhead of unnecessary computation and delay from crypto 
 and DNS operations, the cv value for all ARC-Seal(s)
 MAY be checked at this point. If any of the values are "fail", then the overall 
 state of the chain is "fail" and the algorithm stops here.
@@ -626,32 +618,28 @@ highest instance number.  If this verification fails, then the chain state is
 "fail" and the algorithm stops here.
 4. For each ARC-Seal from the "N"th instance to the first, apply the following
 logic:
-    a. If the value of the "cv" tag on that seal is "fail", the chain state is
-"fail" and the algorithm stops here. (This step SHOULD be skipped if the earlier step (2.1)
-was performed)
-    b. In Boolean nomenclature: if ((i == 1 && cv != "none") or (cv == "none" && i != 1))
+   a. If the value of the "cv" tag on that seal is "fail", the chain state is
+"fail" and the algorithm stops here. 
+   b. In Boolean nomenclature: if ((i == 1 && cv != "none") or (cv == "none" && i != 1))
 then the chain state is "fail" and the algorithm stops here (note that the
 ordering of the logic is structured for short-circuit evaluation).
-    c. Initialize a hash function corresponding to the "a" tag of the ARC-Seal.
-    d. Compute the canonicalized form of the ARC header fields, in the order
+   c. Initialize a hash function corresponding to the "a" tag of the ARC-Seal.
+   d. Compute the canonicalized form of the ARC header fields, in the order
 described in {{implicit-as-h}}, using the "relaxed" header
 canonicalization defined in Section 3.4.2 of {{RFC6376}}.  Pass the canonicalized
 result to the hash function.
-    e. Retrieve the final digest from the hash function.
-    f. Retrieve the public key identified by the "s" and "d" tags in the
+   e. Retrieve the final digest from the hash function.
+   f. Retrieve the public key identified by the "s" and "d" tags in the
 ARC-Seal, as described in {{key-mgmt}}.
-    g. Determine whether the signature portion ("b" tag) of the ARC-Seal and
+   g. Determine whether the signature portion ("b" tag) of the ARC-Seal and
 the digest computed above are valid according to the public key. (See
 also Section {{dns-arc}} for failure case handling)
-    h. If the signature is not valid, the chain state is "fail" and the
+   h. If the signature is not valid, the chain state is "fail" and the
 algorithm stops here.
 5. If all seals pass validation, then the chain state is "pass", and the
 algorithm is complete.
-6. Results from the determination of this algorithm SHOULD be recorded in the
-Authentication-Results header
-
-Whatever the end result of the verifier's checks via the algorithm specified
-above, the results MUST be added into the Authentication-Results header(s) for
+6. The end result of the verifier's checks via this algorithm 
+MUST be added into the Authentication-Results header(s) for
 the ADMD.
 
 \[\[ See [issue 12](https://trac.ietf.org/trac/dmarc/ticket/12) regarding the final paragraph ]]
@@ -662,7 +650,7 @@ trust boundary. The cv state may be recorded by sealing at the time of
 verification in an initial ARC set (for the ADMD) or may be recorded out of
 band depending on the architecture of the ADMD.
 
-## ARC Authentication-Results Information {#aar-new-info}
+## Authentication-Results Information {#aar-new-info}
 
 Certain information pertinent to ascertaining message disposition can be lost
 in transit when messages are handled by intermediaries. For example, failing
@@ -671,7 +659,7 @@ messages modified by intermediaries will fail. Recording the following
 information in the A-R provides a mechanism for this information to survive
 transit.
 
-The ptypes and properties defined in this section SHOULD be recorded in the AR:
+The ptypes and properties defined in this section SHOULD be recorded in the A-R:
 
 - smtp.client-ip - The connecting client IP address from which the message is received;
 - smtp.header.5322from-domain - Defined in {{RFC5322}} 
@@ -693,14 +681,14 @@ If a receiver determines that the ARC chain has failed, the
 receiver MAY signal the breakage through the extended SMTP response code 5.7.7 {{RFC3463}} 
 "message integrity failure" {{ENHANCED-STATUS}} and corresponding SMTP response code.
 
-# Signer Actions
+# Sealer Actions
 
 \[\[ See [issue 13](https://trac.ietf.org/trac/dmarc/ticket/13) for critique ]]
 
-This section includes a specification of the actions an ARC signer
+This section includes a specification of the actions an ARC sealer
 takes when presented with a message.
 
-The signer MUST undertake the following steps:
+The sealer MUST undertake the following steps:
 
 1. Before creating an ARC signature, perform any other, normal authentication
 and/or signing, so that the ARC signature can cover those results.
@@ -709,7 +697,8 @@ and/or signing, so that the ARC signature can cover those results.
 instance number found on the chain (i=); otherwise set "N" equal to zero for
 the following steps.
    2. Generate and attach to the message an ARC-Authentication-Results header
-field using instance number N+1 and the same content from the previous step.
+field as defined in Section {{aar-defn}}, 
+using instance number N+1 and the same content from the previous step.
    3. Generate and attach to the message an ARC-Message-Signature header field
 as defined in {{ams-defn}} above, using instance number N+1.
    4. Generate and attach to the message an ARC-Seal header field using the
@@ -725,11 +714,7 @@ present.
 
 # Usage of ARC and Chain Validity
 
-## Relationship between DKIM-Signature and AMS signing scopes {#dkim-arc}
-
-\[\[ See [issue 14](https://trac.ietf.org/trac/dmarc/ticket/14) for critique of this section ]]
-
-DKIM-Signatures SHOULD never sign any ARC header fields.
+##  ~deleted~ {#dkim-arc}
 
 ## Assessing Chain Validity Violations
 
@@ -804,10 +789,6 @@ reports for each mediated message as they transit the series of handlers.
 DMARC report consumers should be aware of this behaviour and make the
 necessary accommodations.
 
-# Supporting Alternate Signing Algorithms {#alt-sign}
-
-This section has been moved to {{ARC-MULTI}}
-
 # Privacy Considerations
 
 The ARC chain provides a verifiable record of the handlers for a message.
@@ -815,8 +796,8 @@ Anonymous remailers will probably not find this compatible with their operating 
 
 # IANA Considerations
 
-\[\[ See [issue 21](https://trac.ietf.org/trac/dmarc/ticket/21) regarding which 
-document should be definitive for these fields. ]]
+\[\[ Note to the RFC Editors: Both 7601bis and this document define these fields. Please 
+delete the overlap from whichever document goes through second. ]]
 
 This specification adds three new header fields as defined below.
 
@@ -1127,7 +1108,7 @@ of December 2017.
    developmental version of validator was demonstrated to interoperate with
    the Google and AOL implementations during the interop on 2017-07-15 and the
    released version passes the tests in {{ARC-TEST}}
-   [arc_test_suite](https://github.com/ValiMail/arc_test_suite) with both python and python3.
+   [arc_test_suite](https://github.com/Valimail/arc_test_suite) with both python and python3.
 
    Licensing: Open/Other (same as dkimpy package = BCD version 2)
 
@@ -2108,7 +2089,7 @@ This is a test message.
 
 # Acknowledgements
 
-This draft is the work of OAR-Dev Group. 
+This draft originated with the work of OAR-Dev Group. 
 
 The authors thank all of the OAR-Dev group for the ongoing help and though-provoking
 discussions from all the participants, especially: Alex Brotman, Brandon Long, Dave Crocker, 
