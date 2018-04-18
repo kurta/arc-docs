@@ -486,6 +486,7 @@ done with a single allowed signing algorithm, but parallel work in the [DCRUP wo
 group](https://datatracker.ietf.org/wg/dcrup/about/) is expanding that. For handling
 multiple signing algorithms, see {{ARC-MULTI}}.)
 
+_INFORMATIONAL_: 
 Because the AMS and AS header field values are made up of tag-spec constructs,
 the i= tag may be found anywhere within the header field value, but is
 represented throughout this spec in the initial position for convenience.
