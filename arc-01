@@ -62,6 +62,7 @@ normative:
   RFC2119:
   RFC3463:
   RFC5234:
+  RFC5322:
   RFC5598:
   RFC6376:
   RFC6377:
@@ -193,6 +194,8 @@ use of DKIM and/or SPF alone.
 
 ## Overview {#overview}
 
+### General Concepts for ARC 
+
 ARC provides a "chain of custody" for a message, allowing each entity that
 handles the message to see what entities handled it before, and to see what the
 authentication status of the message was at each step in the handling.  The
@@ -229,18 +232,17 @@ and if it accepts that assertion and that modifications made were benign, it
 can deliver the message, rather than reject it, based on the additional
 information that ARC has provided.
 
-### High Level Summary
+### Differences Between ARC and DKIM
 
 In DKIM, every participating signing agent attaches a signature that is based
-on the some of the content of the message, local policy, and the domain name of the
-signing agent's Administrative Management Domain (ADMD).  Any verifier can
-process such a signature; a verified signature means 
-that the domain referenced in the signature's "d=" parameter has some
-responsibility for handling the message.  An artifact of using digital
-signature technology for this means that verification also ensures that
-the portion of the message that
-was "covered" by the signature has not been altered since the signature was
-applied.  The signatures themselves are generally independent of one another.
+on the some of the content of the message, local policy, and the domain name of
+the signing agent's Administrative Management Domain (ADMD).  Any verifier can
+process such a signature; a verified signature means that the domain referenced
+in the signature's "d=" parameter has some responsibility for handling the
+message.  An artifact of using digital signature technology for this means that
+verification also ensures that the portion of the message that was "covered" by
+the signature has not been altered since the signature was applied.  The
+signatures themselves are generally independent of one another.
 
 In contrast, a validated ARC signature conveys the following pieces of information:
 
@@ -280,10 +282,6 @@ its destination.  Moreover, as described in {{i-defn}}, they each have an
 "instance number" that increases with each ADMD in the handling chain so that
 their original order can be preserved and the three related header fields can 
 be processed as a set.
-
-### Technical Summary
-
-\[\[ possibly including a diagram - this may not be needed any more ]]
 
 ## Definitions and Terminology
 
@@ -602,32 +600,35 @@ state is "none" and the algorithm stops here.
 of each of the
 three ARC-specific header fields), then the chain state is "fail" and the
 algorithm stops here.
-  a. To avoid the overhead of unnecessary computation and delay from crypto 
+   1. To avoid the overhead of unnecessary computation and delay from crypto 
 and DNS operations, the cv value for all ARC-Seal(s)
-MAY be checked at this point. If any of the values are "fail", then the overall 
+MAY be checked at this point. 
+      1. If any of the values are "fail", then the overall 
 state of the chain is "fail" and the algorithm stops here.
-3. Conduct verification of the ARC-Message-Signature header field bearing the
-highest instance number.  If this verification fails, then the chain state is
-"fail" and the algorithm stops here.
+      1. The cv value must be "none" if and only if i==1. If that is not true,
+then the overall state of the chain is "fail" and the algorithm stops here.
+3. For each ARC-Message-Signature from the "N"th instance to the first, 
+verification the AMS signature value.
+   1. If the "N"th instance (most recent) signature fails, then the chain state
+is "fail" and the algorithm stops here.
+   1. If one of the prior AMS signatures fails, then set the oldest-pass value
+to the lowest AMS instance number which passed and go onto the next step (there
+is no need to check any other (older) AMS signatures).
+   1. If all AMS signatures verify, set the oldest-pass value to zero (0).
 4. For each ARC-Seal from the "N"th instance to the first, apply the following
 logic:
-   a. If the value of the "cv" tag on that seal is "fail", the chain state is
-"fail" and the algorithm stops here. 
-   b. In Boolean nomenclature: if ((i == 1 && cv != "none") or (cv == "none" && i != 1))
-then the chain state is "fail" and the algorithm stops here (note that the
-ordering of the logic is structured for short-circuit evaluation).
-   c. Initialize a hash function corresponding to the "a" tag of the ARC-Seal.
-   d. Compute the canonicalized form of the ARC header fields, in the order
+   3. Initialize a hash function corresponding to the "a" tag of the ARC-Seal.
+   4. Compute the canonicalized form of the ARC header fields, in the order
 described in {{implicit-as-h}}, using the "relaxed" header
 canonicalization defined in Section 3.4.2 of {{RFC6376}}.  Pass the canonicalized
 result to the hash function.
-   e. Retrieve the final digest from the hash function.
-   f. Retrieve the public key identified by the "s" and "d" tags in the
+   5. Retrieve the final digest from the hash function.
+   6. Retrieve the public key identified by the "s" and "d" tags in the
 ARC-Seal, as described in {{key-mgmt}}.
-   g. Determine whether the signature portion ("b" tag) of the ARC-Seal and
+   7. Determine whether the signature portion ("b" tag) of the ARC-Seal and
 the digest computed above are valid according to the public key. (See
 also Section {{dns-arc}} for failure case handling)
-   h. If the signature is not valid, the chain state is "fail" and the
+   8. If the signature is not valid, the chain state is "fail" and the
 algorithm stops here.
 5. If all seals pass validation, then the chain state is "pass", and the
 algorithm is complete.
@@ -689,7 +690,7 @@ and/or signing, so that the ARC signature can cover those results.
    1. If an ARC chain exists on the message, then set "N" equal to the highest
 instance number found on the chain (i=); otherwise set "N" equal to zero for
 the following steps.
-   2. Generate and attach to the message an ARC-Authentication-Results header
+   1. Generate and attach to the message an ARC-Authentication-Results header
 field as defined in Section {{aar-defn}}, 
 using instance number N+1 and the same content from the previous step.
    3. Generate and attach to the message an ARC-Message-Signature header field
