@@ -772,7 +772,7 @@ of data discovered in the ARC evaluation ({{arc-data}} and {{aar-new-info}}):
 &lt;policy_evaluated>
   &lt;disposition>delivered&lt;/disposition>
   &lt;dkim>fail&lt;/dkim>
-  &lt;spf>fail &lt;comment>source.ip=10.0.0.1&lt;/comment>&lt;/spf>
+  &lt;spf>fail&lt;/spf> 
   &lt;reason>
    &lt;type>local_policy&lt;/type>
    &lt;comment>arc=pass ams\[2].d=d2.example ams\[2].s=s1 as\[2].d=d2.example 
