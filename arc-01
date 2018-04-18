@@ -510,7 +510,7 @@ with "cv=fail".
 
 The ARC-Authentication-Results header field is syntactically and semantically
 identical to an Authentication-Results header field (defined in Section 2.2 of
-{{I-D-7601bis}} (A-R)). Note that several optional data fields SHOULD be added 
+{{I-D-7601bis}}). Note that several optional data fields SHOULD be added 
 (smtp.client-ip, dkim header.s, arc.oldest-pass) to enable completeness for DMARC
 reporting.
 
@@ -519,8 +519,8 @@ Formally, the header field is specified as follows using ABNF {{RFC5234}}:
     arc-authres-header-prefix = "ARC-Authentication-Results:" [CFWS] arc-info
     arc-info = instance *([CFWS] propspec) [CFWS] ";" authres-payload
 
-The AAR MUST contain all A-R results from within the participating ADMD,
-regardless of how many A-R headers are on the message.
+The AAR MUST contain all -R results from within the participating ADMD,
+regardless of how many Authentication-Results headers are on the message.
 
 ## ARC-Message-Signature (AMS) {#ams-defn}
 
@@ -657,10 +657,10 @@ Certain information pertinent to ascertaining message disposition can be lost
 in transit when messages are handled by intermediaries. For example, failing
 DKIM signatures are sometimes removed by MTAs, and most DKIM signatures on
 messages modified by intermediaries will fail. Recording the following
-information in the A-R provides a mechanism for this information to survive
+information in the Authentication-Results provides a mechanism for this information to survive
 transit.
 
-The ptypes and properties defined in this section SHOULD be recorded in the A-R:
+The ptypes and properties defined in this section SHOULD be recorded in the Authentication-Results:
 
 - smtp.client-ip - The connecting client IP address from which the message is received;
 - smtp.header.5322from-domain - Defined in {{RFC5322}} 
