@@ -635,7 +635,7 @@ algorithm is complete.
 MUST be added into the Authentication-Results header(s) for
 the ADMD.
 
-The cv state may be recorded by sealing at the time of
+_INFORMATIONAL_: The cv state may be recorded by sealing at the time of
 verification in an initial ARC set (for the ADMD) or may be recorded out of
 band depending on the architecture of the ADMD.
 
@@ -663,10 +663,6 @@ The ptypes and properties defined in this section SHOULD be recorded in the Auth
 - dkim.header.s - Defined in {{RFC6376}} section 7.2
 - arc.oldest-pass - The instance number of the oldest AMS that still validates, or 0 if all pass.
 
-\[\[ Also see [issue 20](https://trac.ietf.org/trac/dmarc/ticket/20) for another possible 
-field to be added and [issue 21](https://trac.ietf.org/trac/dmarc/ticket/21) re which 
-document should define these for IANA action. ]]
-
 ## Handling DNS Problems While Validating ARC {#dns-arc}
 
 DNS-based failures to verify a chain are treated no differently than any other
@@ -680,7 +676,7 @@ receiver MAY signal the breakage through the extended SMTP response code 5.7.7 {
 
 # Sealer Actions
 
-\[\[ See [issue 13](https://trac.ietf.org/trac/dmarc/ticket/13) for critique ]]
+\[\[ Verify that this is OK with -14 [issue 13](https://trac.ietf.org/trac/dmarc/ticket/13) ]]
 
 This section includes a specification of the actions an ARC sealer
 takes when presented with a message.
@@ -709,25 +705,6 @@ chain failure MUST be only the matching instance headers created by the MTA
 which detected the malformed chain, as if this newest ARC set was the only set
 present. 
 
-# Usage of ARC and Chain Validity
-
-##  ~deleted~ {#dkim-arc}
-
-## Assessing Chain Validity Violations
-
-\[\[ [Issue 15](https://trac.ietf.org/trac/dmarc/ticket/15) ]]
-
-Email transit can produce broken signatures for a wide variety of benign
-reasons.  This includes possibly breaking one or more ARC signatures.
-Therefore, receivers need to be wary of ascribing motive to such breakage
-although patterns of common behaviour may provide some basis for adjusting
-local policy decisions.
-
-ARC does not attempt to protect an entire message.  There are various ways
-that a message can still be problematic, in spite of having a valid ARC chain.
-Consequently, all normal, content-based analysis SHOULD still be performed on
-any message having a valid chain of ARC header sets.
-
 # Recording and Reporting the Results of ARC Evaluation
 
 The evaluation of an ARC chain provides information which will be useful to both the 
@@ -755,9 +732,6 @@ Details of the ARC chain which was evaluated should be included in the Authentic
 and AAR headers per Section {{aar-new-info}}.
 
 ## DMARC Reporting of ARC Findings - Interim
-
-\[\[ Note: [Move to separate document?](https://trac.ietf.org/trac/dmarc/ticket/16)
-(see the additional fields specified in {{aar-new-info}}) ]]
 
 Receivers SHOULD indicate situations in which ARC evaluation influenced the
 results of their local policy determination. DMARC reporting of ARC-informed decisions
@@ -820,7 +794,7 @@ This draft adds one item to the IANA "Email Authentication Methods" registry:
 
   ptype: header
 
-  Property: 5322.from-domain
+  Property: 5322from-domain
 
   Value: Domain from RFC5322.from header field value (see {{RFC5322}})
 
