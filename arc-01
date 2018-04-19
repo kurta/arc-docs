@@ -591,18 +591,15 @@ A verifier takes the following steps to determine the state of the
 ARC chain on a message (cv value). Canonicalization, hash functions, and signature
 validation methods are imported from Section 5 of {{RFC6376}}.
 
-\[\[ Note: need markdown flag to have subordinate numbering distinction 
-[issue 11](https://trac.ietf.org/trac/dmarc/ticket/11) ]]
-
 1. Collect all ARC sets currently on the message.  If there were none, the ARC
 state is "none" and the algorithm stops here.
-2. If the form of any ARC set is invalid (e.g., does not contain exactly one
-of each of the
-three ARC-specific header fields), then the chain state is "fail" and the
+2. Check the morphology of the ARC chain:
+   1. If the form of any ARC set is invalid (e.g., does not contain exactly one
+of each of the three ARC-specific header fields), then the chain state is "fail" and the
 algorithm stops here.
-   1. To avoid the overhead of unnecessary computation and delay from crypto 
-and DNS operations, the cv value for all ARC-Seal(s)
-MAY be checked at this point. 
+   1. Validate that the instance values form a continuous sequence from 1..N with
+no gaps.
+   1. Validate the cv value for all ARC-Seal(s): 
       1. If any of the values are "fail", then the overall 
 state of the chain is "fail" and the algorithm stops here.
       1. The cv value must be "none" if and only if i==1. If that is not true,
@@ -755,11 +752,11 @@ of data discovered in the ARC evaluation ({{arc-data}} and {{aar-new-info}}):
 In the suggested sample, d2.example is the sealing domain for ARC\[2] and 
 d1.example is the sealing domain for ARC\[1].
 
-Mediators SHOULD generate DMARC reports on messages which transit their system 
-just like any other message which they receive. This will result in multiple
-reports for each mediated message as they transit the series of handlers.
-DMARC report consumers should be aware of this behaviour and make the
-necessary accommodations.
+Intermediary message handlers SHOULD generate DMARC reports on messages which
+transit their system just like any other message which they receive. This will
+result in multiple reports for each mediated message as they transit the series
+of handlers.  DMARC report consumers should be aware of this behaviour and make
+the necessary accommodations.
 
 # Privacy Considerations
 
@@ -831,15 +828,10 @@ This specification adds three new header fields to the "Permanent Message Header
 Field Registry", as follows:
 
 *  Header field name: ARC-Seal
-
    Applicable protocol:  mail
-
    Status:  draft
-
    Author/Change controller:  IETF
-
    Specification document(s):  {{&SELF}}
-
    Related information:  {{RFC6376}}
 
 *  Header field name:  ARC-Message-Signature
