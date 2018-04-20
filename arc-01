@@ -629,8 +629,7 @@ negative conclusions without a good understanding of the wider handling
 context.  Until ARC usage is widespread, intermediaries will continue to modify
 messages without ARC seals.  As with a failing DKIM signature ({{RFC6376}}
 Section-6.3), a failing ARC chain SHOULD be treated the same as a message with
-no ARC chain.  \[\[ NOTE TO WORKING GROUP: This paragraph was moved here per
-[issue 10](https://trac.ietf.org/trac/dmarc/ticket/10) ]]
+no ARC chain.  
 
 ## Authentication-Results Information {#aar-new-info}
 
@@ -659,8 +658,6 @@ receiver MAY signal the breakage through the extended SMTP response code 5.7.7 {
 "message integrity failure" {{ENHANCED-STATUS}} and corresponding SMTP response code.
 
 # Sealer Actions
-
-\[\[ Verify that this is OK with -14 [issue 13](https://trac.ietf.org/trac/dmarc/ticket/13) ]]
 
 This section includes a specification of the actions an ARC sealer
 takes when presented with a message.
@@ -751,7 +748,7 @@ Anonymous remailers will probably not find this compatible with their operating 
 
 # IANA Considerations
 
-\[\[ Note to the RFC Editors: Both 7601bis and this document define these fields. Please 
+\[\[ Note to the RFC Editors: Both {{I-D-7601bis}} and this document define these fields. Please 
 delete the overlap from whichever document goes through second. ]]
 
 This specification adds three new header fields as defined below.
@@ -760,89 +757,61 @@ This specification adds three new header fields as defined below.
 
 This draft adds one item to the IANA "Email Authentication Methods" registry:
 
-* Method : arc
+* Method : arc  
+Defined: {{&SELF}}  
+ptype: header  
+Property: chain evaluation result  
+Value: chain evaluation result status (see {{as-defn}})  
+Status: active  
 
-  Defined: {{&SELF}}
+* Method : smtp  
+  Defined: {{&SELF}}  
+  ptype: header  
+  Property: 5322from-domain  
+  Value: Domain from RFC5322.from header field value (see {{RFC5322}})  
+  Status: active  
 
-  ptype: header
+* Method : spf  
+  Defined: {{&SELF}}  
+  ptype: smtp  
+  Property: client-ip  
+  Value: the connecting client IP address from which the message is received  
+  Status: active  
 
-  Property: chain evaluation result
-
-  Value: chain evaluation result status (see {{as-defn}})
-
-  Status: active
-
-* Method : smtp
-
-  Defined: {{&SELF}}
-
-  ptype: header
-
-  Property: 5322from-domain
-
-  Value: Domain from RFC5322.from header field value (see {{RFC5322}})
-
-  Status: active
-
-* Method : spf
-
-  Defined: {{&SELF}}
-
-  ptype: smtp
-
-  Property: client-ip
-
-  Value: the connecting client IP address from which the message is received
-
-  Status: active
-
-* Method : arc
-
-  Defined: {{&SELF}}
-
-  ptype: header
-
-  Property: oldest-pass
-
-  Value: the oldest instance with a still validating AMS signature
-
-  Status: active
+* Method : arc  
+  Defined: {{&SELF}}  
+  ptype: header  
+  Property: oldest-pass  
+  Value: the oldest instance with a still validating AMS signature  
+  Status: active  
 
 ## Definitions of the ARC header fields
 
 This specification adds three new header fields to the "Permanent Message Header
 Field Registry", as follows:
 
-*  Header field name: ARC-Seal
-   Applicable protocol:  mail
-   Status:  draft
-   Author/Change controller:  IETF
-   Specification document(s):  {{&SELF}}
-   Related information:  {{RFC6376}}
+*  Header field name: ARC-Seal  
+   Applicable protocol:  mail  
+   Status:  draft  
+   Author/Change controller:  IETF  
+   Specification document(s):  {{&SELF}}  
+   Related information:  {{RFC6376}}  
 
-*  Header field name:  ARC-Message-Signature
 
-   Applicable protocol:  mail
+*  Header field name:  ARC-Message-Signature  
+   Applicable protocol:  mail  
+   Status:  draft  
+   Author/Change controller:  IETF  
+   Specification document(s):  {{&SELF}}  
+   Related information: {{RFC6376}}  
 
-   Status:  draft
 
-   Author/Change controller:  IETF
-
-   Specification document(s):  {{&SELF}}
-
-   Related information: {{RFC6376}}
-
-*  Header field name:  ARC-Authentication-Results
-
-   Applicable protocol:  mail
-
-   Status:  standard
-
-   Author/Change controller:  IETF
-
-   Specification document(s):  {{&SELF}}
-
-   Related information:  {{RFC7601}} 
+*  Header field name:  ARC-Authentication-Results  
+   Applicable protocol:  mail  
+   Status:  standard  
+   Author/Change controller:  IETF  
+   Specification document(s):  {{&SELF}}  
+   Related information:  {{RFC7601}}   
 
 # Security Considerations {#sec-con}
 
@@ -1009,39 +978,29 @@ of December 2017.
 
 ## GMail test reflector and incoming validation
 
-  Organization: Google
-
+  Organization: Google  
   Description: Internal production implementation with both debug
-    analysis and validating + sealing pass-through function
+    analysis and validating + sealing pass-through function  
+  Status of Operation: Production - Incoming Validation  
+  Coverage: Full spec implemented as of {{ARC-DRAFT-06}}  
+  Licensing: Proprietary - Internal only  
+  Implementation Notes:
 
-  Status of Operation: Production - Incoming Validation
-
-  Coverage: Full spec implemented as of {{ARC-DRAFT-06}}
-
-  Licensing: Proprietary - Internal only
-
-  Implementation Notes: 
-
-  * Full functionality was demonstrated during the interop testing on 2017-07-15.
+  * Full functionality was demonstrated during the interop testing on 2017-07-15.  
 
   Contact Info: <arc-discuss@dmarc.org>
 
 ## AOL test reflector and internal tagging
 
-  Organization: AOL
-
+  Organization: AOL  
   Description: Internal prototype implementation with both debug
-    analysis and validating + sealing pass-through function
-
-  Status of Operation: Beta
-
+    analysis and validating + sealing pass-through function  
+  Status of Operation: Beta  
   Coverage: ARC chain validity status checking is operational, but only
-    applied to email addresses enrolled in the test program.
-    This system conforms to {{ARC-DRAFT-06}}
-
-  Licensing: Proprietary - Internal only
-
-  Implementation Notes: 
+    applied to email addresses enrolled in the test program.  
+    This system conforms to {{ARC-DRAFT-06}}  
+  Licensing: Proprietary - Internal only  
+  Implementation Notes:
 
   * 2017-07-15: Full functionality verified during the interop testing.
 
@@ -1049,13 +1008,10 @@ of December 2017.
 
 ## dkimpy 
 
-   Organization: dkimpy developers/Scott Kitterman
-
-   Description: Python DKIM package
-
-   Status of Operation: Production
-
-   Coverage: 
+   Organization: dkimpy developers/Scott Kitterman  
+   Description: Python DKIM package  
+   Status of Operation: Production  
+   Coverage:
 
    * 2017-07-15: The internal test suite is incomplete, but the command line
    developmental version of validator was demonstrated to interoperate with
@@ -1063,24 +1019,18 @@ of December 2017.
    released version passes the tests in {{ARC-TEST}}
    [arc_test_suite](https://github.com/Valimail/arc_test_suite) with both python and python3.
 
-   Licensing: Open/Other (same as dkimpy package = BCD version 2)
-
+   Licensing: Open/Other (same as dkimpy package = BCD version 2)  
    Contact Info: https://launchpad.net/dkimpy
 
 ## OpenARC
 
-  Organization: TDP/Murray Kucherawy
-
+  Organization: TDP/Murray Kucherawy  
   Description: Implemention of milter functionality related to the OpenDKIM
-    and OpenDMARC packages
-
-  Status of Operation: Beta
-
-  Coverage: Built to support {{ARC-DRAFT-10}}
-
-  Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)
-
-  Implementation Notes: 
+    and OpenDMARC packages  
+  Status of Operation: Beta  
+  Coverage: Built to support {{ARC-DRAFT-10}}  
+  Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)  
+  Implementation Notes:
 
   * The build is FreeBSD oriented but some packages have been built for
   easier deployment on RedHat-based Linux platforms.
@@ -1097,17 +1047,12 @@ of December 2017.
 
 ## Mailman 3.2 patch
 
-  Organization: Mailman development team
-
-  Description: Integrated ARC capabilities within the Mailman 3.2 package
-
-  Status of Operation: Patch submitted 
-
-  Coverage: Based on OpenARC
-
-  Licensing: Same as mailman package - GPL
-
-  Implementation Notes: 
+  Organization: Mailman development team  
+  Description: Integrated ARC capabilities within the Mailman 3.2 package  
+  Status of Operation: Patch submitted  
+  Coverage: Based on OpenARC  
+  Licensing: Same as mailman package - GPL  
+  Implementation Notes:
 
   * Appears to work properly in at least one beta deployment, but
   waiting on acceptance of the pull request into the mainline of
@@ -1117,17 +1062,12 @@ of December 2017.
 
 ## Copernica/MailerQ web-based validation
 
-  Organization: Copernica
-
-  Description: Web-based validation of ARC-signed messages
-
-  Status of Operation: Beta
-
-  Coverage: Built to support {{ARC-DRAFT-05}}
-
-  Licensing: On-line usage only 
-
-  Implementation Notes: 
+  Organization: Copernica  
+  Description: Web-based validation of ARC-signed messages  
+  Status of Operation: Beta  
+  Coverage: Built to support {{ARC-DRAFT-05}}  
+  Licensing: On-line usage only  
+  Implementation Notes:
 
   * Released 2016-10-24
   * Requires full message content to be pasted into a web form found at
@@ -1141,17 +1081,12 @@ listed in this section.
 
 ## Rspamd 
 
-  Organization: Rspamd community 
-
-  Description: ARC signing and verification module
-
-  Status of Operation: Production, though deployment usage is unknown
-
-  Coverage: Built to support {{ARC-DRAFT-06}}
-
-  Licensing: Open source
-
-  Implementation Notes: 
+  Organization: Rspamd community  
+  Description: ARC signing and verification module  
+  Status of Operation: Production, though deployment usage is unknown  
+  Coverage: Built to support {{ARC-DRAFT-06}}  
+  Licensing: Open source  
+  Implementation Notes:
 
   * 2017-06-12: Released with version 1.6.0
   * 2017-07-15: Testing during the interop showed that the validation functionality 
@@ -1161,16 +1096,11 @@ listed in this section.
 
 ## PERL MAIL::DKIM module
 
-  Organization: FastMail
-
-  Description: Email domain authentication (sign and/or verify) module, previously included SPF / DKIM / DMARC, now has ARC added
-
-  Status of Operation: Production, deployment usage unknown
-
-  Coverage: Built to support {{ARC-DRAFT-10}}
-
-  Licensing: Open Source
-
+  Organization: FastMail  
+  Description: Email domain authentication (sign and/or verify) module, previously included SPF / DKIM / DMARC, now has ARC added  
+  Status of Operation: Production, deployment usage unknown  
+  Coverage: Built to support {{ARC-DRAFT-10}}  
+  Licensing: Open Source  
   Implementation Notes:
 
   * 2017-12-15: v0.50 released with full test set passing for ARC
@@ -1179,16 +1109,11 @@ listed in this section.
 
 ## PERL Mail::Milter::Authentication module 
 
-  Organization: FastMail
-
-  Description: Email domain authentication milter, uses MAIL::DKIM (see above)
-
-  Status of Operation: Intial validation completed during IETF99 hackathon with some follow-on work during the week
-
-  Coverage: Built to support {{&SELF}}
-
-  Licensing: Open Source
-
+  Organization: FastMail  
+  Description: Email domain authentication milter, uses MAIL::DKIM (see above)  
+  Status of Operation: Intial validation completed during IETF99 hackathon with some follow-on work during the week  
+  Coverage: Built to support {{&SELF}}  
+  Licensing: Open Source  
   Implementation Notes:
 
   * 2017-07-15: Validation functionality which interoperates with Gmail, AOL, dkimpy was demonstrated; later in
@@ -1199,16 +1124,11 @@ listed in this section.
 
 ## Sympa List Manager
 
-  Organization: Sympa Dev Community
-
-  Description: Work in progress
-
-  Status of Operation: Work in progress
-
-  Coverage: unknown
-
-  Licensing: open source
-
+  Organization: Sympa Dev Community  
+  Description: Work in progress  
+  Status of Operation: Work in progress  
+  Coverage: unknown  
+  Licensing: open source  
   Implementation Notes:
 
   * 2018-01-05: Tracked as https://github.com/sympa-community/sympa/issues/153
@@ -1217,34 +1137,24 @@ listed in this section.
 
 ## Oracle Messaging Server
 
-  Organization: Oracle
-
-  Description: 
-
-  Status of Operation: Intial development work during IETF99 hackathon. Status since then unknown.
-
-  Coverage: Built to support {{ARC-DRAFT-06}}
-
-  Licensing: Unknown
-
+  Organization: Oracle  
+  Description:  
+  Status of Operation: Intial development work during IETF99 hackathon. Status since then unknown.  
+  Coverage: Work in progress  
+  Licensing: Unknown  
   Implementation Notes:
 
-  * 2018-01: Protocol handling components are completed, but crypto is not yet functional.
+  * 2018-03: Protocol handling components are completed, but crypto is not yet functional.
 
   Contact Info: Chris Newman
 
-## MessageSystems Momentum
+## MessageSystems Momentum and PowerMTA platforms
 
-  Organization: MessageSystems/SparkPost
-
-  Description: OpenARC integration into the LUA-enabled Momentum processing space
-
-  Status of Operation: Beta
-
-  Coverage: Built to support {{ARC-DRAFT-10}}
-
-  Licensing: Unknown
-
+  Organization: MessageSystems/SparkPost  
+  Description: OpenARC integration into the LUA-enabled Momentum processing space  
+  Status of Operation: Beta  
+  Coverage: Built to support {{ARC-DRAFT-10}}  
+  Licensing: Unknown  
   Implementation Notes:
 
   * Initial deployments for validation expected in mid-2018.
