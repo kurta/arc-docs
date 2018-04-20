@@ -192,9 +192,7 @@ information, the recipient system(s) can make a more informed handling choice,
 reducing or eliminating the rejections that would occur with the
 use of DKIM and/or SPF alone.
 
-## Overview {#overview}
-
-### General Concepts for ARC 
+## General Concepts 
 
 ARC provides a "chain of custody" for a message, allowing each entity that
 handles the message to see what entities handled it before, and to see what the
@@ -232,7 +230,7 @@ and if it accepts that assertion, it
 can accept the message for further processing, rather than reject it, 
 based on the additional information that ARC has provided.
 
-### Differences Between ARC and DKIM
+## Differences Between ARC and DKIM
 
 In DKIM, every participating signing agent attaches a signature that is based
 on the some of the content of the message, local policy, and the domain name of
@@ -454,11 +452,21 @@ an ARC Set.  This is known as an "instance", and the indicator is an "i=".
 That is, the members of the first ARC set affixed to a message will all include
 "i=1".  This is described in detail in section {{i-defn}}.
 
-### Chain Validation Status
+### Chain Validation Status {#cv-values}
 
-ARC introduces a mechanism, also via a new tag, which indicates the state of
-the ARC Chain at each step.  This is the "chain validation status".  This is
-described in detail in section {{cv-defn}}.
+ARC introduces a mechanism which indicates the state of the ARC chain at each
+step.  The "chain validation status" is used to communicate the
+current chain status within the ARC chain and also
+through Authentication-Results and ARC-Authentication-Results
+stamps as well as DMARC reporting.
+
+The chain validation status has one of three possible values:
+* none: There was no chain on the message when it arrived for validation; 
+typically occurs when the message arrives at a Message Transfer Agent (MTA)
+or mediator from a Message Submission Agent (MSA) or when any upstream handlers 
+may not be participating in ARC handling;
+* fail: The message has a chain whose validation failed;
+* pass: The message has a chain whose validation succeeded.
 
 # The ARC Header Fields
 
@@ -547,14 +555,7 @@ from Section 3.5 of {{RFC6376}}.
 
 A new tag "cv" (chain validation) indicates the outcome of evaluating the
 existing ARC chain upon arrival at the ADMD that is adding this header field.
-It accepts one of three possible values:
-
-* none:  There was no chain on the message when it arrived for validation;
-typically occurs when the message arrives at a Message Transfer Agent (MTA)
-from a Message Submission Agent (MSA) or when any upstream MTAs may not be
-participating in ARC handling;
-* fail:  The message has a chain whose validation failed;
-* pass:  The message has a chain whose validation succeeded.
+The values are defined per Section {{cv-values}}.
 
 In ABNF terms:
 
