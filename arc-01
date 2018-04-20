@@ -275,7 +275,7 @@ Syntax descriptions use Augmented BNF (ABNF) {{RFC5234}}.
 * "ARC-Authentication-Results" (AAR) - an ARC header field described in {{aar-defn}}.
 * "ARC-Message-Signature" (AMS) - an ARC header field described in {{ams-defn}}.
 * "ARC-Seal" (AS) - an ARC header field described in {{as-defn}}.
-* "ARC Set" - A single group of the header fields introduced in {{overview}} is 
+* "ARC Set" - A single group of the header fields introduced in {{arc-set-defn}} is 
 called an "ARC Set". 
 * "ARC Chain" - the complete sequence of ARC Sets for a message. The ARC Chain
 represents a “chain of custody” for the message, recording its authentication
@@ -324,6 +324,8 @@ Receiver, is both an ARC Validator (when receiving) and then an ARC Sealer
 message receipt must be passed to the sealer function in order for sealing to
 occur properly; how this is done is considered ADMD-specific and an
 implementation detail.
+
+## The "ARC Set" of Header Fields {#arc-set-defn}
 
 Each "ARC set" consists of the following three new header fields:
 
