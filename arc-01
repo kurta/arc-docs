@@ -77,6 +77,13 @@ informative:
   ENHANCED-STATUS: 
     title: IANA SMTP Enhanced Status Codes
     target: http://www.iana.org/assignments/smtp-enhanced-status-codes/smtp-enhanced-status-codes.xhtml
+  ARC-DRAFT-13:
+    title: Authenticated Received Chain (ARC) Protocol (I-D-13)
+    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-13
+    author:
+      -
+        ins: K. Andersen
+        name: Kurt Andersen
   ARC-DRAFT-10:
     title: Authenticated Received Chain (ARC) Protocol (I-D-10)
     target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-10
@@ -100,8 +107,8 @@ informative:
         name: Kurt Andersen
   ARC-USAGE:
     title: Recommended Usage of the ARC Headers
-    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-usage-01
-    date: 2017-12
+    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-usage-05
+    date: 2018-04
     author:
       -
         ins: S. Jones
@@ -1165,8 +1172,18 @@ listed in this section.
 
   * Initial deployments for validation expected in mid-2018.
 
-  Contact Info: 
+  Contact Info: TBD
 
+## Exim
+
+  Organization: Exim developers  
+  Status of Operation: Operational; requires specific enabling for compile.  
+  Coverage: Full spec implemented as of {{ARC-DRAFT-13}}  
+  Licensing: GPL  
+  Contact Info: exim-users@exim.org  
+  Implementation notes:
+
+  * Exim 4.91
 
 --- back
 
