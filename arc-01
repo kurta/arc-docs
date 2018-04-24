@@ -1,7 +1,7 @@
 ---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-13d
+docname: draft-ietf-dmarc-arc-protocol-14
 date: 2018-04-23
 
 # stand_alone: true
@@ -313,9 +313,10 @@ possibly modifying) the email message in transit;
   * the {{RFC7601}} Authentication-Results each participating ADMD saw; and
   * additional data needed to compile a DMARC report for the sending domain.
 
-Given this information, a Final Receiver is able to make a more-informed local
-policy decision regarding message delivery to the end user in spite of an
-authentication failure and to inform the message orgination system(s) through
+Given this information, each receiver is able to make a more informed local
+policy decision regarding message processing and, ultimately, delivery to the 
+end user in spite of 
+authentication failure(s) and to inform the message orgination system(s) through
 the DMARC report(s).
 
 Every participant in an ARC Chain, except for the originating sender and Final
@@ -329,7 +330,7 @@ were performed in a single pass over the message.
 
 The following protocol features are functional parts and design decisions
 related the protocol that are not specific to either Validators or Sealers, but
-ensure the ARC Chain conveys this information to a Final Receiver.
+ensure that the ARC Chain conveys this information to a Final Receiver.
 
 ## The "ARC Set" of Header Fields {#arc-set-defn}
 
@@ -354,27 +355,28 @@ all instances of these fields added by prior ADMDs.
 An ARC participant always adds all of these header fields 
 before relaying a message to the next handling agent _en route_ to
 its destination.  Moreover, they each have an
-"instance number" that increases with each ADMD in the handling chain so that
+"instance number" that increases with each ARC Set in the handling chain so that
 their original order can be preserved and the three related header fields can 
 be processed as a set.
 
 ### Instance Tags
 
-ARC introduces an indicator to its header fields to show the order in which the
-header fields comprising an ARC Set were added, and the specific members of
-an ARC Set.  This is known as an "instance", and the indicator is an "i=" tag/value.
+ARC includes an indicator in its header fields to show the order in which the
+header fields comprising an ARC Chain were added, and the specific members of
+each ARC Set.  This is known as the "instance", and the indicator is an "i=" tag/value.
 That is, the members of the first ARC Set affixed to a message will all include
 "i=1".  This is described in detail in section {{i-defn}}.
 
 ## Chain Validation Status {#cv-values}
 
-ARC introduces a mechanism which indicates the state of the ARC Chain at each
+ARC includes a mechanism which denotes the state of the ARC Chain at each
 step.  The "chain validation status" ("cv" tag/value) is used to communicate the
 current chain status within the ARC Chain and also
 through Authentication-Results and ARC-Authentication-Results
 stamps as well as DMARC reporting.
 
 The chain validation status has one of three possible values:
+
 * none: There was no chain on the message when it arrived for validation; 
 typically occurs when the message arrives at a Message Transfer Agent (MTA)
 or mediator from a Message Submission Agent (MSA) or when any upstream handlers 
@@ -386,8 +388,8 @@ may not be participating in ARC handling;
 
 ARC includes trace information encoded in the AAR. While section {{aar-defn}}
 defines what information must be provided, sealing ADMDs may provide additional
-information, and validating receivers may use or ignore this trace information
-as they wish.
+information, and validating receivers may use this trace information
+as they find it useful.
 
 ## Key Management {#key-mgmt}
 
@@ -635,7 +637,7 @@ messages modified by intermediaries will fail. Recording the following
 information in the Authentication-Results stamped as part of the ARC evaluation
 provides a mechanism for this information to survive transit through a particular ADMD.
 
-Stamped ARC evaluation results is limited to the Chain Validation status (cv) from {#cv-values}.
+Stamped ARC evaluation results is limited to the Chain Validation status (cv) from {{cv-values}}.
 
 The ptypes and properties defined in this section SHOULD be recorded in the Authentication-Results:
 
@@ -750,8 +752,8 @@ Anonymous remailers will probably not find this compatible with their operating 
 
 # IANA Considerations
 
-\[\[ Note to the RFC Editors: Both {{I-D-7601bis}} and this document define these fields. Please 
-delete the overlap from whichever document goes through second. ]]
+\[\[ Note to the RFC Editors: Some of these fields are defined both here and in {{I-D-7601bis}}. Please 
+delete the overlap from whichever document goes through the publication process after the other. ]]
 
 This specification adds three new header fields as defined below.
 
@@ -865,7 +867,7 @@ messages, so even with a chain of trusted participants, the message
 might still never have authenticated in the first place (which is why you
 have the AAR to inspect) or could have been subject to unintended modifications.
 
-# Evaluating the Efficacy of the ARC Protocol {#is-arc-ok} (Experimental Considerations)
+# Evaluating the Efficacy of the ARC Protocol (Experimental Considerations) {#is-arc-ok}
 
 The ARC protocol is designed to mitigate some of the most common failure
 conditions for email which transits intermediary handlers en route to the
