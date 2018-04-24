@@ -17,7 +17,7 @@
 <?rfc sortrefs="yes"?>
 <?rfc symrefs="yes"?>
 
-<rfc ipr="trust200902" docName="draft-ietf-dmarc-arc-usage-04" category="info">
+<rfc ipr="trust200902" docName="draft-ietf-dmarc-arc-usage-05" category="info">
 
   <front>
     <title abbrev="ARC-USAGE">Recommended Usage of the Authenticated Received Chain (ARC)</title>
@@ -54,7 +54,7 @@
       </address>
     </author>
 
-    <date year="2018" month="January" day="22"/>
+    <date year="2018" month="April" day="23"/>
 
     <area>art</area>
     <workgroup>DMARC Working Group</workgroup>
@@ -181,18 +181,26 @@ not to take ARC information into account at all.</t>
 </section>
 <section anchor="what-is-the-significance-of-an-invalid-broken-arc-chain" title="What is the significance of an invalid (“broken”) ARC chain?">
 
-<t>An ARC chain is not considered to be valid if the signatures in the
-ARC-Seal header fields cannot be verified. For example the remote server
+<t>An ARC chain is broken if the signatures in the
+ARC-Seal header fields cannot be verified or if the most recent AMS
+can not be verified. For example the remote server
 delivering the message to the local ADMD is not reflected in any ARC
 header fields, perhaps because they have not implemented ARC, but they
 modified the message such that ARC and DKIM signatures already in the
 message were invalidated.</t>
 
-<t>In such cases the ARC-Authentication-Results header field should not have
-any influence on the disposition of the message. For example, a
+<t>In case of a broken ARC chain, the message should be treated the same
+as if there was no ARC chain at all.
+For example, a
 message that fails under DMARC and has an invalid ARC chain would be
 subject to that DMARC policy, which may cause it to be quarantined or
 rejected.</t>
+
+<t>Email transit can produce broken signatures for a wide variety of
+benign reasons.  This includes possibly breaking one or more ARC
+signatures.  Therefore, receivers need to be wary of ascribing motive
+to such breakage although patterns of common behaviour may provide
+some basis for adjusting local policy decisions.</t>
 
 </section>
 <section anchor="what-does-the-absence-of-an-arc-chain-in-a-message-mean" title="What does the absence of an ARC chain in a message mean?">

@@ -6,6 +6,7 @@
 <!ENTITY RFC2119 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml">
 <!ENTITY RFC3463 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3463.xml">
 <!ENTITY RFC5234 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5234.xml">
+<!ENTITY RFC5322 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5322.xml">
 <!ENTITY RFC5598 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5598.xml">
 <!ENTITY RFC6376 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6376.xml">
 <!ENTITY RFC6377 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6377.xml">
@@ -22,7 +23,7 @@
 <?rfc sortrefs="yes"?>
 <?rfc symrefs="yes"?>
 
-<rfc ipr="trust200902" docName="draft-ietf-dmarc-arc-protocol-13" category="exp">
+<rfc ipr="trust200902" docName="draft-ietf-dmarc-arc-protocol-14" category="exp">
 
   <front>
     <title abbrev="ARC-Protocol">Authenticated Received Chain (ARC) Protocol</title>
@@ -53,7 +54,7 @@
       </address>
     </author>
     <author initials="S." surname="Blank" fullname="Seth Blank" role="editor">
-      <organization>ValiMail</organization>
+      <organization>Valimail</organization>
       <address>
         <email>seth@valimail.com</email>
       </address>
@@ -65,7 +66,7 @@
       </address>
     </author>
 
-    <date year="2018" month="March" day="21"/>
+    <date year="2018" month="April" day="23"/>
 
     <area>art</area>
     <workgroup>DMARC Working Group</workgroup>
@@ -81,7 +82,7 @@ attached, authenticated record of the status
 at each step along the handling path, for use by
 the final recipient in making choices about the disposition of the message.
 Changes in the message that might break existing authentication mechanisms
-can be identified through the ARC set of header fields.</t>
+can be identified through the ARC Set of header fields.</t>
 
 
 
@@ -105,18 +106,19 @@ in substantial detail in those protocols’ defining documents as well as in
 
 <t>Technologies that build upon the use of SPF and DKIM can reduce the success of
 fraudulent email campaigns.  To this end, Domain-based Mail Authentication,
-Reporting and Compliance (DMARC) <xref target="RFC7489"/>, validates the domain of the
-RFC5322.From author header field.
+Reporting and Conformance (DMARC) <xref target="RFC7489"/>, validates the domain of the
+RFC5322.From header field.
 However its use along email transmission paths that have independent
 intermediaries, such as some forwarders and essentially all mailing list
 services, produces false positive rejections that are problematic, both for the
 message authors, the intermediary service(s), and for those they are 
 interacting with.</t>
 
-<t>What is needed is a mechanism by which legitimate alteration of a message,
-which invalidates associated SPF and DKIM information, does not ultimately
-result in a rejection of an email message on delivery.<vspace />
-Authenticated Receive Chain (ARC) builds upon DKIM mechanisms to provide a
+<t><xref target="RFC7960"/> documented the need for a mechanism which would survive legitimate
+alteration of a message, in spite of breaking the associated SPF and DKIM
+information so that the end receiver system(s) can avoid those false positive
+rejections on delivery.
+Authenticated Received Chain (ARC) builds upon DKIM mechanisms to provide a
 sequence of signatures that provide a
 view of the handling sequence for a message, especially the points where
 alterations of the content might have occurred.
@@ -125,7 +127,7 @@ information, the recipient system(s) can make a more informed handling choice,
 reducing or eliminating the rejections that would occur with the
 use of DKIM and/or SPF alone.</t>
 
-<section anchor="overview" title="Overview">
+<section anchor="general-concepts" title="General Concepts">
 
 <t>ARC provides a “chain of custody” for a message, allowing each entity that
 handles the message to see what entities handled it before, and to see what the
@@ -161,70 +163,36 @@ by listmania.example, and can verify listmania’s assertion.</t>
 see that mysender.example publishes a DMARC policy asking that unauthenticated
 messages be rejected.  But is can also see the assertion by listmania.example
 that the message was correctly authenticated when the message arrived there,
-and if it accepts that assertion and that modifications made were benign, it
-can deliver the message, rather than reject it, based on the additional
-information that ARC has provided.</t>
+and if it accepts that assertion, it
+can accept the message for further processing, rather than reject it, 
+based on the additional information that ARC has provided.</t>
 
-<section anchor="high-level-summary" title="High Level Summary">
+</section>
+<section anchor="differences-between-arc-and-dkim" title="Differences Between ARC and DKIM">
 
 <t>In DKIM, every participating signing agent attaches a signature that is based
-on the some of the content of the message, local policy, and the domain name of the
-signing agent’s Administrative Management Domain (ADMD).  Any verifier can
-process such a signature; a verified signature means 
-that the domain referenced in the signature’s “d=” parameter has some
-responsibility for handling the message.  An artifact of using digital
-signature technology for this means that verification also ensures that
-the portion of the message that
-was “covered” by the signature has not been altered since the signature was
-applied.  The signatures themselves are generally independent of one another.</t>
+on some of the content of the message, local policy, and the domain name of
+the signing agent’s Administrative Management Domain (ADMD).  Any verifier can
+process such a signature; a verified signature means that the domain referenced
+in the signature’s “d=” parameter has some responsibility for handling the
+message.  An artifact of using digital signature technology for this means that
+verification also ensures that the portion of the message that was “covered” by
+the signature has not been altered since the signature was applied.  The
+signatures themselves are generally independent of one another.</t>
 
-<t>In contrast, a validated ARC signature conveys the following pieces of information:</t>
+<t>In contrast, a validated ARC Set conveys the following pieces of information:</t>
 
 <t><list style="numbers">
   <t>An assertion that, at the time that the intermediary ADMD processed the
-message, the various assertions (SPF, DKIM-Signature(s) and/or ARC sets) 
+message, the various assertions (such as SPF, DKIM-Signature(s) and/or ARC Chain) 
 already attached to the message by other ADMDs were or were not valid;</t>
   <t>As with DKIM, an assertion that, for a validated ARC signature, the domain name
 in the signature takes some responsibility for handling of the message and that
-the covered content of message is unchanged since that signature was applied;</t>
+the covered content of the message is unchanged since that signature was applied;</t>
   <t>A further assertion that binds the ARC evaluation results into the 
-ARC chain sequence.</t>
+ARC Chain sequence.</t>
 </list></t>
 
-<t>The ARC protocol accomplishes this by adding an “ARC Set” of three new header
-fields to the message as follows:</t>
-
-<t><list style="numbers">
-  <t>ARC-Authentication-Results (referred to below as “AAR”): virtually identical
-in syntax to an Authentication-Results field <xref target="RFC7601"/>, this field records
-the results of all message authentication checks done by the recording ADMD at
-the time the message arrived. Additional information is placed in this field 
-compared to a standard Authentication-Results field in order to support a more
-complete DMARC report (see <xref target="aar-defn"/>);</t>
-  <t>ARC-Message-Signature (referred to below as “AMS”): virtually identical in
-syntax to DKIM-Signature, this field contains the signature about the message
-header and body as they existed at the time of handling by the ADMD adding it
-(including any modifications made by the sealing ADMD);
-and</t>
-  <t>ARC-Seal (referred to below as “AS”): highly similar in structure and format
-to a DKIM-Signature, this field applies a digital signature that protects the
-integrity of all three of these new fields when they are added by an ADMD, plus
-all instances of these fields added by prior ADMDs.</t>
-</list></t>
-
-<t>An ARC participant always adds all of these header fields 
-before relaying a message to the next handling agent <spanx style="emph">en route</spanx> to
-its destination.  Moreover, as described in <xref target="i-defn"/>, they each have an
-“instance number” that increases with each ADMD in the handling chain so that
-their original order can be preserved and the three related header fields can 
-be processed as a set.</t>
-
-</section>
-<section anchor="technical-summary" title="Technical Summary">
-
-<t>[[ possibly including a diagram - this may not be needed any more ]]</t>
-
-</section>
 </section>
 <section anchor="definitions-and-terminology" title="Definitions and Terminology">
 
@@ -246,11 +214,11 @@ particular, the potential roles of intermediaries in the delivery of email.</t>
   <t>“ARC-Authentication-Results” (AAR) - an ARC header field described in <xref target="aar-defn"/>.</t>
   <t>“ARC-Message-Signature” (AMS) - an ARC header field described in <xref target="ams-defn"/>.</t>
   <t>“ARC-Seal” (AS) - an ARC header field described in <xref target="as-defn"/>.</t>
-  <t>“ARC Set” - A single group of the header fields introduced in <xref target="overview"/> is 
+  <t>“ARC Set” - A single group of the header fields introduced in <xref target="arc-set-defn"/> is 
 called an “ARC Set”.</t>
   <t>“ARC Chain” - the complete sequence of ARC Sets for a message. The ARC Chain
 represents a “chain of custody” for the message, recording its authentication
-status at each ARC-compliant ADMD that handled the message.</t>
+status at each ARC-participating ADMD that handled the message.</t>
 </list></t>
 
 </section>
@@ -281,50 +249,131 @@ Specific references can be found below.</t>
 
 <t>As with other domain authentication technologies (such as SPF, DKIM, and
 DMARC), ARC makes no claims about the contents of the email message it has
-sealed. However, for a valid and passing ARC chain, a Final Receiver is able to
+sealed. However, for a valid and passing ARC Chain, a Final Receiver is able to
 ascertain:</t>
 
 <t><list style="symbols">
   <t>all (participating) domains that claim responsibility for handling (and
 possibly modifying) the email message in transit;</t>
   <t>trace information, including:  <list style="symbols">
-      <t>the <xref target="RFC7601"/> authentication results each participating ADMD saw; and</t>
+      <t>the <xref target="RFC7601"/> Authentication-Results each participating ADMD saw; and</t>
       <t>additional data needed to compile a DMARC report for the sending domain.</t>
     </list></t>
 </list></t>
 
-<t>Given this information, a Final Receiver is able to make a more-informed local
-policy decision regarding message delivery to the end user in spite of an authentication
-failure.</t>
+<t>Given this information, each receiver is able to make a more informed local
+policy decision regarding message processing and, ultimately, delivery to the 
+end user in spite of 
+authentication failure(s) and to inform the message orgination system(s) through
+the DMARC report(s).</t>
 
-<t>Every participant in an ARC chain, except for the originating sender and Final
+<t>Every participant in an ARC Chain, except for the originating sender and Final
 Receiver, is both an ARC Validator (when receiving) and then an ARC Sealer
-(when sending a message onward).  The validated chain status as determined at
-message receipt must be passed to the sealer function in order for sealing to
-occur properly; how this is done is considered ADMD-specific and an
-implementation detail.</t>
+(when sending a message onward).</t>
 
 <t><spanx style="emph">INFORMATIONAL</spanx>: It is important to understand that validating and then
 immediately sealing a message leaves no room for message modification, and many
 early implementations of ARC did not initially work because both operations
 were performed in a single pass over the message.</t>
 
-<section anchor="features-of-the-arc-protocol" title="Features of the ARC Protocol">
-
 <t>The following protocol features are functional parts and design decisions
 related the protocol that are not specific to either Validators or Sealers, but
-ensure the ARC chain conveys this information to a Final Receiver.</t>
+ensure that the ARC Chain conveys this information to a Final Receiver.</t>
 
+<section anchor="arc-set-defn" title="The “ARC Set” of Header Fields">
+
+<t>Each “ARC Set” consists of the following three new header fields:</t>
+
+<t><list style="numbers">
+  <t>ARC-Authentication-Results (referred to below as “AAR”): virtually identical
+in syntax to an Authentication-Results field <xref target="RFC7601"/>, this field records
+the results of all message authentication checks done by the recording ADMD at
+the time the message arrived. Additional information is placed in this field 
+compared to a standard Authentication-Results field in order to support a more
+complete DMARC report;</t>
+  <t>ARC-Message-Signature (referred to below as “AMS”): virtually identical in
+syntax to DKIM-Signature, this field contains the signature about the message
+header and body as they existed at the time of handling by the ADMD adding it
+(including any modifications made by the sealing ADMD);
+and</t>
+  <t>ARC-Seal (referred to below as “AS”): highly similar in structure and format
+to a DKIM-Signature, this field applies a digital signature that protects the
+integrity of all three of these new fields when they are added by an ADMD, plus
+all instances of these fields added by prior ADMDs.</t>
+</list></t>
+
+<t>An ARC participant always adds all of these header fields 
+before relaying a message to the next handling agent <spanx style="emph">en route</spanx> to
+its destination.  Moreover, they each have an
+“instance number” that increases with each ARC Set in the handling chain so that
+their original order can be preserved and the three related header fields can 
+be processed as a set.</t>
+
+<section anchor="instance-tags" title="Instance Tags">
+
+<t>ARC includes an indicator in its header fields to show the order in which the
+header fields comprising an ARC Chain were added, and the specific members of
+each ARC Set.  This is known as the “instance”, and the indicator is an “i=” tag/value.
+That is, the members of the first ARC Set affixed to a message will all include
+“i=1”.  This is described in detail in section <xref target="i-defn"/>.</t>
+
+</section>
+</section>
+<section anchor="cv-values" title="Chain Validation Status">
+
+<t>ARC includes a mechanism which denotes the state of the ARC Chain at each
+step.  The “chain validation status” (“cv” tag/value) is used to communicate the
+current chain status within the ARC Chain and also
+through Authentication-Results and ARC-Authentication-Results
+stamps as well as DMARC reporting.</t>
+
+<t>The chain validation status has one of three possible values:</t>
+
+<t><list style="symbols">
+  <t>none: There was no chain on the message when it arrived for validation; 
+typically occurs when the message arrives at a Message Transfer Agent (MTA)
+or mediator from a Message Submission Agent (MSA) or when any upstream handlers 
+may not be participating in ARC handling;</t>
+  <t>fail: The message has a chain whose validation failed;</t>
+  <t>pass: The message has a chain whose validation succeeded.</t>
+</list></t>
+
+</section>
+<section anchor="trace-information" title="Trace Information">
+
+<t>ARC includes trace information encoded in the AAR. While section <xref target="aar-defn"/>
+defines what information must be provided, sealing ADMDs may provide additional
+information, and validating receivers may use this trace information
+as they find it useful.</t>
+
+</section>
+<section anchor="key-mgmt" title="Key Management">
+
+<t>The public keys for ARC header fields follow the same requirements, syntax and
+semantics as those for DKIM signatures, described in Section 3.6 of
+<xref target="RFC6376"/>.  ARC places no requirements on the selectors and/or domains used
+for the ARC header field signatures.</t>
+
+</section>
+<section anchor="all-failures-are-permanent" title="All Failures are Permanent">
+
+<t>Because ARC Chains are transmitted across multiple intermediaries, all errors,
+even temporary ones, become unrecoverable and are considered permanent.</t>
+
+<t>Any error validating or sealing a chain, for whatever reason, MUST result in a
+“cv=fail” verdict as documented in <xref target="cv-defn"/>.</t>
+
+</section>
 <section anchor="chain-of-custody" title="Chain of Custody">
 
-<t>At a high level, an ARC chain represents a chain of custody of authentication
+<t>At a high level, an ARC Chain represents a chain of custody of authentication
 and other trace information (AAR) related to a message, signed by each handler
 of the message. Each link in the chain (AMS) is designed to be brittle, insofar
 as it survives only until the next modification of the message. However, the
 sequence of intermediaries in the handling chain (AS) is designed to remain
 intact over the entirety of the chain.</t>
 
-<t>The ARC chain can be conceptualized through an analogy with the chain of custody
+<t>The ARC Chain can be conceptualized through an analogy with the chain of custody
 for legal evidence.  The material evidence itself is sealed within an
 tamper-proof bag (AMS) each time.  When handed to a new party, that party both
 vouches for the state of the received evidence container (AAR) and signs for
@@ -332,54 +381,44 @@ the evidence on a chain of custody report form (AS). As with all analogies,
 this one should not be taken to interpretive extremes, but primarily used as a
 conceptual framework.</t>
 
-<t>An ARC chain that is valid and passing has the attributes listed above in
+<t>An ARC Chain that is valid and passing has the attributes listed above in
 <xref target="protocol-elements"/>.</t>
-
-<t>Recipients of an ARC chain that is invalid or does not pass SHOULD NOT draw
-negative conclusions without a good understanding of the wider handling
-context.  Until ARC usage is widespread, intermediaries will continue to modify
-messages without ARC seals.  As with a failing DKIM signature (<xref target="RFC6376"/>
-Section-6.3), a failing ARC chain SHOULD be treated the same as a message with
-no ARC chain.  [[ NOTE TO WORKING GROUP: This paragraph probably is better
-placed in Verifier actions. Ref <eref target="https://trac.ietf.org/trac/dmarc/ticket/10">issue 10</eref> ]]</t>
 
 </section>
 <section anchor="optional-participation" title="Optional Participation">
 
-<t>Validating an existing chain and then adding your own ARC set to a message
+<t>Validating an existing chain and then adding your own ARC Set to a message
 allows you to claim responsibility for handling the message and modifications,
 if any, done by your ADMD to benefit message delivery downstream. However, no
 ADMD is obligated to perform these actions.</t>
 
 </section>
-<section anchor="only-one-arc-chain-one-chain-to-rule-them-all" title="Only one ARC Chain (One Chain to Rule Them All)">
+<section anchor="broad-responsibility-to-seal" title="Broad Responsibility to Seal">
 
-<t>A message can have only one ARC chain on it at a time (see <xref target="i-defn"/>).  Once
+<t>Any mediator (<xref target="RFC5598"/>, section 5) that modifies a message may seal its own changes. 
+ARC is not solely intended for perimeter MTAs.</t>
+
+</section>
+<section anchor="one-chain-to-rule-them-all" title="One Chain to Rule Them All">
+
+<t>A message can have only one ARC Chain on it at a time (see <xref target="i-defn"/>).  Once
 broken, the chain cannot be continued, as the chain of custody is no longer
 valid and responsibility for the message has been lost. For further discussion
 of this topic and the designed restriction which prevents chain continuation or 
 re-establishment, see <xref target="ARC-USAGE"/>.</t>
 
 </section>
-<section anchor="all-failures-are-permanent" title="All Failures are Permanent">
+<section anchor="sealing-is-always-safe" title="Sealing is Always Safe">
 
-<t>Because ARC chains are transmitted across multiple intermediaries, all errors,
-even temporary ones, become unrecoverable and are considered permanent.</t>
-
-<t>Any error validating or sealing a chain, for whatever reason, MUST result in a
-“cv=fail” verdict.</t>
-
-</section>
-<section anchor="benign-nature-of-an-arc-set" title="Benign nature of an ARC Set">
-
-<t>Even when an ARC chain is valid and passes, its value is limited to very
-specific cases. An ARC chain is specifically designed to provide value to a
-Final Receiver evaluating message delivery in the context of an authentication failure.
-An ARC chain in general, and each ARC set in particular, provide additional
-information, and otherwise is benign. Specifically:</t>
+<t>Even when an ARC Chain is valid and passes, its value is limited to very
+specific cases. An ARC Chain is specifically designed to provide additional information to a
+receiver evaluating message delivery in the context of an authentication failure and 
+otherwise be benign.
+Specifically:</t>
 
 <t><list style="symbols">
-  <t>properly adding an ARC set to a message does not damage or invalidate an existing chain, and</t>
+  <t>properly adding an ARC Set to a message does not damage or invalidate an existing chain,</t>
+  <t>sealing a chain when you did not modify a message does not negatively affect the chain, and</t>
   <t>validating a message exposes no new threat vectors (see <xref target="sec-con"/>).</t>
 </list></t>
 
@@ -394,136 +433,84 @@ explore such usage except to note that it is intentionally allowed within the
 scope of this specification.</t>
 
 </section>
-<section anchor="key-mgmt" title="Key Management">
-
-<t>The public keys for ARC header fields follow the same requirements, syntax and
-semantics as those for DKIM signatures, described in Section 3.6 of
-<xref target="RFC6376"/>.  ARC places no requirements on the selectors and/or domains used
-for the ARC header field signatures.</t>
-
-</section>
-<section anchor="trace-information" title="Trace Information">
-
-<t>ARC includes trace information encoded in the AAR. While section <xref target="aar-defn"/>
-defines what information must be provided, sealing ADMDs may provide additional
-information, and validating receivers may use or ignore this trace information
-as they wish.</t>
-
-</section>
-<section anchor="instance-tags" title="Instance Tags">
-
-<t>ARC introduces an indicator to its header fields to show the order in which the
-header fields comprising an ARC set were added, and the specific members of
-an ARC Set.  This is known as an “instance”, and the indicator is an “i=”.
-That is, the members of the first ARC set affixed to a message will all include
-“i=1”.  This is described in detail in section <xref target="i-defn"/>.</t>
-
-</section>
-<section anchor="chain-validation-status" title="Chain Validation Status">
-
-<t>ARC introduces a mechanism, also via a new tag, which indicates the state of
-the ARC Chain at each step.  This is the “chain validation status”.  This is
-described in detail in section <xref target="cv-defn"/>.</t>
-
-</section>
-</section>
 </section>
 <section anchor="the-arc-header-fields" title="The ARC Header Fields">
 
 <section anchor="i-defn" title="Instance (‘i=’) Tag">
 
-<t>The header fields comprising a single ARC set are identified by the presence of
-a string in the value portion of the header field that complies with
+<t>The header fields comprising a single ARC Set are identified by a common
+“instance” tag value. The instance tag is a string in each header field value
+that complies with
 the “tag-spec” ABNF found in Section 3.2 of <xref target="RFC6376"/>.  The tag-name is 
 “i” and the value is the text representation of a positive
 integer, indicating the position in the ARC sequence this set occupies, where
-the first ARC set is numbered 1.  In ABNF terms:</t>
+the first ARC Set is numbered 1.  In ABNF terms:</t>
 
 <figure><artwork><![CDATA[
-   instance = [FWS] %x69 [FWS] "=" [FWS] position [FWS] ";"
    position = 1*2DIGIT ; 1 - 50
+   instance = [FWS] %x69 [FWS] "=" [FWS] position [FWS] ";"
 ]]></artwork></figure>
 
-<t>Valid ARC sets must have exactly one instance of each header field for a given
-position value and signing algorithm.  (Initial development of ARC is only being 
+<t>Valid ARC Sets MUST have exactly one instance of each header field (of three) for a given
+instance value and signing algorithm.</t>
+
+<t>(<spanx style="emph">INFORMATIONAL:</spanx> Initial development of ARC is only being 
 done with a single allowed signing algorithm, but parallel work in the <eref target="https://datatracker.ietf.org/wg/dcrup/about/">DCRUP working 
 group</eref> is expanding that. For handling
 multiple signing algorithms, see <xref target="ARC-MULTI"/>.)</t>
 
-<t>Because the AMS and AS header field values are made up of tag-spec constructs,
+<t>The ‘i’ tag value can range from 1-50 (inclusive).</t>
+
+<t>ARC Chains longer than the defined maximum count MUST be marked as failed.</t>
+
+<t><spanx style="emph">INFORMATIONAL</spanx>: 
+Because the AMS and AS header field values are made up of tag-spec constructs,
 the i= tag may be found anywhere within the header field value, but is
 represented throughout this spec in the initial position for convenience.
 Implementers are encouraged to place the i= tag at the beginning of the field
 value to facilitate human inspection of the headers.</t>
 
-<section anchor="i-hdr" title="Valid Range for Instance Tags">
-
-<t>The ‘i’ tag value can range from 1-50 (inclusive).</t>
-
-<t>ARC implementations MUST support at least ten (10) ARC sets.</t>
-
-<t>An effective operational maximum will have to be developed through deployment
-experience in the field and will be documented within <xref target="ARC-USAGE"/> once
-determined.</t>
-
-<t>ARC chains with more than the defined operational maximum count MUST be marked 
-with “cv=fail”.</t>
-
-</section>
 </section>
 <section anchor="aar-defn" title="ARC-Authentication-Results (AAR)">
 
 <t>The ARC-Authentication-Results header field is syntactically and semantically
-identical to an Authentication-Results header field (defined in Section 2.2 of
-<xref target="I-D-7601bis"/> (A-R)). Note that several optional data fields SHOULD be added 
-(smtp.client-ip, dkim header.s, arc.oldest-pass) to enable completeness for DMARC
-reporting.</t>
+identical,
+except for the header field name itself and its instance tag,
+to an Authentication-Results header field (defined in Section 2.2 of
+<xref target="I-D-7601bis"/>).</t>
 
 <t>Formally, the header field is specified as follows using ABNF <xref target="RFC5234"/>:</t>
 
 <figure><artwork><![CDATA[
-arc-authres-header-prefix = "ARC-Authentication-Results:" [CFWS] arc-info
-arc-info = instance *([CFWS] propspec) [CFWS] ";" authres-payload
+arc-info = instance [CFWS] ";" authres-payload
+arc-authres-header = "ARC-Authentication-Results:" [CFWS] arc-info
 ]]></artwork></figure>
 
-<t>The purpose of this header field is to transmit the results of any
-authentication done on the message downstream to participating ADMDs validating
-and continuing the chain.</t>
-
-<t>The AAR MUST contain all A-R results from within the participating ADMD,
-regardless of how many A-R headers are on the message.</t>
+<t>The AAR MUST contain all Authentication-Results from within the participating ADMD,
+regardless of how many Authentication-Results headers are on the message.</t>
 
 </section>
 <section anchor="ams-defn" title="ARC-Message-Signature (AMS)">
 
-<t>The ARC-Message-Signature header field is syntactically and
-semantically identical to a DKIM-Signature header field <xref target="RFC6376"/>, 
-with the following exceptions:</t>
+<t>The ARC-Message-Signature header field is simplified version of 
+a DKIM-Signature header field <xref target="RFC6376"/>, 
+with the following modifications:</t>
 
 <t><list style="symbols">
   <t>There is an “i” tag, as described in <xref target="i-defn"/>.</t>
   <t>There is no “v” tag defined for the AMS header. As required for undefined
-tags, if seen, it MUST be ignored.</t>
+tags (in <xref target="RFC6376"/>), if seen, it MUST be ignored.</t>
 </list></t>
 
-<t>ARC-Seal header fields MUST NOT be included in the content covered
-by the signature in this header field.</t>
+<t>ARC-related header fields (ARC-Seal, ARC-Message-Signture, ARC-Authentication-Results) 
+MUST NOT be included in the content covered by the signature in the signature in this header field.</t>
 
 <t>The AMS SHOULD include any DKIM-Signature header fields already present on the
 message in the header fields covered by this signature.</t>
 
-<t>The AMS header field SHOULD not include (sign) the AAR header field(s). 
-(Early drafts of this protocol and some older examples included the AAR header(s)
-within the signing scope for the AMS, but ambiguity regarding which of the 
-potentially multiple AAR headers (one per ARC set) argues against such practice.)</t>
-
-<t>Authentication-Results header fields SHOULD NOT be included since they are
-likely to be deleted by downstream ADMDs (per Section XXX of <xref target="RFC7601"/>),
+<t>Authentication-Results header fields MUST NOT be included since they are
+likely to be deleted by downstream ADMDs (per Section 5 of <xref target="RFC7601"/>),
 thereby breaking the AMS signature.</t>
-
-<t>As with a DKIM-Signature, the purpose of this header field is to allow the ADMD
-generating it to take some responsibility for handling this message as it
-progresses toward delivery.</t>
 
 </section>
 <section anchor="as-defn" title="ARC-Seal (AS)">
@@ -534,42 +521,20 @@ similar to a DKIM-Signature field, with the following exceptions:</t>
 <t><list style="symbols">
   <t>There is an “i” tag, as described in <xref target="i-defn"/>.</t>
   <t>The ARC-Seal covers none of the body content of the message.  It only covers
-specific header fields.  (See below: <xref target="implicit-as-h"/>.)  As a result, no body
-canonicalization is done.  Further, only “relaxed” header canonicalization
-(Section 3.4.2 of <xref target="RFC6376"/>) is used.</t>
-  <t>The only supported tags are “i” (<xref target="i-defn"/> supercedes the <xref target="RFC6376"/> 
-definition), and “a”, “b”, “d, “s”, “t”. The latter 5 tag definitions are 
-copied from Section 3.5 of <xref target="RFC6376"/>.</t>
-  <t>An additional tag, “cv” is defined.  (See below: <xref target="cv-defn"/>)</t>
+specific header fields as defined below: <xref target="implicit-as-h"/>. 
+No body canonicalization is done.</t>
+  <t>Only “relaxed” header canonicalization (Section 3.4.2 of <xref target="RFC6376"/>) is used.</t>
+  <t>The only supported tags are “i” (from <xref target="i-defn"/> of this document),
+and “a”, “b”, “d, “s”, “t”
+from Section 3.5 of <xref target="RFC6376"/>.</t>
+  <t>An additional tag, “cv” is defined in <xref target="cv-defn"/></t>
 </list></t>
 
-<section anchor="cv-defn" title="The ‘cv’ Tag">
+<section anchor="implicit-as-h" title="Covered Header Fields">
 
-<t>A new tag “cv” (chain validation) indicates the the outcome of evaluating the
-existing ARC chain upon arrival at the ADMD that is adding this header field.
-It accepts one of three possible values:</t>
-
-<t><list style="symbols">
-  <t>none:  There was no chain on the message when it arrived for validation;
-typically occurs when the message arrives at a Message Transfer Agent (MTA)
-from a Message Submission Agent (MSA) or when any upstream MTAs may not be
-participating in ARC handling;</t>
-  <t>fail:  The message has a chain whose validation failed;</t>
-  <t>pass:  The message has a chain whose validation succeeded.</t>
-</list></t>
-
-<t>In ABNF terms:</t>
-
-<figure><artwork><![CDATA[
- seal-cv-tag = %x63.76 [FWS] "=" [FWS] ("none" / "fail" / "pass")
-]]></artwork></figure>
-
-</section>
-<section anchor="implicit-as-h" title="Implicit Header Fields">
-
-<t>The ARC-Seal signs a canonicalized form of the ARC set header values.  The ARC
-set header values are compiled in increasing instance order, starting at 1,
-and inclue the set being added at the time of sealing the message.</t>
+<t>The ARC-Seal signs a specific canonicalized form of the ARC Set header values.
+The ARC set header values are compiled in increasing instance order, starting
+at 1, and include the set being added at the time of sealing the message.</t>
 
 <t>Within a set, the header fields are listed in the following order:</t>
 
@@ -581,96 +546,100 @@ and inclue the set being added at the time of sealing the message.</t>
 
 <t>Where the ARC-Seal is the one being generated, it is input to the hash
 function in its final form except with an empty “b=” value, in the same manner
-by which a DKIM-Signature signs itself.</t>
+by which a DKIM-Signature signs itself (<xref target="RFC6376"/>, section 3.7).</t>
 
 <t>Note that the signing scope for the ARC-Seal is modified in the situation where
 a chain has failed validation (see <xref target="seal-failed"/>).</t>
+
+</section>
+<section anchor="cv-defn" title="The ‘cv’ Tag">
+
+<t>A new tag “cv” (chain validation) indicates the outcome of evaluating the
+existing ARC Chain upon arrival at the ADMD that is adding this header field.
+The values are defined per Section <xref target="cv-values"/>.</t>
+
+<t>In ABNF terms:</t>
+
+<figure><artwork><![CDATA[
+ chain-status = ("none" / "fail" / "pass")
+ seal-cv-tag = %x63.76 [FWS] "=" [FWS] chain-status
+]]></artwork></figure>
 
 </section>
 </section>
 </section>
 <section anchor="cv-calc" title="Verifier Actions">
 
-<t>A verifier takes the following steps to determine the state of the
-ARC chain on a message (cv value). Canonicalization, hash functions, and signature
+<t>A verifier takes the following steps to validate the ARC Chain.
+Canonicalization, hash functions, and signature
 validation methods are imported from Section 5 of <xref target="RFC6376"/>.</t>
 
-<t>[[ Note: need markdown flag to have subordinate numbering distinction 
-<eref target="https://trac.ietf.org/trac/dmarc/ticket/11">issue 11</eref> ]]</t>
-
 <t><list style="numbers">
-  <t>Collect all ARC sets currently on the message.  If there were none, the ARC
+  <t>Collect all ARC Sets currently on the message.  If there were none, the ARC
 state is “none” and the algorithm stops here.</t>
-  <t>If the form of any ARC set is invalid (e.g., does not contain exactly one
-of each of the
-three ARC-specific header fields), then the chain state is “fail” and the
-algorithm stops here.
-a. To avoid the overhead of unnecessary computation and delay from crypto 
-and DNS operations, the cv value for all ARC-Seal(s)
-MAY be checked at this point. If any of the values are “fail”, then the overall 
-state of the chain is “fail” and the algorithm stops here.</t>
-  <t>Conduct verification of the ARC-Message-Signature header field bearing the
-highest instance number.  If this verification fails, then the chain state is
-“fail” and the algorithm stops here.</t>
-  <t>For each ARC-Seal from the “N”th instance to the first, apply the following
-logic:
- a. If the value of the “cv” tag on that seal is “fail”, the chain state is
-“fail” and the algorithm stops here. (This step SHOULD be skipped if the earlier step (2.1)
-was performed)
- b. In Boolean nomenclature: if ((i == 1 &amp;&amp; cv != “none”) or (cv == “none” &amp;&amp; i != 1))
-then the chain state is “fail” and the algorithm stops here (note that the
-ordering of the logic is structured for short-circuit evaluation).
- c. Initialize a hash function corresponding to the “a” tag of the ARC-Seal.
- d. Compute the canonicalized form of the ARC header fields, in the order
-described in <xref target="implicit-as-h"/>, using the “relaxed” header
-canonicalization defined in Section 3.4.2 of <xref target="RFC6376"/>.  Pass the canonicalized
-result to the hash function.
- e. Retrieve the final digest from the hash function.
- f. Retrieve the public key identified by the “s” and “d” tags in the
-ARC-Seal, as described in <xref target="key-mgmt"/>.
- g. Determine whether the signature portion (“b” tag) of the ARC-Seal and
-the digest computed above are valid according to the public key. (See
-also Section <xref target="dns-arc"/> for failure case handling)
- h. If the signature is not valid, the chain state is “fail” and the
+  <t>Check the morphology of the ARC Chain. If any of these conditions are not met,
+the chain state is “fail” and the algorithm stops here:
+  <list style="numbers">
+      <t>Each ARC Set must be complete (e.g., contains exactly one
+of each of the three ARC-specific header fields);</t>
+      <t>The instance values must form a continuous sequence from 1..N with
+no gaps or repeats;</t>
+      <t>The cv value for all ARC-Seal(s) must be non-failing:
+      <list style="numbers">
+          <t>For i &gt; 1, the value must be “pass”;</t>
+          <t>For i = 1, the value must be “none”.</t>
+        </list></t>
+    </list></t>
+  <t>For each ARC-Message-Signature from the “N”th instance to the first, 
+validate the AMS:
+  <list style="numbers">
+      <t>If the “N”th instance (most recent) signature fails, then the chain state
+is “fail” and the algorithm stops here.</t>
+      <t>If one of the prior AMS signatures fails to validate (for instance “M”), 
+then set the oldest-pass value
+to the lowest AMS instance number which passed (M+1) and go onto the next step (there
+is no need to check any other (older) AMS signatures). This does not affect the 
+validity of the chain.</t>
+      <t>If all AMS signatures verify, set the oldest-pass value to zero (0).</t>
+    </list></t>
+  <t>For each ARC-Seal from the “N”th instance to the first, validate the seal.
+  <list style="numbers">
+      <t>If any seal is not valid, the chain state is “fail” and the
 algorithm stops here.</t>
-  <t>If all seals pass validation, then the chain state is “pass”, and the
+      <t>If all seals pass validation, then the chain state is “pass”, and the
 algorithm is complete.</t>
-  <t>Results from the determination of this algorithm SHOULD be recorded in the
-Authentication-Results header</t>
+    </list></t>
 </list></t>
 
-<t>Whatever the end result of the verifier’s checks via the algorithm specified
-above, the results MUST be added into the Authentication-Results header(s) for
+<t>The end result of the verifier’s checks via this algorithm 
+MUST be added into the Authentication-Results header(s) for
 the ADMD.</t>
 
-<t>[[ See <eref target="https://trac.ietf.org/trac/dmarc/ticket/12">issue 12</eref> regarding the final paragraph ]]</t>
+<t><spanx style="emph">INFORMATIONAL</spanx>: Recipients of an ARC Chain that is invalid or does not pass
+SHOULD NOT draw negative conclusions without a good understanding of the wider
+handling context.  Until ARC usage is widespread, intermediaries will continue
+to modify messages without ARC seals.</t>
 
-<t>The verifier should save the cv state for subsequent use by any sealing which
-may be done later (potentially after message modification) within the same
-trust boundary. The cv state may be recorded by sealing at the time of
-verification in an initial ARC set (for the ADMD) or may be recorded out of
-band depending on the architecture of the ADMD.</t>
+<t>As with a failing DKIM signature (<xref target="RFC6376"/> Section-6.3), a message with a
+failing ARC Chain MUST be treated the same as a message with no ARC Chain.</t>
 
-<section anchor="aar-new-info" title="ARC Authentication-Results Information">
+<section anchor="aar-new-info" title="Authentication-Results Information">
 
 <t>Certain information pertinent to ascertaining message disposition can be lost
 in transit when messages are handled by intermediaries. For example, failing
 DKIM signatures are sometimes removed by MTAs, and most DKIM signatures on
 messages modified by intermediaries will fail. Recording the following
-information in the A-R provides a mechanism for this information to survive
-transit.</t>
+information in the Authentication-Results stamped as part of the ARC evaluation
+provides a mechanism for this information to survive transit through a particular ADMD.</t>
 
-<t>The ptypes and properties defined in this section SHOULD be recorded in the AR:</t>
+<t>Stamped ARC evaluation results is limited to the Chain Validation status (cv) from <xref target="cv-values"/>.</t>
+
+<t>The ptypes and properties defined in this section SHOULD be recorded in the Authentication-Results:</t>
 
 <t><list style="symbols">
   <t>smtp.client-ip - The connecting client IP address from which the message is received;</t>
-  <t>header.s - Defined in <xref target="RFC6376"/> section 7.2</t>
-  <t>arc.oldest-pass - The instance number of the oldest AMS that still validates, or 0 if all pass.</t>
+  <t>header.oldest-pass - The instance number of the oldest AMS that still validates, or 0 if all pass.</t>
 </list></t>
-
-<t>[[ Also see <eref target="https://trac.ietf.org/trac/dmarc/ticket/20">issue 20</eref> for another possible 
-field to be added and <eref target="https://trac.ietf.org/trac/dmarc/ticket/21">issue 21</eref> re which 
-document should define these for IANA action. ]]</t>
 
 </section>
 <section anchor="dns-arc" title="Handling DNS Problems While Validating ARC">
@@ -681,31 +650,27 @@ ARC violation. They result in a “cv=fail” verdict.</t>
 </section>
 <section anchor="responding-to-arc-validity-violations-during-the-smtp-transaction" title="Responding to ARC Validity Violations During the SMTP Transaction">
 
-<t>If a receiver determines that the ARC chain has failed, the
+<t>If a receiver determines that the ARC Chain has failed, the
 receiver MAY signal the breakage through the extended SMTP response code 5.7.7 <xref target="RFC3463"/> 
 “message integrity failure” <xref target="ENHANCED-STATUS"/> and corresponding SMTP response code.</t>
 
 </section>
 </section>
-<section anchor="signer-actions" title="Signer Actions">
+<section anchor="sealer-actions" title="Sealer Actions">
 
-<t>[[ See <eref target="https://trac.ietf.org/trac/dmarc/ticket/13">issue 13</eref> for critique ]]</t>
-
-<t>This section includes a specification of the actions an ARC signer
-takes when presented with a message.</t>
-
-<t>The signer MUST undertake the following steps:</t>
+<t>An ARC sealer MUST take the following actions when presented with a message:</t>
 
 <t><list style="numbers">
   <t>Before creating an ARC signature, perform any other, normal authentication
 and/or signing, so that the ARC signature can cover those results.</t>
-  <t>Build and attach the new ARC set:
+  <t>Build and attach the new ARC Set:
   <list style="numbers">
-      <t>If an ARC chain exists on the message, then set “N” equal to the highest
+      <t>If an ARC Chain exists on the message, then set “N” equal to the highest
 instance number found on the chain (i=); otherwise set “N” equal to zero for
 the following steps.</t>
       <t>Generate and attach to the message an ARC-Authentication-Results header
-field using instance number N+1 and the same content from the previous step.</t>
+field as defined in Section <xref target="aar-defn"/>, 
+using instance number N+1 and the same content from the previous step.</t>
       <t>Generate and attach to the message an ARC-Message-Signature header field
 as defined in <xref target="ams-defn"/> above, using instance number N+1.</t>
       <t>Generate and attach to the message an ARC-Seal header field using the
@@ -718,46 +683,24 @@ status as determined in <xref target="cv-calc"/>, and instance number N+1.</t>
 
 <t>The header fields signed by the AS header field b= value in the case of a 
 chain failure MUST be only the matching instance headers created by the MTA
-which detected the malformed chain, as if this newest ARC set was the only set
+which detected the malformed chain, as if this newest ARC Set was the only set
 present.</t>
 
-</section>
-</section>
-<section anchor="usage-of-arc-and-chain-validity" title="Usage of ARC and Chain Validity">
-
-<section anchor="dkim-arc" title="Relationship between DKIM-Signature and AMS signing scopes">
-
-<t>[[ See <eref target="https://trac.ietf.org/trac/dmarc/ticket/14">issue 14</eref> for critique of this section ]]</t>
-
-<t>DKIM-Signatures SHOULD never sign any ARC header fields.</t>
-
-</section>
-<section anchor="assessing-chain-validity-violations" title="Assessing Chain Validity Violations">
-
-<t>[[ <eref target="https://trac.ietf.org/trac/dmarc/ticket/15">Issue 15</eref> ]]</t>
-
-<t>Email transit can produce broken signatures for a wide variety of benign
-reasons.  This includes possibly breaking one or more ARC signatures.
-Therefore, receivers need to be wary of ascribing motive to such breakage
-although patterns of common behaviour may provide some basis for adjusting
-local policy decisions.</t>
-
-<t>ARC does not attempt to protect an entire message.  There are various ways
-that a message can still be problematic, in spite of having a valid ARC chain.
-Consequently, all normal, content-based analysis SHOULD still be performed on
-any message having a valid chain of ARC header sets.</t>
+<t><spanx style="emph">INFORMATIONAL:</spanx> In the case of a malformed or otherwise invalid chain there is
+no way to generate a deterministic set of AS header fields ({#implicit_as_h}) so
+this approach is mandated.</t>
 
 </section>
 </section>
 <section anchor="recording-and-reporting-the-results-of-arc-evaluation" title="Recording and Reporting the Results of ARC Evaluation">
 
-<t>The evaluation of an ARC chain provides information which will be useful to both the 
+<t>The evaluation of an ARC Chain provides information which will be useful to both the 
 receiver (or intermediary) and to the initial sender of the message. This information
 should be preserved and reported as follows.</t>
 
 <section anchor="arc-data" title="Information from an ARC Evaluation">
 
-<t>The evaluation of an ARC chain produces a list of domain names for participating
+<t>The evaluation of an ARC Chain produces a list of domain names for participating
 intermediaries which handled the message, to wit:</t>
 
 <t><list style="symbols">
@@ -766,68 +709,65 @@ intermediaries which handled the message, to wit:</t>
 (since that is the only one necessarily validated)</t>
 </list></t>
 
-<t>In the case of a failed chain, only the terminal ARC set is covered by the ARC-Seal
-so the reporting is limited to the findings in that terminal ARC set.</t>
+<t>In the case of a failed chain, only the terminal ARC Set is covered by the ARC-Seal
+so the reporting is limited to the findings in that terminal ARC Set.</t>
 
 </section>
 <section anchor="arc-record" title="Recording (local) ARC Evaluation Results">
 
-<t>Receivers MAY add an “arc=[pass|fail|policy]” method annotation into a locally-affixed
-Authentication-Results <xref target="RFC7601"/> header field along with any salient comment(s).</t>
+<t>Receivers who process an attached ARC Chain SHOULD add an
+“arc=[pass|fail|policy]” method annotation into a locally-affixed
+Authentication-Results <xref target="RFC7601"/> header field along with any salient
+comment(s).</t>
 
-<t>Details of the ARC chain which was evaluated should be included in the Authentication-Results
-and AAR headers per Section <xref target="aar-new-info"/>.</t>
+<t>Details of the ARC Chain which was evaluated should be included in the
+Authentication-Results and AAR headers per Section <xref target="aar-new-info"/>.</t>
 
 </section>
 <section anchor="dmarc-reporting-of-arc-findings-interim" title="DMARC Reporting of ARC Findings - Interim">
 
-<t>[[ Note: <eref target="https://trac.ietf.org/trac/dmarc/ticket/16">Move to separate document?</eref>
-(see the additional fields specified in <xref target="aar-new-info"/>) ]]</t>
-
 <t>Receivers SHOULD indicate situations in which ARC evaluation influenced the
 results of their local policy determination. DMARC reporting of ARC-informed decisions
 can be accomplished by adding a local_policy comment explanation containing the list
-of data discovered in the ARC evaluation (<xref target="arc-data"/> and <xref target="aar-new-info"/>):</t>
+of data discovered in the ARC evaluation, which at a minimum SHOULD include:
+* the Chain Validation status,
+* the domain and selector for each AS,
+* the IP addresses of the mail originating ADMD:</t>
 
 <figure><artwork><![CDATA[
 <policy_evaluated>
-  <disposition>delivered</disposition>
+  <disposition>none</disposition>
   <dkim>fail</dkim>
-  <spf>fail <comment>source.ip=10.0.0.1</comment></spf>
+  <spf>fail</spf> 
   <reason>
    <type>local_policy</type>
    <comment>arc=pass ams[2].d=d2.example ams[2].s=s1 as[2].d=d2.example 
-     as[2].s=s2 as[1].d=d1.example as[1].s=s3</comment>
+     as[2].s=s2 as[1].d=d1.example as[1].s=s3 client-ip[1]=10.10.10.13</comment>
   </reason>
 </policy_evaluated>
 ]]></artwork></figure>
 
-<t>In the suggested sample, d2.example is the sealing domain for ARC[2] and 
+<t>In the sample above, d2.example is the sealing domain for ARC[2] and 
 d1.example is the sealing domain for ARC[1].</t>
 
-<t>Mediators SHOULD generate DMARC reports on messages which transit their system 
-just like any other message which they receive. This will result in multiple
-reports for each mediated message as they transit the series of handlers.
-DMARC report consumers should be aware of this behaviour and make the
-necessary accommodations.</t>
+<t>Intermediary message handlers SHOULD generate DMARC reports on messages which
+transit their system just like any other message which they receive. This will
+result in multiple reports for each mediated message as they transit the series
+of handlers.  DMARC report consumers should be aware of this behaviour and make
+the necessary accommodations.</t>
 
 </section>
-</section>
-<section anchor="alt-sign" title="Supporting Alternate Signing Algorithms">
-
-<t>This section has been moved to <xref target="ARC-MULTI"/></t>
-
 </section>
 <section anchor="privacy-considerations" title="Privacy Considerations">
 
-<t>The ARC chain provides a verifiable record of the handlers for a message.
+<t>The ARC Chain provides a verifiable record of the handlers for a message.
 Anonymous remailers will probably not find this compatible with their operating goals.</t>
 
 </section>
 <section anchor="iana-considerations" title="IANA Considerations">
 
-<t>[[ See <eref target="https://trac.ietf.org/trac/dmarc/ticket/21">issue 21</eref> regarding which 
-document should be definitive for these fields. ]]</t>
+<t>[[ Note to the RFC Editors: Some of these fields are defined both here and in <xref target="I-D-7601bis"/>. Please 
+delete the overlap from whichever document goes through the publication process after the other. ]]</t>
 
 <t>This specification adds three new header fields as defined below.</t>
 
@@ -836,29 +776,37 @@ document should be definitive for these fields. ]]</t>
 <t>This draft adds one item to the IANA “Email Authentication Methods” registry:</t>
 
 <t><list style="symbols">
-  <t>Method : arc  <vspace blankLines='1'/>
-Defined: &SELF;  <vspace blankLines='1'/>
-ptype: header  <vspace blankLines='1'/>
-Property: chain evaluation result  <vspace blankLines='1'/>
-Value: chain evaluation result status (see <xref target="as-defn"/>)  <vspace blankLines='1'/>
+  <t>Method : arc<vspace />
+Defined: &SELF;<vspace />
+ptype: header<vspace />
+Property: chain evaluation result<vspace />
+Value: chain evaluation result status (see <xref target="as-defn"/>)<vspace />
 Status: active</t>
-  <t>Method : dkim  <vspace blankLines='1'/>
-Defined: &SELF;  <vspace blankLines='1'/>
-ptype: header  <vspace blankLines='1'/>
-Property: selector  <vspace blankLines='1'/>
-Value: value of signature “s” tag (see <xref target="RFC6376"/>)  <vspace blankLines='1'/>
+</list></t>
+
+</section>
+<section anchor="email-authentication-result-names-registry-update" title="Email Authentication Result Names Registry Update">
+
+<t>This draft updates the Email Authentication Results registry, most recently
+defined in <xref target="I-D-7601bis"/>, with one new authentication method and several status
+codes, all defined by this document:</t>
+
+<t><list style="symbols">
+  <t>Auth Method : arc<vspace />
+Code: “none”, “pass”, “fail”<vspace />
+Specification: &SELF; <xref target="cv-defn"/>
 Status: active</t>
-  <t>Method : spf  <vspace blankLines='1'/>
-Defined: &SELF;  <vspace blankLines='1'/>
-ptype: smtp  <vspace blankLines='1'/>
-Property: client-ip  <vspace blankLines='1'/>
-Value: the connecting client IP address from which the message is received  <vspace blankLines='1'/>
+  <t>Method : spf<vspace />
+Defined: &SELF;<vspace />
+ptype: smtp<vspace />
+Property: client-ip<vspace />
+Value: the connecting client IP address from which the message is received<vspace />
 Status: active</t>
-  <t>Method : arc  <vspace blankLines='1'/>
-Defined: &SELF;  <vspace blankLines='1'/>
-ptype: header  <vspace blankLines='1'/>
-Property: oldest-pass  <vspace blankLines='1'/>
-Value: the oldest instance with a still validating AMS signature  <vspace blankLines='1'/>
+  <t>Method : arc<vspace />
+Defined: &SELF;<vspace />
+ptype: header<vspace />
+Property: oldest-pass<vspace />
+Value: the oldest instance with a still validating AMS signature<vspace />
 Status: active</t>
 </list></t>
 
@@ -869,23 +817,23 @@ Status: active</t>
 Field Registry”, as follows:</t>
 
 <t><list style="symbols">
-  <t>Header field name: ARC-Seal  <vspace blankLines='1'/>
-Applicable protocol:  mail  <vspace blankLines='1'/>
-Status:  draft  <vspace blankLines='1'/>
-Author/Change controller:  IETF  <vspace blankLines='1'/>
-Specification document(s):  &SELF;  <vspace blankLines='1'/>
+  <t>Header field name: ARC-Seal<vspace />
+Applicable protocol:  mail<vspace />
+Status:  draft<vspace />
+Author/Change controller:  IETF<vspace />
+Specification document(s):  &SELF;<vspace />
 Related information:  <xref target="RFC6376"/></t>
-  <t>Header field name:  ARC-Message-Signature  <vspace blankLines='1'/>
-Applicable protocol:  mail  <vspace blankLines='1'/>
-Status:  draft  <vspace blankLines='1'/>
-Author/Change controller:  IETF  <vspace blankLines='1'/>
-Specification document(s):  &SELF;  <vspace blankLines='1'/>
+  <t>Header field name:  ARC-Message-Signature<vspace />
+Applicable protocol:  mail<vspace />
+Status:  draft<vspace />
+Author/Change controller:  IETF<vspace />
+Specification document(s):  &SELF;<vspace />
 Related information: <xref target="RFC6376"/></t>
-  <t>Header field name:  ARC-Authentication-Results  <vspace blankLines='1'/>
-Applicable protocol:  mail  <vspace blankLines='1'/>
-Status:  standard  <vspace blankLines='1'/>
-Author/Change controller:  IETF  <vspace blankLines='1'/>
-Specification document(s):  &SELF;  <vspace blankLines='1'/>
+  <t>Header field name:  ARC-Authentication-Results<vspace />
+Applicable protocol:  mail<vspace />
+Status:  standard<vspace />
+Author/Change controller:  IETF<vspace />
+Specification document(s):  &SELF;<vspace />
 Related information:  <xref target="RFC7601"/></t>
 </list></t>
 
@@ -898,20 +846,20 @@ this specification.</t>
 
 <section anchor="header-size" title="Header Size">
 
-<t>Inclusion of ARC sets in the header of emails may cause problems for some
+<t>Inclusion of ARC Sets in the header of emails may cause problems for some
 older or more constrained MTAs if they are unable to accept the greater 
 size of the header.</t>
 
 </section>
 <section anchor="dns-ops" title="DNS Operations">
 
-<t>Operators who receive a message bearing N ARC sets have to complete up to N+1 
+<t>Operators who receive a message bearing N ARC Sets have to complete up to N+1 
 DNS queries to evaluate the chain (barring DNS redirection mechanisms which 
 can increase the lookups for a given target value).  This has at least two effects:</t>
 
 <t><list style="numbers">
-  <t>An attacker can send a message to an ARC partipant with a concocted
-sequence of ARC sets bearing the domains of intended victims, and all of them
+  <t>An attacker can send a message to an ARC participant with a concocted
+sequence of ARC Sets bearing the domains of intended victims, and all of them
 will be queried by the participant until a failure is discovered. The
 difficulty of forging the signature values should limit the extent of this
 load to domains under control of the attacker.</t>
@@ -924,15 +872,15 @@ a DoS attack.</t>
 </section>
 <section anchor="message-content-suspicion" title="Message Content Suspicion">
 
-<t>Recipients are cautioned to treat messages bearing ARC sets with the
+<t>Recipients are cautioned to treat messages bearing ARC Sets with the
 same suspicion that they apply to all other email messages. This includes
 appropriate content scanning and other checks for potentially malicious
-content. The handlers which are identified within the ARC chain may be
+content. The handlers which are identified within the ARC Chain may be
 used to provide input to local policy engines in cases where DMARC
 validation fails (due to mediation impacting SPF attribution, DKIM validity
 or alignment).</t>
 
-<t>Note that a passing ARC chain may not adequately mean that the message
+<t>Note that a passing ARC Chain may not adequately mean that the message
 is safe because:</t>
 
 <t><list style="numbers">
@@ -945,7 +893,7 @@ have the AAR to inspect) or could have been subject to unintended modifications.
 
 </section>
 </section>
-<section anchor="is-arc-ok" title="Evaluating the Efficacy of the ARC Protocol">
+<section anchor="is-arc-ok" title="Evaluating the Efficacy of the ARC Protocol (Experimental Considerations)">
 
 <t>The ARC protocol is designed to mitigate some of the most common failure
 conditions for email which transits intermediary handlers en route to the
@@ -969,7 +917,7 @@ inferrence rather than direct evidence.</t>
 
 <t>ARC will be a success if, for ARC sealed messages, receivers are able to
 implment ARC-based algorithmic decisions based on the direct evidence found
-within the ARC chain. This is especially relevant for DMARC processing when the
+within the ARC Chain. This is especially relevant for DMARC processing when the
 DKIM d= value is aligned with the rfc5322.From author domain.</t>
 
 </section>
@@ -997,15 +945,18 @@ actors trying to craft or replay malicious chains.</t>
 </section>
 <section anchor="dns-overhead" title="DNS Overhead">
 
-<t>Longer ARC chains will require more queries to retrieve the keys for validating
+<t>Longer ARC Chains will require more queries to retrieve the keys for validating
 the chain. While this is not believed to be a security issue (see <xref target="dns-ops"/>),
 it is unclear how much overhead will truly be added. This is similar to some of
 the initial processing and query load concerns which were debated at the time
 of the DKIM specification development.</t>
 
 <t>Data should be collected to better understand usable length and distribution of
-lengths found in valid ARC chains along with the the DNS impact of processing
-ARC chains.</t>
+lengths found in valid ARC Chains along with the the DNS impact of processing
+ARC Chains.</t>
+
+<t>An effective operational maximum will have to be developed through deployment
+experience in the field.</t>
 
 </section>
 <section anchor="distinguishing-valuable-from-worthless-trace-information" title="Distinguishing Valuable from Worthless Trace Information">
@@ -1033,7 +984,7 @@ regardless of size.</t>
 provides useful signals that affect deliverability, and what portions of the
 trace data are left untouched or provide no useful information.</t>
 
-<t>Since many such systems are intentionly proprietary or confidential to prevent
+<t>Since many such systems are intentionally proprietary or confidential to prevent
 gaming by abusers, it may not be viable to reliably answer this particular
 question.  The evolving nature of attacks can also shift the landscape of
 “useful” information over time.</t>
@@ -1065,18 +1016,13 @@ of December 2017.</t>
 
 <section anchor="gmail-test-reflector-and-incoming-validation" title="GMail test reflector and incoming validation">
 
-<t>Organization: Google</t>
-
-<t>Description: Internal production implementation with both debug
-    analysis and validating + sealing pass-through function</t>
-
-<t>Status of Operation: Production - Incoming Validation</t>
-
-<t>Coverage: Full spec implemented as of <xref target="ARC-DRAFT-06"/></t>
-
-<t>Licensing: Proprietary - Internal only</t>
-
-<t>Implementation Notes:</t>
+<t>Organization: Google<vspace />
+  Description: Internal production implementation with both debug
+    analysis and validating + sealing pass-through function<vspace />
+  Status of Operation: Production - Incoming Validation<vspace />
+  Coverage: Full spec implemented as of <xref target="ARC-DRAFT-06"/><vspace />
+  Licensing: Proprietary - Internal only<vspace />
+  Implementation Notes:</t>
 
 <t><list style="symbols">
   <t>Full functionality was demonstrated during the interop testing on 2017-07-15.</t>
@@ -1087,20 +1033,15 @@ of December 2017.</t>
 </section>
 <section anchor="aol-test-reflector-and-internal-tagging" title="AOL test reflector and internal tagging">
 
-<t>Organization: AOL</t>
-
-<t>Description: Internal prototype implementation with both debug
-    analysis and validating + sealing pass-through function</t>
-
-<t>Status of Operation: Beta</t>
-
-<t>Coverage: ARC chain validity status checking is operational, but only
-    applied to email addresses enrolled in the test program.
-    This system conforms to <xref target="ARC-DRAFT-06"/></t>
-
-<t>Licensing: Proprietary - Internal only</t>
-
-<t>Implementation Notes:</t>
+<t>Organization: AOL<vspace />
+  Description: Internal prototype implementation with both debug
+    analysis and validating + sealing pass-through function<vspace />
+  Status of Operation: Beta<vspace />
+  Coverage: ARC Chain validity status checking is operational, but only
+    applied to email addresses enrolled in the test program.<vspace />
+    This system conforms to <xref target="ARC-DRAFT-06"/><vspace />
+  Licensing: Proprietary - Internal only<vspace />
+  Implementation Notes:</t>
 
 <t><list style="symbols">
   <t>2017-07-15: Full functionality verified during the interop testing.</t>
@@ -1111,41 +1052,32 @@ of December 2017.</t>
 </section>
 <section anchor="dkimpy" title="dkimpy">
 
-<t>Organization: dkimpy developers/Scott Kitterman</t>
-
-<t>Description: Python DKIM package</t>
-
-<t>Status of Operation: Production</t>
-
-<t>Coverage:</t>
+<t>Organization: dkimpy developers/Scott Kitterman<vspace />
+   Description: Python DKIM package<vspace />
+   Status of Operation: Production<vspace />
+   Coverage:</t>
 
 <t><list style="symbols">
   <t>2017-07-15: The internal test suite is incomplete, but the command line
    developmental version of validator was demonstrated to interoperate with
    the Google and AOL implementations during the interop on 2017-07-15 and the
    released version passes the tests in <xref target="ARC-TEST"/>
-   <eref target="https://github.com/ValiMail/arc_test_suite">arc_test_suite</eref> with both python and python3.</t>
+   <eref target="https://github.com/Valimail/arc_test_suite">arc_test_suite</eref> with both python and python3.</t>
 </list></t>
 
-<t>Licensing: Open/Other (same as dkimpy package = BCD version 2)</t>
-
-<t>Contact Info: https://launchpad.net/dkimpy</t>
+<t>Licensing: Open/Other (same as dkimpy package = BCD version 2)<vspace />
+   Contact Info: https://launchpad.net/dkimpy</t>
 
 </section>
 <section anchor="openarc" title="OpenARC">
 
-<t>Organization: TDP/Murray Kucherawy</t>
-
-<t>Description: Implemention of milter functionality related to the OpenDKIM
-    and OpenDMARC packages</t>
-
-<t>Status of Operation: Beta</t>
-
-<t>Coverage: Built to support <xref target="ARC-DRAFT-10"/></t>
-
-<t>Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)</t>
-
-<t>Implementation Notes:</t>
+<t>Organization: TDP/Murray Kucherawy<vspace />
+  Description: Implemention of milter functionality related to the OpenDKIM
+    and OpenDMARC packages<vspace />
+  Status of Operation: Beta<vspace />
+  Coverage: Built to support <xref target="ARC-DRAFT-10"/><vspace />
+  Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)<vspace />
+  Implementation Notes:</t>
 
 <t><list style="symbols">
   <t>The build is FreeBSD oriented but some packages have been built for
@@ -1164,17 +1096,12 @@ of December 2017.</t>
 </section>
 <section anchor="mailman-32-patch" title="Mailman 3.2 patch">
 
-<t>Organization: Mailman development team</t>
-
-<t>Description: Integrated ARC capabilities within the Mailman 3.2 package</t>
-
-<t>Status of Operation: Patch submitted</t>
-
-<t>Coverage: Based on OpenARC</t>
-
-<t>Licensing: Same as mailman package - GPL</t>
-
-<t>Implementation Notes:</t>
+<t>Organization: Mailman development team<vspace />
+  Description: Integrated ARC capabilities within the Mailman 3.2 package<vspace />
+  Status of Operation: Patch submitted<vspace />
+  Coverage: Based on OpenARC<vspace />
+  Licensing: Same as mailman package - GPL<vspace />
+  Implementation Notes:</t>
 
 <t><list style="symbols">
   <t>Appears to work properly in at least one beta deployment, but
@@ -1187,17 +1114,12 @@ of December 2017.</t>
 </section>
 <section anchor="copernicamailerq-web-based-validation" title="Copernica/MailerQ web-based validation">
 
-<t>Organization: Copernica</t>
-
-<t>Description: Web-based validation of ARC-signed messages</t>
-
-<t>Status of Operation: Beta</t>
-
-<t>Coverage: Built to support <xref target="ARC-DRAFT-05"/></t>
-
-<t>Licensing: On-line usage only</t>
-
-<t>Implementation Notes:</t>
+<t>Organization: Copernica<vspace />
+  Description: Web-based validation of ARC-signed messages<vspace />
+  Status of Operation: Beta<vspace />
+  Coverage: Built to support <xref target="ARC-DRAFT-05"/><vspace />
+  Licensing: On-line usage only<vspace />
+  Implementation Notes:</t>
 
 <t><list style="symbols">
   <t>Released 2016-10-24</t>
@@ -1214,17 +1136,12 @@ listed in this section.</t>
 </section>
 <section anchor="rspamd" title="Rspamd">
 
-<t>Organization: Rspamd community</t>
-
-<t>Description: ARC signing and verification module</t>
-
-<t>Status of Operation: Production, though deployment usage is unknown</t>
-
-<t>Coverage: Built to support <xref target="ARC-DRAFT-06"/></t>
-
-<t>Licensing: Open source</t>
-
-<t>Implementation Notes:</t>
+<t>Organization: Rspamd community<vspace />
+  Description: ARC signing and verification module<vspace />
+  Status of Operation: Production, though deployment usage is unknown<vspace />
+  Coverage: Built to support <xref target="ARC-DRAFT-06"/><vspace />
+  Licensing: Open source<vspace />
+  Implementation Notes:</t>
 
 <t><list style="symbols">
   <t>2017-06-12: Released with version 1.6.0</t>
@@ -1237,17 +1154,12 @@ listed in this section.</t>
 </section>
 <section anchor="perl-maildkim-module" title="PERL MAIL::DKIM module">
 
-<t>Organization: FastMail</t>
-
-<t>Description: Email domain authentication (sign and/or verify) module, previously included SPF / DKIM / DMARC, now has ARC added</t>
-
-<t>Status of Operation: Production, deployment usage unknown</t>
-
-<t>Coverage: Built to support <xref target="ARC-DRAFT-10"/></t>
-
-<t>Licensing: Open Source</t>
-
-<t>Implementation Notes:</t>
+<t>Organization: FastMail<vspace />
+  Description: Email domain authentication (sign and/or verify) module, previously included SPF / DKIM / DMARC, now has ARC added<vspace />
+  Status of Operation: Production, deployment usage unknown<vspace />
+  Coverage: Built to support <xref target="ARC-DRAFT-10"/><vspace />
+  Licensing: Open Source<vspace />
+  Implementation Notes:</t>
 
 <t><list style="symbols">
   <t>2017-12-15: v0.50 released with full test set passing for ARC</t>
@@ -1258,17 +1170,12 @@ listed in this section.</t>
 </section>
 <section anchor="perl-mailmilterauthentication-module" title="PERL Mail::Milter::Authentication module">
 
-<t>Organization: FastMail</t>
-
-<t>Description: Email domain authentication milter, uses MAIL::DKIM (see above)</t>
-
-<t>Status of Operation: Intial validation completed during IETF99 hackathon with some follow-on work during the week</t>
-
-<t>Coverage: Built to support &SELF;</t>
-
-<t>Licensing: Open Source</t>
-
-<t>Implementation Notes:</t>
+<t>Organization: FastMail<vspace />
+  Description: Email domain authentication milter, uses MAIL::DKIM (see above)<vspace />
+  Status of Operation: Intial validation completed during IETF99 hackathon with some follow-on work during the week<vspace />
+  Coverage: Built to support &SELF;<vspace />
+  Licensing: Open Source<vspace />
+  Implementation Notes:</t>
 
 <t><list style="symbols">
   <t>2017-07-15: Validation functionality which interoperates with Gmail, AOL, dkimpy was demonstrated; later in
@@ -1281,17 +1188,12 @@ listed in this section.</t>
 </section>
 <section anchor="sympa-list-manager" title="Sympa List Manager">
 
-<t>Organization: Sympa Dev Community</t>
-
-<t>Description: Work in progress</t>
-
-<t>Status of Operation: Work in progress</t>
-
-<t>Coverage: unknown</t>
-
-<t>Licensing: open source</t>
-
-<t>Implementation Notes:</t>
+<t>Organization: Sympa Dev Community<vspace />
+  Description: Work in progress<vspace />
+  Status of Operation: Work in progress<vspace />
+  Coverage: unknown<vspace />
+  Licensing: open source<vspace />
+  Implementation Notes:</t>
 
 <t><list style="symbols">
   <t>2018-01-05: Tracked as https://github.com/sympa-community/sympa/issues/153</t>
@@ -1302,38 +1204,28 @@ listed in this section.</t>
 </section>
 <section anchor="oracle-messaging-server" title="Oracle Messaging Server">
 
-<t>Organization: Oracle</t>
-
-<t>Description:</t>
-
-<t>Status of Operation: Intial development work during IETF99 hackathon. Status since then unknown.</t>
-
-<t>Coverage: Built to support <xref target="ARC-DRAFT-06"/></t>
-
-<t>Licensing: Unknown</t>
-
-<t>Implementation Notes:</t>
+<t>Organization: Oracle<vspace />
+  Description:<vspace />
+  Status of Operation: Intial development work during IETF99 hackathon. Status since then unknown.<vspace />
+  Coverage: Work in progress<vspace />
+  Licensing: Unknown<vspace />
+  Implementation Notes:</t>
 
 <t><list style="symbols">
-  <t>2018-01: Protocol handling components are completed, but crypto is not yet functional.</t>
+  <t>2018-03: Protocol handling components are completed, but crypto is not yet functional.</t>
 </list></t>
 
 <t>Contact Info: Chris Newman</t>
 
 </section>
-<section anchor="messagesystems-momentum" title="MessageSystems Momentum">
+<section anchor="messagesystems-momentum-and-powermta-platforms" title="MessageSystems Momentum and PowerMTA platforms">
 
-<t>Organization: MessageSystems/SparkPost</t>
-
-<t>Description: OpenARC integration into the LUA-enabled Momentum processing space</t>
-
-<t>Status of Operation: Beta</t>
-
-<t>Coverage: Built to support <xref target="ARC-DRAFT-10"/></t>
-
-<t>Licensing: Unknown</t>
-
-<t>Implementation Notes:</t>
+<t>Organization: MessageSystems/SparkPost<vspace />
+  Description: OpenARC integration into the LUA-enabled Momentum processing space<vspace />
+  Status of Operation: Beta<vspace />
+  Coverage: Built to support <xref target="ARC-DRAFT-10"/><vspace />
+  Licensing: Unknown<vspace />
+  Implementation Notes:</t>
 
 <t><list style="symbols">
   <t>Initial deployments for validation expected in mid-2018.</t>
@@ -1354,6 +1246,7 @@ listed in this section.</t>
 &RFC2119;
 &RFC3463;
 &RFC5234;
+&RFC5322;
 &RFC5598;
 &RFC6376;
 &RFC6377;
@@ -1441,7 +1334,7 @@ listed in this section.</t>
     <date year="2018" month="January"/>
   </front>
 </reference>
-<reference anchor="ARC-TEST" target="https://github.com/ValiMail/arc_test_suite">
+<reference anchor="ARC-TEST" target="https://github.com/Valimail/arc_test_suite">
   <front>
     <title>ARC Test Suite</title>
     <author initials="S." surname="Blank" fullname="Seth Blank">
@@ -2283,7 +2176,7 @@ This is a test message.
 </section>
 <section anchor="acknowledgements" title="Acknowledgements">
 
-<t>This draft is the work of OAR-Dev Group.</t>
+<t>This draft originated with the work of OAR-Dev Group.</t>
 
 <t>The authors thank all of the OAR-Dev group for the ongoing help and though-provoking
 discussions from all the participants, especially: Alex Brotman, Brandon Long, Dave Crocker, 
