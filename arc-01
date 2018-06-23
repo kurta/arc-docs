@@ -1,7 +1,7 @@
 ﻿---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-15-x1
+docname: draft-ietf-dmarc-arc-protocol-15.1
 date: 2018-06-22
 
 # stand_alone: true
@@ -67,6 +67,7 @@ normative:
   RFC6376:
   RFC6377:
   RFC7208:
+  RFC7405:
   RFC7601:
   RFC8174:
 
@@ -77,6 +78,13 @@ informative:
   ENHANCED-STATUS:
     title: IANA SMTP Enhanced Status Codes
     target: http://www.iana.org/assignments/smtp-enhanced-status-codes/smtp-enhanced-status-codes.xhtml
+  ARC-DRAFT-14:
+    title: Authenticated Received Chain (ARC) Protocol (I-D-14)
+    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-14
+    author:
+      -
+        ins: K. Andersen
+        name: Kurt Andersen
   ARC-DRAFT-13:
     title: Authenticated Received Chain (ARC) Protocol (I-D-13)
     target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-13
@@ -255,6 +263,10 @@ include MSAs, MTAs, MDAs, gateways, and mailing lists.
 
 Syntax descriptions use Augmented BNF (ABNF) {{RFC5234}} and {{RFC7405}}.
 
+{::boilerplate bcp14+}
+
+\[\[ Note: Manual boilerplate ]]
+
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
 document are to be interpreted as described in BCP 14 {{RFC2119}} {{RFC8174}}
@@ -296,7 +308,7 @@ Chain of Custody.
 A Validator is an ARC-enabled Internet Mail Handler that evaluates an
 Authenticated Received Chain for validity and content. The process of
 evaluation of the individual ARC Sets that compose an Authenticated Received
-Chain is described in Section {{arc-eval}}.
+Chain is described in Section {{validate-actions}}.
 
 In General Concept terms, a Validator inspects the Chain of Custody to
 determine the content and validity of individual Evidence supplied by
@@ -306,9 +318,9 @@ Custodians.
 
 The following ABNF tokens are imported:
 
-    tag-list ({{RFC6376}} section 3.2)
-    authres-payload ({{I-D-7601bis}} section 2.2)
-    cfws ({{RFC5322}} section 3.2.2)
+* tag-list ({{RFC6376}} section 3.2)
+* authres-payload ({{I-D-7601bis}} section 2.2)
+* cfws ({{RFC5322}} section 3.2.2)
 
 ## Common ABNF Tokens
 
@@ -412,7 +424,7 @@ The AS header field is similar in syntax and semantics to DKIM-Signatures
   tag" can be found in Section {{i-defn}}.
 * the signature of the AS header field does not cover the body of the
   message and therefore there is no 'bh' tag. The signature of the AS header 
-  field only covers specific header fields as defined in Section {{as-create}}.
+  field only covers specific header fields as defined in Section {{as-hdrs}}.
 * no body canonicalization is performed as the AS signature does not cover the
   body of a message.
 * only "relaxed" header canonicalization ({{RFC6376}} section 3.4.2) is used.
@@ -575,7 +587,7 @@ ARC is not solely intended for perimeter MTAs. Any mediator ({{RFC5598}},
 section 5) that modifies a message may Seal its own changes. For additional
 information, see Section {{trust-boundaries}}.
 
-### Sealing is Always Safe{{s}}
+### Sealing is Always Safe
 
 The utility of an Authenticated Received Chain is limited to very specific cases.
 Authenticated Received Chains are designed to provide additional information to
@@ -724,7 +736,7 @@ message.
 This section explores several messaging handling use cases that are addressed
 by ARC.
 
-## Communicate Authentication Results Across Trust Boundaries {#trust-boundaries}}
+## Communicate Authentication Results Across Trust Boundaries {#trust-boundaries}
 
 When an intermediary ADMD adds an ARC Set to a message's Authenticated Received
 Chain (or creates the initial ARC Set), the ADMD communicates authentication
@@ -830,23 +842,26 @@ discovered during ARC Validation, which at a minimum includes:
 * the domain and selector for each AS,
 * the originating IP address from the first ARC Set:
 
-    EXAMPLE:
-    
-    <policy_evaluated>
-     <disposition>none</disposition>
-     <dkim>fail</dkim>
-     <spf>fail</spf> 
-     <reason>
-      <type>local_policy</type>
-      <comment>arc=pass ams[2].d=d2.example ams[2].s=s1 as[2].d=d2.example 
-	as[2].s=s2 as[1].d=d1.example as[1].s=s3 client-ip[1]=10.10.10.13</comment>
-     </reason>
-    </policy_evaluated>
+~~~~~~~~~~
+EXAMPLE:
 
+&lt;policy_evaluated>
+  &lt;disposition>none&lt;/disposition>
+  &lt;dkim>fail&lt;/dkim>
+  &lt;spf>fail&lt;/spf>
+  &lt;reason>
+   &lt;type>local_policy&lt;/type>
+   &lt;comment>arc=pass ams\[2].d=d2.example ams\[2].s=s1 
+     as\[2].d=d2.example as\[2].s=s2 as\[1].d=d1.example 
+     as\[1].s=s3 client-ip[1]=10.10.10.13&lt;/comment>
+  &lt;/reason>
+&lt;/policy_evaluated>
+~~~~~~~~~~
+    
 In the above example DMARC XML reporting fragment, data relating to specific
-validated ARC Sets are enumerated using array syntax (eg, "ams[2]" means AMS
+validated ARC Sets are enumerated using array syntax (eg, "ams\[2]" means AMS
 header field with instance value of 2). d2.example is the Sealing domain for
-ARC Set #2 and d1.example is the Sealing domain for ARC Set #1.
+ARC Set #2 (i=2) and d1.example is the Sealing domain for ARC Set #1 (i=1).
 
 Depending on the reporting practices of intermediate message handlers, Domain
 Owners may receive multiple DMARC reports for a single message. DMARC report
@@ -944,7 +959,7 @@ Authentication Result Names" registry:
 
 * Auth Method : arc
 Code: "none", "pass", "fail"
-Specification: {{I-D.ARC}} Section 2.2
+Specification: {{&SELF}} Section 2.2
 Status: active
 
 ## Email Authentication Methods Registry Update {#iana-ptypes}
@@ -952,23 +967,23 @@ Status: active
 This draft adds several new items to the Email Authentication Methods registry,
 most recently defined in {{I-D-7601bis}}:
 
-   * Method: arc
-Definition: {{I-D.ARC}}
+* Method: arc
+Definition: {{&SELF}}
 ptype: smtp
 Property: client-ip
 Value: IP address of originating SMTP connection
 Status: active
 Version: 1
 
-   * Method: arc
-Definition: {{I-D.ARC}}
+* Method: arc
+Definition: {{&SELF}}
 ptype: header
 Property: oldest-pass
 Value: The instance id of the oldest validating AMS, or 0 if they all pass (see Sectionn 4)
 Status: active
 Version: 1
 
-   * Method: dkim
+* Method: dkim
 Definition: {{RFC6376}}
 ptype: header
 Property: s
@@ -981,23 +996,25 @@ Version: 1
 This specification adds three new header fields to the "Permanent Message
 Header Field Registry", as follows:
 
-      * Header field name: ARC-Seal
+* Header field name: ARC-Seal
 Applicable protocol: mail
 Status: draft
 Author/Change controller: IETF
-Specification document(s): {{I-D.ARC}}
+Specification document(s): {{&SELF}}
 Related information: {{RFC6376}}
-      * Header field name: ARC-Message-Signature
+
+* Header field name: ARC-Message-Signature
 Applicable protocol: mail
 Status: draft
 Author/Change controller: IETF
-Specification document(s): {{I-D.ARC}}
+Specification document(s): {{&SELF}}
 Related information: {{RFC6376}}
-      * Header field name: ARC-Authentication-Results
+
+* Header field name: ARC-Authentication-Results
 Applicable protocol: mail
 Status: standard
 Author/Change controller: IETF
-Specification document(s): {{I-D.ARC}}
+Specification document(s): {{&SELF}}
 Related information: {{I-D-7601bis}}
 
 # Experimental Considerations {#exp-consider}
