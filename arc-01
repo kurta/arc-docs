@@ -1,8 +1,8 @@
 ﻿---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-15.1
-date: 2018-06-23
+docname: draft-ietf-dmarc-arc-protocol-15
+date: 2018-06-24
 
 # stand_alone: true
 
