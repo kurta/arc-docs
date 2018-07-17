@@ -375,7 +375,6 @@
 
   <link href="#rfc.toc" rel="Contents"/>
 <link href="#rfc.section.1" rel="Chapter" title="1 Introduction"/>
-<link href="#rfc.section.1.1" rel="Chapter" title="1.1 Note to Reviewers in the DMARC WG"/>
 <link href="#rfc.section.2" rel="Chapter" title="2 General Concepts"/>
 <link href="#rfc.section.2.1" rel="Chapter" title="2.1 Evidence"/>
 <link href="#rfc.section.2.2" rel="Chapter" title="2.2 Custody"/>
@@ -465,9 +464,9 @@
   <meta name="generator" content="xml2rfc version 2.5.0 - http://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
-  <meta name="dct.creator" content="Andersen, K., Long, B., Ed., Blank, S., Ed., Kucherawy, M., Ed., and T. Draegon, Ed." />
-  <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-dmarc-arc-protocol-15" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-6-24" />
+  <meta name="dct.creator" content="Andersen, K., Long, B., Ed., Blank, S., Ed., Kucherawy, M., Ed., and T. Draegen, Ed." />
+  <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-dmarc-arc-protocol-16" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-7-17" />
   <meta name="dct.abstract" content="The Authenticated Received Chain (ARC) protocol allows Internet Mail Handlers to attach assertions of message authentication state to individual messages. As messages traverse ARC-enabled Internet Mail Handlers, additional ARC assertions can be attached to messages to form ordered sets of ARC assertions that represent authentication state along each step of message handling paths." />
   <meta name="description" content="The Authenticated Received Chain (ARC) protocol allows Internet Mail Handlers to attach assertions of message authentication state to individual messages. As messages traverse ARC-enabled Internet Mail Handlers, additional ARC assertions can be attached to messages to form ordered sets of ARC assertions that represent authentication state along each step of message handling paths." />
 
@@ -491,7 +490,7 @@
   <td class="right">B. Long, Ed.</td>
 </tr>
 <tr>
-  <td class="left">Expires: December 26, 2018</td>
+  <td class="left">Expires: January 18, 2019</td>
   <td class="right">Google</td>
 </tr>
 <tr>
@@ -512,7 +511,7 @@
 </tr>
 <tr>
   <td class="left"></td>
-  <td class="right">T. Draegon, Ed.</td>
+  <td class="right">T. Draegen, Ed.</td>
 </tr>
 <tr>
   <td class="left"></td>
@@ -520,7 +519,7 @@
 </tr>
 <tr>
   <td class="left"></td>
-  <td class="right">June 24, 2018</td>
+  <td class="right">July 17, 2018</td>
 </tr>
 
     	
@@ -528,7 +527,7 @@
   </table>
 
   <p class="title">Authenticated Received Chain (ARC) Protocol<br />
-  <span class="filename">draft-ietf-dmarc-arc-protocol-15</span></p>
+  <span class="filename">draft-ietf-dmarc-arc-protocol-16</span></p>
   
   <h1 id="rfc.abstract">
   <a href="#rfc.abstract">Abstract</a>
@@ -541,7 +540,7 @@
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at http://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on December 26, 2018.</p>
+<p>This Internet-Draft will expire on January 18, 2019.</p>
 <h1 id="rfc.copyrightnotice">
   <a href="#rfc.copyrightnotice">Copyright Notice</a>
 </h1>
@@ -554,8 +553,7 @@
   <ul class="toc">
 
   	<li>1.   <a href="#rfc.section.1">Introduction</a></li>
-<ul><li>1.1.   <a href="#rfc.section.1.1">Note to Reviewers in the DMARC WG</a></li>
-</ul><li>2.   <a href="#rfc.section.2">General Concepts</a></li>
+<li>2.   <a href="#rfc.section.2">General Concepts</a></li>
 <ul><li>2.1.   <a href="#rfc.section.2.1">Evidence</a></li>
 <li>2.2.   <a href="#rfc.section.2.2">Custody</a></li>
 <li>2.3.   <a href="#rfc.section.2.3">Chain of Custody</a></li>
@@ -646,15 +644,13 @@
   <h1 id="rfc.section.1"><a href="#rfc.section.1">1.</a> <a href="#intro" id="intro">Introduction</a></h1>
 <p id="rfc.section.1.p.1">The utility of widely deployed email authentication technologies such as Sender Policy Framework (SPF) <a href="#RFC7208">[RFC7208]</a> and DomainKeys Identified Mail (DKIM) <a href="#RFC6376">[RFC6376]</a> is impacted by the processing of Internet Mail by intermediate handlers. This impact is thoroughly documented in the defining documents for SPF and DKIM and further discussed in <a href="#RFC6377">[RFC6377]</a> and <a href="#RFC7960">[RFC7960]</a>.</p>
 <p id="rfc.section.1.p.2">The utility of technologies that build upon SPF and DKIM (such as DMARC <a href="#RFC7489">[RFC7489]</a>) is similarly impacted by intermediate handlers. The disruption of authentication mechanisms for legitimate messages by intermediate handlers can impact all aspects of Internet Mail - message authors, message recipients, and even the intermediary handler itself.</p>
-<p id="rfc.section.1.p.3">Authenticated Received Chain (ARC) creates a mechanism for individual Internet Mail Handlers to add their authentication processing results to a message&#8217;s ordered set of processing results. ARC encapsulates processing results in a DKIM signature derivative to grant other handlers the ability to verify the authenticity of each individual processing results as well as the aggregate set and sequence of results.</p>
+<p id="rfc.section.1.p.3">Authenticated Received Chain (ARC) creates a mechanism for individual Internet Mail Handlers to add their authentication processing results to a message&#8217;s ordered set of processing results. ARC encapsulates processing results in a DKIM signature derivative to grant other handlers the ability to verify the authenticity of the individual processing results as well as the aggregate set and sequence of results.</p>
 <p id="rfc.section.1.p.4">Ordered sets of processing results can be used by ARC-enabled Internet Mail Handlers to inform message handling disposition, to identify where alteration of message content might have occurred, and to provide additional trace information for use in understanding message handling paths.</p>
-<h1 id="rfc.section.1.1"><a href="#rfc.section.1.1">1.1.</a> <a href="#note-to-reviewers-in-the-dmarc-wg" id="note-to-reviewers-in-the-dmarc-wg">Note to Reviewers in the DMARC WG</a></h1>
-<p id="rfc.section.1.1.p.1">[[ Note: This section is editorial to the WG. Will be removed for final version. ]]</p>
-<p id="rfc.section.1.1.p.2">This version of the draft has been extensively reorganized for readability.  No changes to the wire protocol or specification are intended from <a href="#ARC-DRAFT-14">[ARC-DRAFT-14]</a>.</p>
 <h1 id="rfc.section.2"><a href="#rfc.section.2">2.</a> <a href="#general-concepts" id="general-concepts">General Concepts</a></h1>
 <p id="rfc.section.2.p.1">ARC is loosely based on concepts from evidence collection. Evidence is usually collected, labeled, stored, and transported in specific ways to preserve the state of evidence and to document all processing steps.</p>
 <h1 id="rfc.section.2.1"><a href="#rfc.section.2.1">2.1.</a> <a href="#evidence" id="evidence">Evidence</a></h1>
-<p id="rfc.section.2.1.p.1">In ARC&#8217;s situation, the &#8220;evidence&#8221; is a message&#8217;s authentication state at any point along the delivery path between origination and final delivery.  Authentication state can change when intermediate handlers modify message content, route messages through unforeseen paths, or change envelope information.</p>
+<p id="rfc.section.2.1.p.1">In ARC&#8217;s situation, the &#8220;evidence&#8221; is a message&#8217;s authentication state at any point along the delivery path between origination and final delivery.  Authentication state can change when intermediate handlers modify message content (headers and/or body content), route messages through unforeseen paths, or change envelope information.</p>
+<p id="rfc.section.2.1.p.2">The authentication state of a message is determined upon receipt of a message and documented in the Authentication-Results header field(s). ARC extends this mechanism to survive transit through intermediary ADMDs.</p>
 <h1 id="rfc.section.2.2"><a href="#rfc.section.2.2">2.2.</a> <a href="#custody" id="custody">Custody</a></h1>
 <p id="rfc.section.2.2.p.1">&#8220;Custody&#8221; refers to when an ARC-enabled Internet Mail Handler processes a message. When a handler takes custody of a message, the handler becomes a Custodian and attaches their own evidence (authentication state upon receipt) to the message. Evidence is added in such a way so that future handlers can verify the authenticity of both evidence and custody.</p>
 <h1 id="rfc.section.2.3"><a href="#rfc.section.2.3">2.3.</a> <a href="#chain-of-custody" id="chain-of-custody">Chain of Custody</a></h1>
@@ -664,7 +660,7 @@
 <p id="rfc.section.2.4.p.2">Even though a message&#8217;s authentication state might have changed, the validated chain of custody can be used to determine if the changes (and the Custodians responsible for the changes) can be tolerated.</p>
 <h1 id="rfc.section.3"><a href="#rfc.section.3">3.</a> <a href="#terminology-and-definitions" id="terminology-and-definitions">Terminology and Definitions</a></h1>
 <p id="rfc.section.3.p.1">This section defines terms used in the rest of the document.</p>
-<p id="rfc.section.3.p.2">Readers should to be familiar with the contents, core concepts, and definitions found in <a href="#RFC5598">[RFC5598]</a>. The potential roles of intermediaries in the delivery of email is directly relevant.</p>
+<p id="rfc.section.3.p.2">Readers should to be familiar with the contents, core concepts, and definitions found in <a href="#RFC5598">[RFC5598]</a>. The potential roles of intermediaries in the delivery of email are directly relevant.</p>
 <p id="rfc.section.3.p.3">Language, syntax (including some ABNF constructs), and concepts are imported from DKIM <a href="#RFC6376">[RFC6376]</a>. Specific references to DKIM are made throughout this document.  The following terms are imported from <a href="#RFC5598">[RFC5598]</a>:</p>
 <p/>
 
@@ -678,7 +674,7 @@
 <p id="rfc.section.3.p.6">Syntax descriptions use Augmented BNF (ABNF) <a href="#RFC5234">[RFC5234]</a> and <a href="#RFC7405">[RFC7405]</a>.</p>
 <p id="rfc.section.3.p.7">The key words &#8220;MUST&#8221;, &#8220;MUST NOT&#8221;, &#8220;REQUIRED&#8221;, &#8220;SHALL&#8221;, &#8220;SHALL NOT&#8221;, &#8220;SHOULD&#8221;, &#8220;SHOULD NOT&#8221;, &#8220;RECOMMENDED&#8221;, &#8220;NOT RECOMMENDED&#8221;, &#8220;MAY&#8221;, and &#8220;OPTIONAL&#8221; in this document are to be interpreted as described in BCP&#160;14 <a href="#RFC2119">[RFC2119]</a> <a href="#RFC8174">[RFC8174]</a> when, and only when, they appear in all capitals, as shown here.  These words may also appear in this document in lower case as plain English words, absent their normative meanings.</p>
 <h1 id="rfc.section.3.1"><a href="#rfc.section.3.1">3.1.</a> <a href="#arc-set-defn" id="arc-set-defn">ARC Set</a></h1>
-<p id="rfc.section.3.1.p.1">Section <a href="#hdr-defn">Section 4.1</a> introduces three (3) ARC header fields. Together, the 3 header fields compose a single &#8220;ARC Set&#8221;. An ARC Set provides the means for an Internet Mail Handler to attach authentication state to a message in a manner that can be verified by future handlers. A single message can contain multiple ARC Sets.</p>
+<p><a href="#hdr-defn">Section 4.1</a> introduces three (3) ARC header fields. Together, the 3 header fields compose a single &#8220;ARC Set&#8221;. An ARC Set provides the means for an Internet Mail Handler to attach authentication state to a message in a manner that can be verified by future handlers. A single message can contain multiple ARC Sets.</p>
 <p id="rfc.section.3.1.p.2">In General Concept terms, an ARC Set represents Evidence and Custody.</p>
 <h1 id="rfc.section.3.2"><a href="#rfc.section.3.2">3.2.</a> <a href="#arc-chain-defn" id="arc-chain-defn">Authenticated Received Chain (ARC)</a></h1>
 <p id="rfc.section.3.2.p.1">The complete sequence of ARC Sets attached to a message is called the Authenticated Received Chain. An Authenticated Received Chain is a recording of individual authentication states as a message traverses through ARC-participating ADMDs.</p>
@@ -688,7 +684,7 @@
 <p id="rfc.section.3.3.p.1">A Sealer is an Internet Mail Handler that attaches a complete and valid ARC Set to a message.</p>
 <p id="rfc.section.3.3.p.2">In General Concept terms, a Sealer adds Evidence and proof of Custody to the Chain of Custody.</p>
 <h1 id="rfc.section.3.4"><a href="#rfc.section.3.4">3.4.</a> <a href="#validator" id="validator">Validator</a></h1>
-<p id="rfc.section.3.4.p.1">A Validator is an ARC-enabled Internet Mail Handler that evaluates an Authenticated Received Chain for validity and content. The process of evaluation of the individual ARC Sets that compose an Authenticated Received Chain is described in Section <a href="#validate-actions">Section 5.2</a>.</p>
+<p id="rfc.section.3.4.p.1">A Validator is an ARC-enabled Internet Mail Handler that evaluates an Authenticated Received Chain for validity and content. The process of evaluation of the individual ARC Sets that compose an Authenticated Received Chain is described in <a href="#validate-actions">Section 5.2</a>.</p>
 <p id="rfc.section.3.4.p.2">In General Concept terms, a Validator inspects the Chain of Custody to determine the content and validity of individual Evidence supplied by Custodians.</p>
 <h1 id="rfc.section.3.5"><a href="#rfc.section.3.5">3.5.</a> <a href="#imported-abnf-tokens" id="imported-abnf-tokens">Imported ABNF Tokens</a></h1>
 <p id="rfc.section.3.5.p.1">The following ABNF tokens are imported:</p>
@@ -718,7 +714,7 @@ seal-cv-tag = %s"cv" [CFWS] "=" [CFWS] chain-status
 
 <ul>
   <li>the name of the header field itself;</li>
-  <li>the presence of the &#8220;instance tag&#8221;. Additional information on the &#8220;instance tag&#8221; can be found in Section <a href="#i-defn">Section 4.2.1</a>.</li>
+  <li>the presence of the &#8220;instance tag&#8221;. Additional information on the &#8220;instance tag&#8221; can be found in <a href="#i-defn">Section 4.2.1</a>.</li>
 </ul>
 <p id="rfc.section.4.1.1.p.5">The formal ABNF for the AAR header field is:</p>
 <pre>
@@ -734,8 +730,9 @@ arc-authres-header = "ARC-Authentication-Results:" [CFWS] arc-info
 
 <ul>
   <li>the name of the header field itself;</li>
-  <li>no version tag (&#8220;v&#8221;) is defined for the AMS header. As required for undefined tags (in <a href="#RFC6376">[RFC6376]</a>), if seen, a version tag MUST be ignored;</li>
-  <li>the presence of the &#8220;instance tag&#8221;. Additional information on the &#8220;instance tag&#8221; can be found in Section <a href="#i-defn">Section 4.2.1</a>. The instance tag replaces the DKIM &#8220;AUID&#8221; tag.</li>
+  <li>no version tag (&#8220;v&#8221;) is defined for the AMS header field. As required for undefined tags (in <a href="#RFC6376">[RFC6376]</a>), if seen, a version tag MUST be ignored;</li>
+  <li>the presence of the &#8220;instance tag&#8221;. Additional information on the &#8220;instance tag&#8221; can be found in <a href="#i-defn">Section 4.2.1</a>. The instance tag replaces the DKIM &#8220;AUID&#8221; tag;</li>
+  <li>when building the header field list to be signed, ARC-related headers MUST be submitted to the hash function in increasing instance order.</li>
 </ul>
 <p id="rfc.section.4.1.2.p.5">ARC places no requirements on the selectors and/or domains used for the AMS header field signatures.</p>
 <p id="rfc.section.4.1.2.p.6">The formal ABNF for the AMS header field is:</p>
@@ -747,8 +744,8 @@ arc-message-signature = "ARC-Message-Signature:" [CFWS] arc-ams-info
 <p/>
 
 <ul>
-  <li>AMS header fields are added by ARC-participating ADMDs as messages exit the ADMD. AMS header fields should be attached so that any modifications made by the ADMD are included in the signature of the AMS header field.</li>
-  <li>Authentication-Results header fields MUST NOT be included in AMS signatures as they are likely to be deleted by downstream ADMDs (per Section 5 of <a href="#I-D-7601bis">[I-D-7601bis]</a>).</li>
+  <li>AMS header fields are added by ARC-participating ADMDs as messages exit the ADMD. AMS header fields SHOULD be attached so that any modifications made by the ADMD are included in the signature of the AMS header field.</li>
+  <li>Authentication-Results header fields MUST NOT be included in AMS signatures as they are likely to be deleted by downstream ADMDs (per <a href="#I-D-7601bis">[I-D-7601bis]</a> Section 5).</li>
   <li>ARC-related header fields (ARC-Authentication-Results, ARC-Message-Signature, ARC-Seal) MUST NOT be included in the list of header fields covered by the signature of the AMS header field.</li>
 </ul>
 <p id="rfc.section.4.1.2.p.9">To preserve the ability to verify the integrity of a message, the signature of the AMS header field SHOULD include any DKIM-Signature header fields already present in the message.</p>
@@ -759,11 +756,11 @@ arc-message-signature = "ARC-Message-Signature:" [CFWS] arc-ams-info
 <p/>
 
 <ul>
-  <li>the presence of the &#8220;instance tag&#8221;. Additional information on the &#8220;instance tag&#8221; can be found in Section <a href="#i-defn">Section 4.2.1</a>.</li>
-  <li>the signature of the AS header field does not cover the body of the message and therefore there is no &#8216;bh&#8217; tag. The signature of the AS header field only covers specific header fields as defined in Section <a href="#as-hdrs">Section 5.1.1</a>.</li>
+  <li>the presence of the &#8220;instance tag&#8221;. Additional information on the &#8220;instance tag&#8221; can be found in <a href="#i-defn">Section 4.2.1</a>.</li>
+  <li>the signature of the AS header field does not cover the body of the message and therefore there is no &#8216;bh&#8217; tag. The signature of the AS header field only covers specific header fields as defined in <a href="#as-hdrs">Section 5.1.1</a>.</li>
   <li>no body canonicalization is performed as the AS signature does not cover the body of a message.</li>
   <li>only &#8220;relaxed&#8221; header canonicalization (<a href="#RFC6376">[RFC6376]</a> section 3.4.2) is used.</li>
-  <li>the only supported tags are &#8220;i&#8221; (from Section <a href="#i-defn">Section 4.2.1</a> of this document), and &#8220;a&#8221;, &#8220;b&#8221;, &#8220;d, &#8220;s&#8221;, &#8220;t&#8221; from Section 3.5 of <a href="#RFC6376">[RFC6376]</a>. Note especially that the DKIM &#8220;h&#8221; header is NOT allowed and if found, MUST result in a cv status of &#8220;fail&#8221; (for more information see <a href="#as-hdrs">Section 5.1.1</a>;</li>
+  <li>the only supported tags are &#8220;i&#8221; (from <a href="#i-defn">Section 4.2.1</a> of this document), and &#8220;a&#8221;, &#8220;b&#8221;, &#8220;d, &#8220;s&#8221;, &#8220;t&#8221; from <a href="#RFC6376">[RFC6376]</a> Section 3.5. Note especially that the DKIM &#8220;h&#8221; tag is NOT allowed and if found, MUST result in a cv status of &#8220;fail&#8221; (for more information see <a href="#as-hdrs">Section 5.1.1</a>);</li>
   <li>an additional tag, &#8220;cv&#8221; (&#8220;seal-cv-tag&#8221; in the ARC-Seal ABNF definition) is used to communicate Chain Validation Status to subsequent ADMDs.</li>
 </ul>
 <p id="rfc.section.4.1.3.p.5">ARC places no requirements on the selectors and/or domains used for the AS header field signatures.</p>
@@ -774,12 +771,13 @@ arc-seal = "ARC-Seal:" [CFWS] arc-as-info
 </pre>
 <h1 id="rfc.section.4.2"><a href="#rfc.section.4.2">4.2.</a> <a href="#arc-set" id="arc-set">ARC Set</a></h1>
 <p id="rfc.section.4.2.p.1">An &#8220;ARC Set&#8221; is a single collection of three ARC Headers (AAR, AMS, and AS).  ARC Headers of an ARC Set share the same &#8220;instance&#8221; value.</p>
-<p id="rfc.section.4.2.p.2">By adding all ARC Headers to a message, an ARC Sealer adds an ARC Set to a message. A description of how Sealers add an ARC Set to a message is found in Section <a href="#sealer-actions">Section 5.1</a>.</p>
+<p id="rfc.section.4.2.p.2">By adding all ARC Headers to a message, an ARC Sealer adds an ARC Set to a message. A description of how Sealers add an ARC Set to a message is found in <a href="#sealer-actions">Section 5.1</a>.</p>
 <h1 id="rfc.section.4.2.1"><a href="#rfc.section.4.2.1">4.2.1.</a> <a href="#i-defn" id="i-defn">Instance Tags</a></h1>
 <p id="rfc.section.4.2.1.p.1">Instance tags describe which ARC Headers belong to an ARC Set. Each ARC Header of an ARC Set shares the same instance tag value.</p>
 <p id="rfc.section.4.2.1.p.2">Instance tag values are integers that begin at 1 and are incremented by each addition of an ARC Set. Through the incremental values of instance tags, an ARC Validator can determine the order in which ARC Sets were added to a message.</p>
 <p id="rfc.section.4.2.1.p.3">Instance tag values can range from 1-50 (inclusive).</p>
-<p id="rfc.section.4.2.1.p.4">Valid ARC Sets MUST have exactly one instance of each ARC Header field (AAR, AMS, and AS) for a given instance value and signing algorithm.</p>
+<p><em>INFORMATIONAL:</em> The upper limit of 50 was picked based on some initial observations reported by early working group members with a safety margin multiple added on top to support the vast majority of all intermediary mail flows.</p>
+<p id="rfc.section.4.2.1.p.5">Valid ARC Sets MUST have exactly one instance of each ARC Header field (AAR, AMS, and AS) for a given instance value and signing algorithm.</p>
 <p><em>INFORMATIONAL:</em> Initial development of ARC is only being done with a single allowed signing algorithm, but parallel work in the DCRUP working group is expanding that. For handling multiple signing algorithms, see <a href="#ARC-MULTI">[ARC-MULTI]</a>.</p>
 <h1 id="rfc.section.4.3"><a href="#rfc.section.4.3">4.3.</a> <a href="#authenticated-received-chain" id="authenticated-received-chain">Authenticated Received Chain</a></h1>
 <p id="rfc.section.4.3.p.1">An Authenticated Received Chain is an ordered collection of ARC Sets. As ARC Sets are enumerated sets of ARC Headers, an Authenticated Received Chain represents the output of message authentication state along the handling path of ARC-enabled processors.</p>
@@ -812,9 +810,9 @@ arc-seal = "ARC-Seal:" [CFWS] arc-as-info
   <li>All message modifications (including adding DKIM-Signatures) MUST be performed before Sealing.</li>
   <li>Calculate the instance value: if the message contains an Authenticated Received Chain, the instance value is 1 more than the highest instance number found in the Authenticated Received Chain. If no Authenticated Received Chain exists, the instance value is 1.</li>
   <li>Using the calculated instance value, generate and attach to the message in the following order:</li>
-  <li>An ARC-Authentication-Results header field as defined in Section <a href="#aar-defn">Section 4.1.1</a>.</li>
-  <li>An ARC-Message-Signature header field as defined in Section <a href="#ams-defn">Section 4.1.2</a>.</li>
-  <li>An ARC-Seal header field using the AS definition found in Section <a href="#as-defn">Section 4.1.3</a>, the method described in Section <a href="#as-hdrs">Section 5.1.1</a>, and the Chain Validation Status as determined during ARC validation.</li>
+  <li>An ARC-Authentication-Results header field as defined in <a href="#aar-defn">Section 4.1.1</a>.</li>
+  <li>An ARC-Message-Signature header field as defined in <a href="#ams-defn">Section 4.1.2</a>.</li>
+  <li>An ARC-Seal header field using the AS definition found in <a href="#as-defn">Section 4.1.3</a>, the method described in <a href="#as-hdrs">Section 5.1.1</a>, and the Chain Validation Status as determined during ARC validation.</li>
 </ol>
 <h1 id="rfc.section.5.1.1"><a href="#rfc.section.5.1.1">5.1.1.</a> <a href="#as-hdrs" id="as-hdrs">Header Fields To Include In ARC-Seal Signatures</a></h1>
 <p id="rfc.section.5.1.1.p.1">The signature of an AS header field signs a specific canonicalized form of the ARC Set header values. The ARC set header values are supplied to the hash function in increasing instance order, starting at 1, and include the ARC Set being added at the time of Sealing the message.</p>
@@ -827,14 +825,14 @@ arc-seal = "ARC-Seal:" [CFWS] arc-as-info
   <li>ARC-Seal</li>
 </ol>
 <p id="rfc.section.5.1.1.p.4">The ARC-Seal is generated in a manner similar to when DKIM-Signatures are added to messages (<a href="#RFC6376">[RFC6376]</a>, section 3.7).</p>
-<p id="rfc.section.5.1.1.p.5">Note that when an Authenticated Received Chain has failed validation, the signing scope for the ARC-Seal is modified (see Section <a href="#cv-fail-case">Section 5.1.2</a>).</p>
+<p id="rfc.section.5.1.1.p.5">Note that when an Authenticated Received Chain has failed validation, the signing scope for the ARC-Seal is modified (see <a href="#cv-fail-case">Section 5.1.2</a>).</p>
 <h1 id="rfc.section.5.1.2"><a href="#rfc.section.5.1.2">5.1.2.</a> <a href="#cv-fail-case" id="cv-fail-case">Marking and Sealing &#8220;cv=fail&#8221; (Invalid) Chains</a></h1>
 <p id="rfc.section.5.1.2.p.1">In the case of a failed Authenticated Received Chain, the header fields included in the signature scope of the AS header field b= value MUST only include the ARC Set headers created by the MTA which detected the malformed chain, as if this newest ARC Set was the only set present.</p>
 <p><em>INFORMATIONAL</em>: This approach is mandated to handle the case of a malformed or otherwise invalid Authenticated Received Chain. There is no way to generate a deterministic set of AS header fields (<a href="#as-hdrs">Section 5.1.1</a>) in most cases of invalid chains.</p>
 <h1 id="rfc.section.5.1.3"><a href="#rfc.section.5.1.3">5.1.3.</a> <a href="#only-one-authenticated-received-chain-per-message" id="only-one-authenticated-received-chain-per-message">Only One Authenticated Received Chain Per Message</a></h1>
 <p id="rfc.section.5.1.3.p.1">A message can have only one Authenticated Received Chain on it at a time. Once broken, the chain cannot be continued, as the chain of custody is no longer valid and responsibility for the message has been lost. For further discussion of this topic and the designed restriction which prevents chain continuation or re-establishment, see <a href="#ARC-USAGE">[ARC-USAGE]</a>.</p>
 <h1 id="rfc.section.5.1.4"><a href="#rfc.section.5.1.4">5.1.4.</a> <a href="#broad-ability-to-seal" id="broad-ability-to-seal">Broad Ability to Seal</a></h1>
-<p id="rfc.section.5.1.4.p.1">ARC is not solely intended for perimeter MTAs. Any mediator (<a href="#RFC5598">[RFC5598]</a>, section 5) that modifies a message may Seal its own changes. For additional information, see Section <a href="#trust-boundaries">Section 7.1</a>.</p>
+<p id="rfc.section.5.1.4.p.1">ARC is not solely intended for perimeter MTAs. Any mediator (<a href="#RFC5598">[RFC5598]</a>, section 5) that modifies a message may Seal its own changes. For additional information, see <a href="#trust-boundaries">Section 7.1</a>.</p>
 <h1 id="rfc.section.5.1.5"><a href="#rfc.section.5.1.5">5.1.5.</a> <a href="#sealing-is-always-safe" id="sealing-is-always-safe">Sealing is Always Safe</a></h1>
 <p id="rfc.section.5.1.5.p.1">The utility of an Authenticated Received Chain is limited to very specific cases.  Authenticated Received Chains are designed to provide additional information to an Internet Mail Handler when evaluating messages for delivery in the context of authentication failures. Specifically:</p>
 <p/>
@@ -842,7 +840,7 @@ arc-seal = "ARC-Seal:" [CFWS] arc-as-info
 <ul>
   <li>Properly adding an ARC Set to a message does not damage or invalidate an existing Authenticated Received Chain.</li>
   <li>Sealing an Authenticated Received Chain when a message has not been modified does not negatively affect the chain.</li>
-  <li>Validating a message exposes no new threat vectors (see Section <a href="#security-consider">Section 9</a>).</li>
+  <li>Validating a message exposes no new threat vectors (see <a href="#security-consider">Section 9</a>).</li>
   <li>An ADMD may choose to Seal all inbound messages whether or not a message has been modified or will be retransmitted.</li>
 </ul>
 <h1 id="rfc.section.5.1.6"><a href="#rfc.section.5.1.6">5.1.6.</a> <a href="#signing-vs-sealing" id="signing-vs-sealing">Signing vs Sealing</a></h1>
@@ -869,7 +867,7 @@ arc-seal = "ARC-Seal:" [CFWS] arc-as-info
 <p id="rfc.section.5.2.1.p.1">Authenticated Received Chains represent the traversal of messages through one or more intermediaries. All errors, including DNS failures, become unrecoverable and are considered permanent.</p>
 <p id="rfc.section.5.2.1.p.2">Any error Validating an Authenticated Received Chain results in a failed Chain Validation Status. For further discussion of this topic and the design restriction which prevents chain continuation or re-establishment, see <a href="#ARC-USAGE">[ARC-USAGE]</a>.</p>
 <h1 id="rfc.section.5.2.2"><a href="#rfc.section.5.2.2">5.2.2.</a> <a href="#responding-to-arc-validation-failures-during-the-smtp-transaction" id="responding-to-arc-validation-failures-during-the-smtp-transaction">Responding to ARC Validation Failures During the SMTP Transaction</a></h1>
-<p id="rfc.section.5.2.2.p.1">If an ARC Validator determines that the Authenticated Received Chain has failed, the Validator MAY signal the breakage through the extended SMTP response code 5.7.7 <a href="#RFC3463">[RFC3463]</a> &#8220;message integrity failure&#8221; <a href="#ENHANCED-STATUS">[ENHANCED-STATUS]</a> and corresponding SMTP response code.</p>
+<p id="rfc.section.5.2.2.p.1">If an ARC Validator determines that the incoming message fails authentication checks (potentially including ARC validation), the Validator MAY signal the breakage through the extended SMTP response code 5.7.7 <a href="#RFC3463">[RFC3463]</a> &#8220;message integrity failure&#8221; <a href="#ENHANCED-STATUS">[ENHANCED-STATUS]</a> and corresponding SMTP response code.</p>
 <h1 id="rfc.section.5.3"><a href="#rfc.section.5.3">5.3.</a> <a href="#result-of-validation" id="result-of-validation">Result of Validation</a></h1>
 <p id="rfc.section.5.3.p.1">An Authenticated Received Chain with a Chain Validation Status of &#8220;pass&#8221; allows Internet Mail Handlers to ascertain:</p>
 <p/>
@@ -880,8 +878,8 @@ arc-seal = "ARC-Seal:" [CFWS] arc-as-info
 </ul>
 <p id="rfc.section.5.3.p.3">Given this information, handlers can inform local policy decisions regarding disposition of messages that experience authentication failure due to intermediate processing.</p>
 <h1 id="rfc.section.6"><a href="#rfc.section.6">6.</a> <a href="#communication-of-validation-results" id="communication-of-validation-results">Communication of Validation Results</a></h1>
-<p id="rfc.section.6.p.1">Chain Validation Status (described in Section <a href="#cv-defn">Section 4.4</a>) is communicated via Authentication-Results (and AAR) headers using the auth method &#8220;arc&#8221;. This auth method is described in Section <a href="#iana-auth">Section 10.1</a>.</p>
-<p id="rfc.section.6.p.2">If necessary data is available, the ptypes and properties defined in Section <a href="#iana-ptypes">Section 10.2</a> SHOULD be recorded in an Authentication-Results header field:</p>
+<p id="rfc.section.6.p.1">Chain Validation Status (described in <a href="#cv-defn">Section 4.4</a>) is communicated via Authentication-Results (and AAR) headers using the auth method &#8220;arc&#8221;. This auth method is described in <a href="#iana-auth">Section 10.1</a>.</p>
+<p id="rfc.section.6.p.2">If necessary data is available, the ptypes and properties defined in <a href="#iana-ptypes">Section 10.2</a> SHOULD be recorded in an Authentication-Results header field:</p>
 <p/>
 
 <ul>
@@ -920,7 +918,7 @@ arc-seal = "ARC-Seal:" [CFWS] arc-as-info
 <h1 id="rfc.section.7.2.1"><a href="#rfc.section.7.2.1">7.2.1.</a> <a href="#dmarc-local-policy-overrides" id="dmarc-local-policy-overrides">DMARC Local Policy Overrides</a></h1>
 <p id="rfc.section.7.2.1.p.1">DMARC introduces a policy model where Domain Owners can request email receivers to reject or quarantine messages that fail DMARC alignment. Interoperability issues between DMARC and indirect email flows are documented in <a href="#RFC7960">[RFC7960]</a>.</p>
 <p id="rfc.section.7.2.1.p.2">Authenticated Received Chains allow DMARC processors to consider authentication states provided by other ADMDs. As a matter of local policy, a DMARC processor may choose to accept the authentication state provided by an Authenticated Received Chain when determining if a message is DMARC compliant.</p>
-<p id="rfc.section.7.2.1.p.3">When an Authenticated Received Chain is used to determine message disposition, the DMARC processor can communicate this local policy decision to Domain Owners as described in Section <a href="#dmarc-rpt">Section 7.2.2</a>.</p>
+<p id="rfc.section.7.2.1.p.3">When an Authenticated Received Chain is used to determine message disposition, the DMARC processor can communicate this local policy decision to Domain Owners as described in <a href="#dmarc-rpt">Section 7.2.2</a>.</p>
 <h1 id="rfc.section.7.2.2"><a href="#rfc.section.7.2.2">7.2.2.</a> <a href="#dmarc-rpt" id="dmarc-rpt">DMARC Reporting</a></h1>
 <p id="rfc.section.7.2.2.p.1">DMARC-enabled receivers indicate when ARC Validation influences DMARC-related local policy decisions. DMARC reporting of ARC-influenced decisions is accomplished by adding a local_policy comment containing a list of data discovered during ARC Validation, which at a minimum includes:</p>
 <p/>
@@ -953,7 +951,7 @@ EXAMPLE:
 <p id="rfc.section.9.p.1">The Security Considerations of <a href="#RFC6376">[RFC6376]</a> and <a href="#I-D-7601bis">[I-D-7601bis]</a> apply directly to this specification.</p>
 <p id="rfc.section.9.p.2">As with other domain authentication technologies (such as SPF, DKIM, and DMARC), ARC makes no claims about the semantic content of messages.</p>
 <h1 id="rfc.section.9.1"><a href="#rfc.section.9.1">9.1.</a> <a href="#increased-header-size" id="increased-header-size">Increased Header Size</a></h1>
-<p id="rfc.section.9.1.p.1">Inclusion of Authenticated Received Chains into messages may cause issues for older or constrained MTAs due to increased total header size.</p>
+<p id="rfc.section.9.1.p.1">Inclusion of Authenticated Received Chains into messages may cause issues for older or constrained MTAs due to increased total header size. Large header blocks, in general, may cause failures to deliver or other outage scenarios for such MTAs. ARC itself would not cause problems.</p>
 <h1 id="rfc.section.9.2"><a href="#rfc.section.9.2">9.2.</a> <a href="#dns-impact" id="dns-impact">DNS Operations</a></h1>
 <p id="rfc.section.9.2.p.1">The validation of an Authenticated Received Chain composed of N ARC Sets can require up to 2*N DNS queries (not including any DNS redirection mechanisms which can increase the total number of queries). This leads to two considerations:</p>
 <p/>
@@ -970,32 +968,32 @@ EXAMPLE:
 <h1 id="rfc.section.9.5"><a href="#rfc.section.9.5">9.5.</a> <a href="#replay-attacks" id="replay-attacks">Replay Attacks</a></h1>
 <p id="rfc.section.9.5.p.1">Since ARC inherits heavily from DKIM, it has similar attack vectors. In particular, the Replay Attack described in <a href="#RFC6376">[RFC6376]</a> section 8.6 is potentially amplified by ARC&#8217;s chained statuses. In an ARC replay attack, a malicious actor would take an intact and passing ARC Chain, and then resend it to many recipients without making any modifications that invalidate the latest AMS or AS. The impact to a receiver would be more DNS lookups and signature evaluations. This scope of this attack can be limited by caching DNS queries and following the same signing scope guidance from <a href="#RFC6376">[RFC6376]</a> section 5.4.1.</p>
 <h1 id="rfc.section.10"><a href="#rfc.section.10">10.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a></h1>
-<p id="rfc.section.10.p.1">[[ <strong>Note to the RFC Editors:</strong> dkim header.s is defined both here and in <a href="#I-D-7601bis">[I-D-7601bis]</a>. Please delete the overlap from whichever document goes through the publication process after the other. ]]</p>
+<p id="rfc.section.10.p.1">[[ <strong>Note to the RFC Editors:</strong> &#8220;dkim - header - s&#8221; is defined both here and in <a href="#I-D-7601bis">[I-D-7601bis]</a>. Please delete the overlap from whichever document goes through the publication process after the other. ]]</p>
 <p id="rfc.section.10.p.2">This draft introduces three new headers fields and updates the Email Authentication Parameters registry with one new authentication method and several status codes.</p>
 <h1 id="rfc.section.10.1"><a href="#rfc.section.10.1">10.1.</a> <a href="#iana-auth" id="iana-auth">Email Authentication Results Names Registry Update</a></h1>
 <p id="rfc.section.10.1.p.1">This draft adds one Auth Method with three Codes to the IANA &#8220;Email Authentication Result Names&#8221; registry:</p>
 <p/>
 
 <ul>
-  <li>Auth Method : arc Code: &#8220;none&#8221;, &#8220;pass&#8221;, &#8220;fail&#8221; Specification: [I-D.ARC] Section 2.2 Status: active</li>
+  <li>Auth Method : arc<br/> Code: &#8220;none&#8221;, &#8220;pass&#8221;, &#8220;fail&#8221;<br/> Specification: [I-D.ARC] 2.2<br/> Status: active</li>
 </ul>
 <h1 id="rfc.section.10.2"><a href="#rfc.section.10.2">10.2.</a> <a href="#iana-ptypes" id="iana-ptypes">Email Authentication Methods Registry Update</a></h1>
 <p id="rfc.section.10.2.p.1">This draft adds several new items to the Email Authentication Methods registry, most recently defined in <a href="#I-D-7601bis">[I-D-7601bis]</a>:</p>
 <p/>
 
 <ul>
-  <li>Method: arc Definition: [I-D.ARC] ptype: smtp Property: client-ip Value: IP address of originating SMTP connection Status: active Version: 1</li>
-  <li>Method: arc Definition: [I-D.ARC] ptype: header Property: oldest-pass Value: The instance id of the oldest validating AMS, or 0 if they all pass (see Sectionn 4) Status: active Version: 1</li>
-  <li>Method: dkim Definition: <a href="#RFC6376">[RFC6376]</a> ptype: header Property: s Value: value of signature &#8220;s&#8221; tag Status: active Version: 1</li>
+  <li>Method: arc<br/> Definition: [I-D.ARC]<br/> ptype: smtp<br/> Property: client-ip<br/> Value: IP address of originating SMTP connection<br/> Status: active<br/> Version: 1</li>
+  <li>Method: arc<br/> Definition: [I-D.ARC]<br/> ptype: header<br/> Property: oldest-pass<br/> Value: The instance id of the oldest validating AMS, or 0 if they all pass (see <a href="#validate-actions">Section 5.2</a>)<br/> Status: active<br/> Version: 1</li>
+  <li>Method: dkim<br/> Definition: <a href="#RFC6376">[RFC6376]</a><br/> ptype: header<br/> Property: s<br/> Value: value of signature &#8220;s&#8221; tag<br/> Status: active<br/> Version: 1</li>
 </ul>
 <h1 id="rfc.section.10.3"><a href="#rfc.section.10.3">10.3.</a> <a href="#iana-headers" id="iana-headers">Definitions of the ARC header fields</a></h1>
 <p id="rfc.section.10.3.p.1">This specification adds three new header fields to the &#8220;Permanent Message Header Field Registry&#8221;, as follows:</p>
 <p/>
 
 <ul>
-  <li>Header field name: ARC-Seal Applicable protocol: mail Status: draft Author/Change controller: IETF Specification document(s): [I-D.ARC] Related information: <a href="#RFC6376">[RFC6376]</a></li>
-  <li>Header field name: ARC-Message-Signature Applicable protocol: mail Status: draft Author/Change controller: IETF Specification document(s): [I-D.ARC] Related information: <a href="#RFC6376">[RFC6376]</a></li>
-  <li>Header field name: ARC-Authentication-Results Applicable protocol: mail Status: standard Author/Change controller: IETF Specification document(s): [I-D.ARC] Related information: <a href="#I-D-7601bis">[I-D-7601bis]</a></li>
+  <li>Header field name: ARC-Seal<br/> Applicable protocol: mail<br/> Status: draft<br/> Author/Change controller: IETF<br/> Specification document(s): [I-D.ARC]<br/> Related information: <a href="#RFC6376">[RFC6376]</a></li>
+  <li>Header field name: ARC-Message-Signature<br/> Applicable protocol: mail<br/> Status: draft<br/> Author/Change controller: IETF<br/> Specification document(s): [I-D.ARC]<br/> Related information: <a href="#RFC6376">[RFC6376]</a></li>
+  <li>Header field name: ARC-Authentication-Results<br/> Applicable protocol: mail<br/> Status: standard<br/> Author/Change controller: IETF<br/> Specification document(s): [I-D.ARC]<br/> Related information: <a href="#I-D-7601bis">[I-D-7601bis]</a></li>
 </ul>
 <h1 id="rfc.section.11"><a href="#rfc.section.11">11.</a> <a href="#exp-consider" id="exp-consider">Experimental Considerations</a></h1>
 <p id="rfc.section.11.p.1">The ARC protocol is designed to address common interoperability issues introduced by intermediate message handlers. Interoperability issues are described in <a href="#RFC6377">[RFC6377]</a> and <a href="#RFC7960">[RFC7960]</a>.</p>
@@ -1004,13 +1002,13 @@ EXAMPLE:
 <p id="rfc.section.11.1.p.1">In an attempt to deliver legitimate messages that users desire, many receivers use heuristic-based methods to identify messages that arrive via indirect delivery paths.</p>
 <p id="rfc.section.11.1.p.2">ARC will be a success if the presence of Authenticated Received Chains allows for improved decision making when processing legitimate messages.</p>
 <h1 id="rfc.section.11.2"><a href="#rfc.section.11.2">11.2.</a> <a href="#failure-considerations" id="failure-considerations">Failure Considerations</a></h1>
-<p id="rfc.section.11.2.p.1">ARC should function without introducing significant new vectors for abuse (see Section <a href="#security-consider">Section 9</a>). If unforseen vectors are enabled by ARC, then this protocol will be a failure. Note that weaknesses inherent in the mail protocols ARC is built upon (such as DKIM replay attacks and other known issues) are not new vectors which can be attributed to this specification.</p>
+<p id="rfc.section.11.2.p.1">ARC should function without introducing significant new vectors for abuse (see <a href="#security-consider">Section 9</a>). If unforseen vectors are enabled by ARC, then this protocol will be a failure. Note that weaknesses inherent in the mail protocols ARC is built upon (such as DKIM replay attacks and other known issues) are not new vectors which can be attributed to this specification.</p>
 <h1 id="rfc.section.11.3"><a href="#rfc.section.11.3">11.3.</a> <a href="#open-questions" id="open-questions">Open Questions</a></h1>
 <p id="rfc.section.11.3.p.1">The following open questions are academic and have no clear answer at the time of the development of the protocol. However, additional deployment should be able to gather the necessary data to answer some or all of them.</p>
 <h1 id="rfc.section.11.3.1"><a href="#rfc.section.11.3.1">11.3.1.</a> <a href="#value-of-the-arc-seal-as-header" id="value-of-the-arc-seal-as-header">Value of the ARC-Seal (AS) Header</a></h1>
 <p id="rfc.section.11.3.1.p.1">Data should be collected to show if the ARC-Seal (AS) provides value beyond the ARC Message Signature (AMS) for either making delivery decisions or catching malicious actors trying to craft or replay malicious chains.</p>
 <h1 id="rfc.section.11.3.2"><a href="#rfc.section.11.3.2">11.3.2.</a> <a href="#dns-overhead" id="dns-overhead">DNS Overhead</a></h1>
-<p id="rfc.section.11.3.2.p.1">Longer Authenticated Received Chains will require more queries to retrieve the keys for validating the chain. While this is not believed to be a security issue (see Section <a href="#dns-impact">Section 9.2</a>), it is unclear how much overhead will truly be added.  This is similar to some of the initial processing and query load concerns which were debated at the time of the DKIM specification development.</p>
+<p id="rfc.section.11.3.2.p.1">Longer Authenticated Received Chains will require more queries to retrieve the keys for validating the chain. While this is not believed to be a security issue (see <a href="#dns-impact">Section 9.2</a>), it is unclear how much overhead will truly be added.  This is similar to some of the initial processing and query load concerns which were debated at the time of the DKIM specification development.</p>
 <p id="rfc.section.11.3.2.p.2">Data should be collected to better understand usable length and distribution of lengths found in valid Authenticated Received Chains along with the the DNS impact of processing Authenticated Received Chains.</p>
 <p id="rfc.section.11.3.2.p.3">An effective operational maximum will have to be developed through deployment experience in the field.</p>
 <h1 id="rfc.section.11.3.3"><a href="#rfc.section.11.3.3">11.3.3.</a> <a href="#what-trace-information-is-valuable" id="what-trace-information-is-valuable">What Trace Information is Valuable</a></h1>
@@ -1021,12 +1019,12 @@ EXAMPLE:
 <p id="rfc.section.11.3.3.p.5">Data should be collected on what trace information receivers are using that provides useful signals that affect deliverability, and what portions of the trace data are left untouched or provide no useful information.</p>
 <p id="rfc.section.11.3.3.p.6">Since many such systems are intentionally proprietary or confidential to prevent gaming by abusers, it may not be viable to reliably answer this particular question. The evolving nature of attacks can also shift the landscape of &#8220;useful&#8221; information over time.</p>
 <h1 id="rfc.section.12"><a href="#rfc.section.12">12.</a> <a href="#implstat" id="implstat">Implementation Status</a></h1>
-<p id="rfc.section.12.p.1">[[ Note to the RFC Editor: Please remove this section before publication along with the reference to <a href="#RFC6982">[RFC6982]</a>. ]]</p>
-<p id="rfc.section.12.p.2">This section records the status of known implementations of the protocol defined by this specification at the time of posting of this Internet-Draft, and is based on a proposal described in <a href="#RFC6982">[RFC6982]</a>.  The description of implementations in this section is intended to assist the IETF in its decision processes in progressing drafts to RFCs.  Please note that the listing of any individual implementation here does not imply endorsement by the IETF.  Furthermore, no effort has been spent to verify the information presented here that was supplied by IETF contributors.  This is not intended as, and must not be construed to be, a catalog of available implementations or their features.  Readers are advised to note that other implementations may exist.</p>
+<p id="rfc.section.12.p.1">[[ Note to the RFC Editor: Please remove this section before publication along with the reference to <a href="#RFC7942">[RFC7942]</a>. ]]</p>
+<p id="rfc.section.12.p.2">This section records the status of known implementations of the protocol defined by this specification at the time of posting of this Internet-Draft, and is based on a proposal described in <a href="#RFC7942">[RFC7942]</a>.  The description of implementations in this section is intended to assist the IETF in its decision processes in progressing drafts to RFCs.  Please note that the listing of any individual implementation here does not imply endorsement by the IETF.  Furthermore, no effort has been spent to verify the information presented here that was supplied by IETF contributors.  This is not intended as, and must not be construed to be, a catalog of available implementations or their features.  Readers are advised to note that other implementations may exist.</p>
 <p id="rfc.section.12.p.3">This information is known to be correct as of the eighth interoperability test event which was held on 2018-03-17 at IETF101.</p>
 <p id="rfc.section.12.p.4">For a few of the implementations, later status information was available as of June 2018.</p>
 <h1 id="rfc.section.12.1"><a href="#rfc.section.12.1">12.1.</a> <a href="#gmail-test-reflector-and-incoming-validation" id="gmail-test-reflector-and-incoming-validation">GMail test reflector and incoming validation</a></h1>
-<p id="rfc.section.12.1.p.1">Organization: Google Description: Internal production implementation with both debug analysis and validating + sealing pass-through function Status of Operation: Production - Incoming Validation Coverage: Full spec implemented as of <a href="#ARC-DRAFT-14">[ARC-DRAFT-14]</a> Licensing: Proprietary - Internal only Implementation Notes:</p>
+<p id="rfc.section.12.1.p.1">Organization: Google<br/> Description: Internal production implementation with both debug analysis and validating + sealing pass-through function<br/> Status of Operation: Production - Incoming Validation<br/> Coverage: Full spec implemented as of <a href="#ARC-DRAFT-14">[ARC-DRAFT-14]</a><br/> Licensing: Proprietary - Internal only<br/> Implementation Notes:</p>
 <p/>
 
 <ul>
@@ -1034,7 +1032,7 @@ EXAMPLE:
 </ul>
 <p id="rfc.section.12.1.p.3">Contact Info: <a href="mailto:arc-discuss@dmarc.org">arc-discuss@dmarc.org</a></p>
 <h1 id="rfc.section.12.2"><a href="#rfc.section.12.2">12.2.</a> <a href="#aol-test-reflector-and-internal-tagging" id="aol-test-reflector-and-internal-tagging">AOL test reflector and internal tagging</a></h1>
-<p id="rfc.section.12.2.p.1">Organization: AOL Description: Internal prototype implementation with both debug analysis and validating + sealing pass-through function Status of Operation: Beta Coverage: ARC Chain validity status checking is operational, but only applied to email addresses enrolled in the test program.  This system conforms to <a href="#ARC-DRAFT-05">[ARC-DRAFT-05]</a> Licensing: Proprietary - Internal only Implementation Notes:</p>
+<p id="rfc.section.12.2.p.1">Organization: AOL<br/> Description: Internal prototype implementation with both debug analysis and validating + sealing pass-through function<br/> Status of Operation: Beta<br/> Coverage: ARC Chain validity status checking is operational, but only applied to email addresses enrolled in the test program.  This system conforms to <a href="#ARC-DRAFT-05">[ARC-DRAFT-05]</a><br/> Licensing: Proprietary - Internal only<br/> Implementation Notes:</p>
 <p/>
 
 <ul>
@@ -1043,15 +1041,15 @@ EXAMPLE:
 </ul>
 <p id="rfc.section.12.2.p.3">Contact Info: <a href="mailto:arc-discuss@dmarc.org">arc-discuss@dmarc.org</a></p>
 <h1 id="rfc.section.12.3"><a href="#rfc.section.12.3">12.3.</a> <a href="#dkimpy" id="dkimpy">dkimpy</a></h1>
-<p id="rfc.section.12.3.p.1">Organization: dkimpy developers/Scott Kitterman Description: Python DKIM package Status of Operation: Production Coverage:</p>
+<p id="rfc.section.12.3.p.1">Organization: dkimpy developers/Scott Kitterman<br/> Description: Python DKIM package<br/> Status of Operation: Production<br/> Coverage:</p>
 <p/>
 
 <ul>
   <li>2017-07-15: The internal test suite is incomplete, but the command line developmental version of validator was demonstrated to interoperate with the Google and AOL implementations during the interop on 2017-07-15 and the released version passes the tests in <a href="#ARC-TEST">[ARC-TEST]</a> <a href="https://github.com/Valimail/arc_test_suite">arc_test_suite</a> with both python and python3.</li>
 </ul>
-<p id="rfc.section.12.3.p.3">Licensing: Open/Other (same as dkimpy package = BCD version 2) Contact Info: https://launchpad.net/dkimpy</p>
+<p id="rfc.section.12.3.p.3">Licensing: Open/Other (same as dkimpy package = BCD version 2)<br/> Contact Info: https://launchpad.net/dkimpy</p>
 <h1 id="rfc.section.12.4"><a href="#rfc.section.12.4">12.4.</a> <a href="#openarc" id="openarc">OpenARC</a></h1>
-<p id="rfc.section.12.4.p.1">Organization: TDP/Murray Kucherawy Description: Implemention of milter functionality related to the OpenDKIM and OpenDMARC packages Status of Operation: Beta Coverage: Built to support <a href="#ARC-DRAFT-14">[ARC-DRAFT-14]</a> Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages) Implementation Notes:</p>
+<p id="rfc.section.12.4.p.1">Organization: TDP/Murray Kucherawy<br/> Description: Implemention of milter functionality related to the OpenDKIM and OpenDMARC packages<br/> Status of Operation: Beta<br/> Coverage: Built to support <a href="#ARC-DRAFT-14">[ARC-DRAFT-14]</a><br/> Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)<br/> Implementation Notes:</p>
 <p/>
 
 <ul>
@@ -1060,7 +1058,7 @@ EXAMPLE:
 </ul>
 <p id="rfc.section.12.4.p.3">Contact Info: <a href="mailto:arc-discuss@dmarc.org">arc-discuss@dmarc.org</a></p>
 <h1 id="rfc.section.12.5"><a href="#rfc.section.12.5">12.5.</a> <a href="#mailman-3x-patch" id="mailman-3x-patch">Mailman 3.x patch</a></h1>
-<p id="rfc.section.12.5.p.1">Organization: Mailman development team Description: Integrated ARC capabilities within the Mailman 3.2 package Status of Operation: Patch submitted Coverage: Based on OpenARC Licensing: Same as mailman package - GPL Implementation Notes:</p>
+<p id="rfc.section.12.5.p.1">Organization: Mailman development team<br/> Description: Integrated ARC capabilities within the Mailman 3.2 package<br/> Status of Operation: Patch submitted<br/> Coverage: Based on OpenARC<br/> Licensing: Same as mailman package - GPL<br/> Implementation Notes:</p>
 <p/>
 
 <ul>
@@ -1068,7 +1066,7 @@ EXAMPLE:
 </ul>
 <p id="rfc.section.12.5.p.3">Contact Info: https://www.gnu.org/software/mailman/contact.html</p>
 <h1 id="rfc.section.12.6"><a href="#rfc.section.12.6">12.6.</a> <a href="#copernicamailerq-web-based-validation" id="copernicamailerq-web-based-validation">Copernica/MailerQ web-based validation</a></h1>
-<p id="rfc.section.12.6.p.1">Organization: Copernica Description: Web-based validation of ARC-signed messages Status of Operation: Beta Coverage: Built to support <a href="#ARC-DRAFT-05">[ARC-DRAFT-05]</a> Licensing: On-line usage only Implementation Notes:</p>
+<p id="rfc.section.12.6.p.1">Organization: Copernica<br/> Description: Web-based validation of ARC-signed messages<br/> Status of Operation: Beta<br/> Coverage: Built to support <a href="#ARC-DRAFT-05">[ARC-DRAFT-05]</a><br/> Licensing: On-line usage only<br/> Implementation Notes:</p>
 <p/>
 
 <ul>
@@ -1079,7 +1077,7 @@ EXAMPLE:
 </ul>
 <p id="rfc.section.12.6.p.3">Contact Info: https://www.copernica.com/</p>
 <h1 id="rfc.section.12.7"><a href="#rfc.section.12.7">12.7.</a> <a href="#rspamd" id="rspamd">Rspamd</a></h1>
-<p id="rfc.section.12.7.p.1">Organization: Rspamd community Description: ARC signing and verification module Status of Operation: Production, though deployment usage is unknown Coverage: Built to support <a href="#ARC-DRAFT-14">[ARC-DRAFT-14]</a> Licensing: Open source Implementation Notes:</p>
+<p id="rfc.section.12.7.p.1">Organization: Rspamd community<br/> Description: ARC signing and verification module<br/> Status of Operation: Production, though deployment usage is unknown<br/> Coverage: Built to support <a href="#ARC-DRAFT-14">[ARC-DRAFT-14]</a><br/> Licensing: Open source<br/> Implementation Notes:</p>
 <p/>
 
 <ul>
@@ -1088,7 +1086,7 @@ EXAMPLE:
 </ul>
 <p id="rfc.section.12.7.p.3">Contact Info: https://rspamd.com/doc/modules/arc.html and https://github.com/vstakhov/rspamd</p>
 <h1 id="rfc.section.12.8"><a href="#rfc.section.12.8">12.8.</a> <a href="#perl-maildkim-module" id="perl-maildkim-module">PERL MAIL::DKIM module</a></h1>
-<p id="rfc.section.12.8.p.1">Organization: FastMail Description: Email domain authentication (sign and/or verify) module, previously included SPF / DKIM / DMARC, now has ARC added Status of Operation: Production, deployment usage unknown Coverage: Built to support <a href="#ARC-DRAFT-10">[ARC-DRAFT-10]</a> Licensing: Open Source Implementation Notes:</p>
+<p id="rfc.section.12.8.p.1">Organization: FastMail<br/> Description: Email domain authentication (sign and/or verify) module, previously included SPF / DKIM / DMARC, now has ARC added<br/> Status of Operation: Production, deployment usage unknown<br/> Coverage: Built to support <a href="#ARC-DRAFT-10">[ARC-DRAFT-10]</a><br/> Licensing: Open Source<br/> Implementation Notes:</p>
 <p/>
 
 <ul>
@@ -1096,7 +1094,7 @@ EXAMPLE:
 </ul>
 <p id="rfc.section.12.8.p.3">Contact Info: http://search.cpan.org/~mbradshaw/Mail-DKIM-0.50/</p>
 <h1 id="rfc.section.12.9"><a href="#rfc.section.12.9">12.9.</a> <a href="#perl-mailmilterauthentication-module" id="perl-mailmilterauthentication-module">PERL Mail::Milter::Authentication module</a></h1>
-<p id="rfc.section.12.9.p.1">Organization: FastMail Description: Email domain authentication milter, uses MAIL::DKIM (see above) Status of Operation: Intial validation completed during IETF99 hackathon with some follow-on work during the week Coverage: Built to support <a href="#ARC-DRAFT-14">[ARC-DRAFT-14]</a> Licensing: Open Source Implementation Notes:</p>
+<p id="rfc.section.12.9.p.1">Organization: FastMail<br/> Description: Email domain authentication milter, uses MAIL::DKIM (see above)<br/> Status of Operation: Intial validation completed during IETF99 hackathon with some follow-on work during the week<br/> Coverage: Built to support <a href="#ARC-DRAFT-14">[ARC-DRAFT-14]</a><br/> Licensing: Open Source<br/> Implementation Notes:</p>
 <p/>
 
 <ul>
@@ -1105,7 +1103,7 @@ EXAMPLE:
 </ul>
 <p id="rfc.section.12.9.p.3">Contact Info: https://github.com/fastmail/authentication_milter</p>
 <h1 id="rfc.section.12.10"><a href="#rfc.section.12.10">12.10.</a> <a href="#sympa-list-manager" id="sympa-list-manager">Sympa List Manager</a></h1>
-<p id="rfc.section.12.10.p.1">Organization: Sympa Dev Community Description: Work in progress Status of Operation: Work in progress Coverage: unknown Licensing: open source Implementation Notes:</p>
+<p id="rfc.section.12.10.p.1">Organization: Sympa Dev Community<br/> Description: Work in progress<br/> Status of Operation: Work in progress<br/> Coverage: unknown<br/> Licensing: open source<br/> Implementation Notes:</p>
 <p/>
 
 <ul>
@@ -1113,7 +1111,7 @@ EXAMPLE:
 </ul>
 <p id="rfc.section.12.10.p.3">Contact Info: https://github.com/sympa-community</p>
 <h1 id="rfc.section.12.11"><a href="#rfc.section.12.11">12.11.</a> <a href="#oracle-messaging-server" id="oracle-messaging-server">Oracle Messaging Server</a></h1>
-<p id="rfc.section.12.11.p.1">Organization: Oracle Description: Status of Operation: Intial development work during IETF99 hackathon. Framework code is complete, crypto functionality requires integration with libsodium Coverage: Work in progress Licensing: Unknown Implementation Notes:</p>
+<p id="rfc.section.12.11.p.1">Organization: Oracle<br/> Description:<br/> Status of Operation: Intial development work during IETF99 hackathon. Framework code is complete, crypto functionality requires integration with libsodium<br/> Coverage: Work in progress<br/> Licensing: Unknown<br/> Implementation Notes:</p>
 <p/>
 
 <ul>
@@ -1121,7 +1119,7 @@ EXAMPLE:
 </ul>
 <p id="rfc.section.12.11.p.3">Contact Info: Chris Newman, Oracle</p>
 <h1 id="rfc.section.12.12"><a href="#rfc.section.12.12">12.12.</a> <a href="#messagesystems-momentum-and-powermta-platforms" id="messagesystems-momentum-and-powermta-platforms">MessageSystems Momentum and PowerMTA platforms</a></h1>
-<p id="rfc.section.12.12.p.1">Organization: MessageSystems/SparkPost Description: OpenARC integration into the LUA-enabled Momentum processing space Status of Operation: Beta Coverage: Same as OpenARC Licensing: Unknown Implementation Notes:</p>
+<p id="rfc.section.12.12.p.1">Organization: MessageSystems/SparkPost<br/> Description: OpenARC integration into the LUA-enabled Momentum processing space<br/> Status of Operation: Beta<br/> Coverage: Same as OpenARC<br/> Licensing: Unknown<br/> Implementation Notes:</p>
 <p/>
 
 <ul>
@@ -1129,11 +1127,11 @@ EXAMPLE:
 </ul>
 <p id="rfc.section.12.12.p.3">Contact Info: TBD</p>
 <h1 id="rfc.section.12.13"><a href="#rfc.section.12.13">12.13.</a> <a href="#exim" id="exim">Exim</a></h1>
-<p id="rfc.section.12.13.p.1">Organization: Exim developers Status of Operation: Operational; requires specific enabling for compile.  Coverage: Full spec implemented as of <a href="#ARC-DRAFT-13">[ARC-DRAFT-13]</a> Licensing: GPL Contact Info: exim-users@exim.org Implementation notes:</p>
+<p id="rfc.section.12.13.p.1">Organization: Exim developers<br/> Status of Operation: Operational; requires specific enabling for compile.<br/> Coverage: Full spec implemented as of <a href="#ARC-DRAFT-13">[ARC-DRAFT-13]</a><br/> Licensing: GPL<br/> Contact Info: exim-users@exim.org<br/> Implementation notes:</p>
 <p/>
 
 <ul>
-  <li>Exim 4.91</li>
+  <li>Implemented as of Exim 4.91</li>
 </ul>
 <h1 id="rfc.references"><a href="#rfc.references">13.</a> References</h1>
 <h1 id="rfc.references.1"><a href="#rfc.references.1">13.1.</a> Normative References</h1>
@@ -1261,15 +1259,15 @@ EXAMPLE:
     </tr>
     <tr>
       <td class="reference">
-        <b id="RFC6982">[RFC6982]</b>
-      </td>
-      <td class="top"><a>Sheffer, Y.</a> and <a>A. Farrel</a>, "<a href="http://tools.ietf.org/html/rfc6982">Improving Awareness of Running Code: The Implementation Status Section</a>", RFC 6982, DOI 10.17487/RFC6982, July 2013.</td>
-    </tr>
-    <tr>
-      <td class="reference">
         <b id="RFC7489">[RFC7489]</b>
       </td>
       <td class="top"><a>Kucherawy, M.</a> and <a>E. Zwicky</a>, "<a href="http://tools.ietf.org/html/rfc7489">Domain-based Message Authentication, Reporting, and Conformance (DMARC)</a>", RFC 7489, DOI 10.17487/RFC7489, March 2015.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC7942">[RFC7942]</b>
+      </td>
+      <td class="top"><a>Sheffer, Y.</a> and <a>A. Farrel</a>, "<a href="http://tools.ietf.org/html/rfc7942">Improving Awareness of Running Code: The Implementation Status Section</a>", BCP 205, RFC 7942, DOI 10.17487/RFC7942, July 2016.</td>
     </tr>
     <tr>
       <td class="reference">
@@ -1398,9 +1396,9 @@ EXAMPLE:
 </div><div class="avoidbreak">
   <address class="vcard">
 	<span class="vcardline">
-	  <span class="fn">Tim Draegon</span> (editor)
+	  <span class="fn">Tim Draegen</span> (editor)
 	  <span class="n hidden">
-		<span class="family-name">Draegon</span>
+		<span class="family-name">Draegen</span>
 	  </span>
 	</span>
 	<span class="org vcardline">dmarcian</span>

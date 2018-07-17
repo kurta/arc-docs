@@ -1,7 +1,7 @@
 ﻿---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-15.2
+docname: draft-ietf-dmarc-arc-protocol-16
 date: 2018-07-17
 
 # stand_alone: true
@@ -72,7 +72,7 @@ normative:
   RFC8174:
 
 informative:
-  RFC6982:
+  RFC7942:
   RFC7489:
   RFC7960:
   ENHANCED-STATUS:
@@ -1104,11 +1104,11 @@ landscape of "useful" information over time.
 # Implementation Status {#implstat}
 
 \[\[ Note to the RFC Editor: Please remove this section before
-publication along with the reference to {{RFC6982}}. ]]
+publication along with the reference to {{RFC7942}}. ]]
 
 This section records the status of known implementations of the protocol
 defined by this specification at the time of posting of this Internet-Draft,
-and is based on a proposal described in {{RFC6982}}.  The description of
+and is based on a proposal described in {{RFC7942}}.  The description of
 implementations in this section is intended to assist the IETF in its decision
 processes in progressing drafts to RFCs.  Please note that the listing of any
 individual implementation here does not imply endorsement by the IETF.

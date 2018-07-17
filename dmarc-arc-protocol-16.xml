@@ -14,7 +14,7 @@
 <!ENTITY RFC7405 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7405.xml">
 <!ENTITY RFC7601 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7601.xml">
 <!ENTITY RFC8174 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml">
-<!ENTITY RFC6982 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6982.xml">
+<!ENTITY RFC7942 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7942.xml">
 <!ENTITY RFC7489 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7489.xml">
 <!ENTITY RFC7960 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7960.xml">
 <!ENTITY SELF "[I-D.ARC]">
@@ -24,7 +24,7 @@
 <?rfc sortrefs="yes"?>
 <?rfc symrefs="yes"?>
 
-<rfc ipr="trust200902" docName="draft-ietf-dmarc-arc-protocol-15" category="exp">
+<rfc ipr="trust200902" docName="draft-ietf-dmarc-arc-protocol-16" category="exp">
 
   <front>
     <title abbrev="ARC-Protocol">Authenticated Received Chain (ARC) Protocol</title>
@@ -60,14 +60,14 @@
         <email>superuser@gmail.com</email>
       </address>
     </author>
-    <author initials="T." surname="Draegon" fullname="Tim Draegon" role="editor">
+    <author initials="T." surname="Draegen" fullname="Tim Draegen" role="editor">
       <organization>dmarcian</organization>
       <address>
         <email>tim@dmarcian.com</email>
       </address>
     </author>
 
-    <date year="2018" month="June" day="24"/>
+    <date year="2018" month="July" day="17"/>
 
     <area>art</area>
     <workgroup>DMARC Working Group</workgroup>
@@ -115,7 +115,7 @@ even the intermediary handler itself.</t>
 Mail Handlers to add their authentication processing results to a message’s
 ordered set of processing results. ARC encapsulates processing results in a
 DKIM signature derivative to grant other handlers the ability to verify the
-authenticity of each individual processing results as well as the aggregate
+authenticity of the individual processing results as well as the aggregate
 set and sequence of results.</t>
 
 <t>Ordered sets of processing results can be used by ARC-enabled Internet Mail
@@ -123,15 +123,6 @@ Handlers to inform message handling disposition, to identify where alteration
 of message content might have occurred, and to provide additional trace
 information for use in understanding message handling paths.</t>
 
-<section anchor="note-to-reviewers-in-the-dmarc-wg" title="Note to Reviewers in the DMARC WG">
-
-<t>[[ Note: This section is editorial to the WG. Will be removed for final
-version. ]]</t>
-
-<t>This version of the draft has been extensively reorganized for readability.
-No changes to the wire protocol or specification are intended from <xref target="ARC-DRAFT-14"/>.</t>
-
-</section>
 </section>
 <section anchor="general-concepts" title="General Concepts">
 
@@ -144,8 +135,12 @@ state of evidence and to document all processing steps.</t>
 <t>In ARC’s situation, the “evidence” is a message’s authentication state at any
 point along the delivery path between origination and final delivery.
 Authentication state can change when intermediate handlers modify message
-content, route messages through unforeseen paths, or change envelope
-information.</t>
+content (headers and/or body content), route messages through unforeseen paths,
+or change envelope information.</t>
+
+<t>The authentication state of a message is determined upon receipt of a message
+and documented in the Authentication-Results header field(s). ARC extends this
+mechanism to survive transit through intermediary ADMDs.</t>
 
 </section>
 <section anchor="custody" title="Custody">
@@ -183,7 +178,7 @@ responsible for the changes) can be tolerated.</t>
 
 <t>Readers should to be familiar with the contents, core concepts, and definitions
 found in <xref target="RFC5598"/>. The potential roles of intermediaries in the delivery of
-email is directly relevant.</t>
+email are directly relevant.</t>
 
 <t>Language, syntax (including some ABNF constructs), and concepts are imported
 from DKIM <xref target="RFC6376"/>. Specific references to DKIM are made throughout this
@@ -211,7 +206,7 @@ lower case as plain English words, absent their normative meanings.</t>
 
 <section anchor="arc-set-defn" title="ARC Set">
 
-<t>Section <xref target="hdr-defn"/> introduces three (3) ARC header fields. Together, the 3 header
+<t><xref target="hdr-defn"/> introduces three (3) ARC header fields. Together, the 3 header
 fields compose a single “ARC Set”. An ARC Set provides the means for an Internet
 Mail Handler to attach authentication state to a message in a manner that can
 be verified by future handlers. A single message can contain multiple ARC
@@ -248,7 +243,7 @@ Chain of Custody.</t>
 <t>A Validator is an ARC-enabled Internet Mail Handler that evaluates an
 Authenticated Received Chain for validity and content. The process of
 evaluation of the individual ARC Sets that compose an Authenticated Received
-Chain is described in Section <xref target="validate-actions"/>.</t>
+Chain is described in <xref target="validate-actions"/>.</t>
 
 <t>In General Concept terms, a Validator inspects the Chain of Custody to
 determine the content and validity of individual Evidence supplied by
@@ -303,7 +298,7 @@ Authentication-Results field <xref target="I-D-7601bis"/>, with two (2) differen
 <t><list style="symbols">
   <t>the name of the header field itself;</t>
   <t>the presence of the “instance tag”. Additional information on the “instance
-tag” can be found in Section <xref target="i-defn"/>.</t>
+tag” can be found in <xref target="i-defn"/>.</t>
 </list></t>
 
 <t>The formal ABNF for the AAR header field is:</t>
@@ -331,11 +326,14 @@ field <xref target="RFC6376"/>, with three (3) differences:</t>
 
 <t><list style="symbols">
   <t>the name of the header field itself;</t>
-  <t>no version tag (“v”) is defined for the AMS header. As required for undefined
+  <t>no version tag (“v”) is defined for the AMS header field. As required 
+for undefined
 tags (in <xref target="RFC6376"/>), if seen, a version tag MUST be ignored;</t>
   <t>the presence of the “instance tag”. Additional information on the “instance
-tag” can be found in Section <xref target="i-defn"/>. The instance tag replaces the DKIM 
-“AUID” tag.</t>
+tag” can be found in <xref target="i-defn"/>. The instance tag replaces the DKIM 
+“AUID” tag;</t>
+  <t>when building the header field list to be signed, ARC-related headers MUST
+be submitted to the hash function in increasing instance order.</t>
 </list></t>
 
 <t>ARC places no requirements on the selectors and/or domains used for the AMS
@@ -352,11 +350,11 @@ arc-message-signature = "ARC-Message-Signature:" [CFWS] arc-ams-info
 
 <t><list style="symbols">
   <t>AMS header fields are added by ARC-participating ADMDs as messages exit the
-ADMD. AMS header fields should be attached so that any modifications made by
+ADMD. AMS header fields SHOULD be attached so that any modifications made by
 the ADMD are included in the signature of the AMS header field.</t>
   <t>Authentication-Results header fields MUST NOT be included in AMS signatures
-as they are likely to be deleted by downstream ADMDs (per Section 5 of
-<xref target="I-D-7601bis"/>).</t>
+as they are likely to be deleted by downstream ADMDs (per 
+<xref target="I-D-7601bis"/> Section 5).</t>
   <t>ARC-related header fields (ARC-Authentication-Results, ARC-Message-Signature,
 ARC-Seal) MUST NOT be included in the list of header fields covered by the
 signature of the AMS header field.</t>
@@ -382,17 +380,17 @@ Custodians.</t>
 
 <t><list style="symbols">
   <t>the presence of the “instance tag”. Additional information on the “instance
-tag” can be found in Section <xref target="i-defn"/>.</t>
+tag” can be found in <xref target="i-defn"/>.</t>
   <t>the signature of the AS header field does not cover the body of the
 message and therefore there is no ‘bh’ tag. The signature of the AS header 
-field only covers specific header fields as defined in Section <xref target="as-hdrs"/>.</t>
+field only covers specific header fields as defined in <xref target="as-hdrs"/>.</t>
   <t>no body canonicalization is performed as the AS signature does not cover the
 body of a message.</t>
   <t>only “relaxed” header canonicalization (<xref target="RFC6376"/> section 3.4.2) is used.</t>
-  <t>the only supported tags are “i” (from Section <xref target="i-defn"/> of this document), and
-“a”, “b”, “d, “s”, “t” from Section 3.5 of <xref target="RFC6376"/>. Note especially that
-the DKIM “h” header is NOT allowed and if found, MUST result in a cv status
-of “fail” (for more information see <xref target="as-hdrs"/>;</t>
+  <t>the only supported tags are “i” (from <xref target="i-defn"/> of this document), and
+“a”, “b”, “d, “s”, “t” from <xref target="RFC6376"/> Section 3.5. Note especially that
+the DKIM “h” tag is NOT allowed and if found, MUST result in a cv status
+of “fail” (for more information see <xref target="as-hdrs"/>);</t>
   <t>an additional tag, “cv” (“seal-cv-tag” in the ARC-Seal ABNF definition) is
 used to communicate Chain Validation Status to subsequent ADMDs.</t>
 </list></t>
@@ -416,7 +414,7 @@ ARC Headers of an ARC Set share the same “instance” value.</t>
 
 <t>By adding all ARC Headers to a message, an ARC Sealer adds an ARC Set to a
 message. A description of how Sealers add an ARC Set to a message is found in
-Section <xref target="sealer-actions"/>.</t>
+<xref target="sealer-actions"/>.</t>
 
 <section anchor="i-defn" title="Instance Tags">
 
@@ -428,6 +426,11 @@ addition of an ARC Set. Through the incremental values of instance tags, an ARC
 Validator can determine the order in which ARC Sets were added to a message.</t>
 
 <t>Instance tag values can range from 1-50 (inclusive).</t>
+
+<t><spanx style="emph">INFORMATIONAL:</spanx> The upper limit of 50 was picked based on some initial
+observations reported by early working group members with a safety margin
+multiple added on top to support the vast majority of all intermediary mail
+flows.</t>
 
 <t>Valid ARC Sets MUST have exactly one instance of each ARC Header field (AAR,
 AMS, and AS) for a given instance value and signing algorithm.</t>
@@ -508,10 +511,10 @@ actions must be taken by an ARC Sealer when presented with a message:</t>
   exists, the instance value is 1.</t>
   <t>Using the calculated instance value, generate and attach to the message in
   the following order:</t>
-  <t>An ARC-Authentication-Results header field as defined in Section <xref target="aar-defn"/>.</t>
-  <t>An ARC-Message-Signature header field as defined in Section <xref target="ams-defn"/>.</t>
-  <t>An ARC-Seal header field using the AS definition found in Section <xref target="as-defn"/>, 
-  the method described in Section <xref target="as-hdrs"/>, and the Chain Validation Status as 
+  <t>An ARC-Authentication-Results header field as defined in <xref target="aar-defn"/>.</t>
+  <t>An ARC-Message-Signature header field as defined in <xref target="ams-defn"/>.</t>
+  <t>An ARC-Seal header field using the AS definition found in <xref target="as-defn"/>, 
+  the method described in <xref target="as-hdrs"/>, and the Chain Validation Status as 
   determined during ARC validation.</t>
 </list></t>
 
@@ -535,7 +538,7 @@ following order:</t>
 to messages (<xref target="RFC6376"/>, section 3.7).</t>
 
 <t>Note that when an Authenticated Received Chain has failed validation, the
-signing scope for the ARC-Seal is modified (see Section <xref target="cv-fail-case"/>).</t>
+signing scope for the ARC-Seal is modified (see <xref target="cv-fail-case"/>).</t>
 
 </section>
 <section anchor="cv-fail-case" title="Marking and Sealing “cv=fail” (Invalid) Chains">
@@ -564,7 +567,7 @@ re-establishment, see <xref target="ARC-USAGE"/>.</t>
 
 <t>ARC is not solely intended for perimeter MTAs. Any mediator (<xref target="RFC5598"/>,
 section 5) that modifies a message may Seal its own changes. For additional
-information, see Section <xref target="trust-boundaries"/>.</t>
+information, see <xref target="trust-boundaries"/>.</t>
 
 </section>
 <section anchor="sealing-is-always-safe" title="Sealing is Always Safe">
@@ -579,7 +582,7 @@ of authentication failures. Specifically:</t>
 existing Authenticated Received Chain.</t>
   <t>Sealing an Authenticated Received Chain when a message has not been modified
 does not negatively affect the chain.</t>
-  <t>Validating a message exposes no new threat vectors (see Section 
+  <t>Validating a message exposes no new threat vectors (see 
 <xref target="security-consider"/>).</t>
   <t>An ADMD may choose to Seal all inbound messages whether or not a message has
 been modified or will be retransmitted.</t>
@@ -668,10 +671,10 @@ restriction which prevents chain continuation or re-establishment, see
 </section>
 <section anchor="responding-to-arc-validation-failures-during-the-smtp-transaction" title="Responding to ARC Validation Failures During the SMTP Transaction">
 
-<t>If an ARC Validator determines that the Authenticated Received Chain has
-failed, the Validator MAY signal the breakage through the extended SMTP
-response code 5.7.7 <xref target="RFC3463"/> “message integrity failure” <xref target="ENHANCED-STATUS"/>
-and corresponding SMTP response code.</t>
+<t>If an ARC Validator determines that the incoming message fails authentication
+checks (potentially including ARC validation), the Validator MAY signal the
+breakage through the extended SMTP response code 5.7.7 <xref target="RFC3463"/> “message
+integrity failure” <xref target="ENHANCED-STATUS"/> and corresponding SMTP response code.</t>
 
 </section>
 </section>
@@ -695,11 +698,11 @@ intermediate processing.</t>
 </section>
 <section anchor="communication-of-validation-results" title="Communication of Validation Results">
 
-<t>Chain Validation Status (described in Section <xref target="cv-defn"/>) is communicated via
+<t>Chain Validation Status (described in <xref target="cv-defn"/>) is communicated via
 Authentication-Results (and AAR) headers using the auth method “arc”. This auth
-method is described in Section <xref target="iana-auth"/>.</t>
+method is described in <xref target="iana-auth"/>.</t>
 
-<t>If necessary data is available, the ptypes and properties defined in Section
+<t>If necessary data is available, the ptypes and properties defined in 
 <xref target="iana-ptypes"/> SHOULD be recorded in an Authentication-Results header field:</t>
 
 <t><list style="symbols">
@@ -821,7 +824,7 @@ Received Chain when determining if a message is DMARC compliant.</t>
 
 <t>When an Authenticated Received Chain is used to determine message disposition,
 the DMARC processor can communicate this local policy decision to Domain Owners
-as described in Section <xref target="dmarc-rpt"/>.</t>
+as described in <xref target="dmarc-rpt"/>.</t>
 
 </section>
 <section anchor="dmarc-rpt" title="DMARC Reporting">
@@ -885,7 +888,9 @@ DMARC), ARC makes no claims about the semantic content of messages.</t>
 <section anchor="increased-header-size" title="Increased Header Size">
 
 <t>Inclusion of Authenticated Received Chains into messages may cause issues for
-older or constrained MTAs due to increased total header size.</t>
+older or constrained MTAs due to increased total header size. Large header
+blocks, in general, may cause failures to deliver or other outage scenarios for
+such MTAs. ARC itself would not cause problems.</t>
 
 </section>
 <section anchor="dns-impact" title="DNS Operations">
@@ -950,7 +955,7 @@ and following the same signing scope guidance from
 </section>
 <section anchor="iana-considerations" title="IANA Considerations">
 
-<t>[[ <spanx style="strong">Note to the RFC Editors:</spanx> dkim header.s is defined both here and in
+<t>[[ <spanx style="strong">Note to the RFC Editors:</spanx> “dkim - header - s” is defined both here and in
 <xref target="I-D-7601bis"/>. Please delete the overlap from whichever document goes through
 the publication process after the other. ]]</t>
 
@@ -964,9 +969,9 @@ several status codes.</t>
 Authentication Result Names” registry:</t>
 
 <t><list style="symbols">
-  <t>Auth Method : arc
-Code: “none”, “pass”, “fail”
-Specification: &SELF; Section 2.2
+  <t>Auth Method : arc<vspace />
+Code: “none”, “pass”, “fail”<vspace />
+Specification: &SELF; 2.2<vspace />
 Status: active</t>
 </list></t>
 
@@ -977,26 +982,27 @@ Status: active</t>
 most recently defined in <xref target="I-D-7601bis"/>:</t>
 
 <t><list style="symbols">
-  <t>Method: arc
-Definition: &SELF;
-ptype: smtp
-Property: client-ip
-Value: IP address of originating SMTP connection
-Status: active
+  <t>Method: arc<vspace />
+Definition: &SELF;<vspace />
+ptype: smtp<vspace />
+Property: client-ip<vspace />
+Value: IP address of originating SMTP connection<vspace />
+Status: active<vspace />
 Version: 1</t>
-  <t>Method: arc
-Definition: &SELF;
-ptype: header
-Property: oldest-pass
-Value: The instance id of the oldest validating AMS, or 0 if they all pass (see Sectionn 4)
-Status: active
+  <t>Method: arc<vspace />
+Definition: &SELF;<vspace />
+ptype: header<vspace />
+Property: oldest-pass<vspace />
+Value: The instance id of the oldest validating AMS, or 0 if they all pass 
+  (see <xref target="validate-actions"/>)<vspace />
+Status: active<vspace />
 Version: 1</t>
-  <t>Method: dkim
-Definition: <xref target="RFC6376"/>
-ptype: header
-Property: s
-Value: value of signature “s” tag
-Status: active
+  <t>Method: dkim<vspace />
+Definition: <xref target="RFC6376"/><vspace />
+ptype: header<vspace />
+Property: s<vspace />
+Value: value of signature “s” tag<vspace />
+Status: active<vspace />
 Version: 1</t>
 </list></t>
 
@@ -1007,23 +1013,23 @@ Version: 1</t>
 Header Field Registry”, as follows:</t>
 
 <t><list style="symbols">
-  <t>Header field name: ARC-Seal
-Applicable protocol: mail
-Status: draft
-Author/Change controller: IETF
-Specification document(s): &SELF;
+  <t>Header field name: ARC-Seal<vspace />
+Applicable protocol: mail<vspace />
+Status: draft<vspace />
+Author/Change controller: IETF<vspace />
+Specification document(s): &SELF;<vspace />
 Related information: <xref target="RFC6376"/></t>
-  <t>Header field name: ARC-Message-Signature
-Applicable protocol: mail
-Status: draft
-Author/Change controller: IETF
-Specification document(s): &SELF;
+  <t>Header field name: ARC-Message-Signature<vspace />
+Applicable protocol: mail<vspace />
+Status: draft<vspace />
+Author/Change controller: IETF<vspace />
+Specification document(s): &SELF;<vspace />
 Related information: <xref target="RFC6376"/></t>
-  <t>Header field name: ARC-Authentication-Results
-Applicable protocol: mail
-Status: standard
-Author/Change controller: IETF
-Specification document(s): &SELF;
+  <t>Header field name: ARC-Authentication-Results<vspace />
+Applicable protocol: mail<vspace />
+Status: standard<vspace />
+Author/Change controller: IETF<vspace />
+Specification document(s): &SELF;<vspace />
 Related information: <xref target="I-D-7601bis"/></t>
 </list></t>
 
@@ -1052,7 +1058,7 @@ for improved decision making when processing legitimate messages.</t>
 <section anchor="failure-considerations" title="Failure Considerations">
 
 <t>ARC should function without introducing significant new vectors for abuse (see
-Section <xref target="security-consider"/>). If unforseen vectors are enabled by ARC, then
+<xref target="security-consider"/>). If unforseen vectors are enabled by ARC, then
 this protocol will be a failure. Note that weaknesses inherent in the mail
 protocols ARC is built upon (such as DKIM replay attacks and other known
 issues) are not new vectors which can be attributed to this specification.</t>
@@ -1075,7 +1081,7 @@ malicious actors trying to craft or replay malicious chains.</t>
 
 <t>Longer Authenticated Received Chains will require more queries to retrieve the
 keys for validating the chain. While this is not believed to be a security
-issue (see Section <xref target="dns-impact"/>), it is unclear how much overhead will truly
+issue (see <xref target="dns-impact"/>), it is unclear how much overhead will truly
 be added.  This is similar to some of the initial processing and query load
 concerns which were debated at the time of the DKIM specification development.</t>
 
@@ -1121,11 +1127,11 @@ landscape of “useful” information over time.</t>
 <section anchor="implstat" title="Implementation Status">
 
 <t>[[ Note to the RFC Editor: Please remove this section before
-publication along with the reference to <xref target="RFC6982"/>. ]]</t>
+publication along with the reference to <xref target="RFC7942"/>. ]]</t>
 
 <t>This section records the status of known implementations of the protocol
 defined by this specification at the time of posting of this Internet-Draft,
-and is based on a proposal described in <xref target="RFC6982"/>.  The description of
+and is based on a proposal described in <xref target="RFC7942"/>.  The description of
 implementations in this section is intended to assist the IETF in its decision
 processes in progressing drafts to RFCs.  Please note that the listing of any
 individual implementation here does not imply endorsement by the IETF.
@@ -1142,12 +1148,12 @@ of June 2018.</t>
 
 <section anchor="gmail-test-reflector-and-incoming-validation" title="GMail test reflector and incoming validation">
 
-<t>Organization: Google
+<t>Organization: Google<vspace />
    Description: Internal production implementation with both debug
-     analysis and validating + sealing pass-through function
-   Status of Operation: Production - Incoming Validation
-   Coverage: Full spec implemented as of <xref target="ARC-DRAFT-14"/>
-   Licensing: Proprietary - Internal only
+     analysis and validating + sealing pass-through function<vspace />
+   Status of Operation: Production - Incoming Validation<vspace />
+   Coverage: Full spec implemented as of <xref target="ARC-DRAFT-14"/><vspace />
+   Licensing: Proprietary - Internal only<vspace />
    Implementation Notes:</t>
 
 <t><list style="symbols">
@@ -1159,14 +1165,14 @@ of June 2018.</t>
 </section>
 <section anchor="aol-test-reflector-and-internal-tagging" title="AOL test reflector and internal tagging">
 
-<t>Organization: AOL
+<t>Organization: AOL<vspace />
   Description: Internal prototype implementation with both debug
-    analysis and validating + sealing pass-through function
-  Status of Operation: Beta
+    analysis and validating + sealing pass-through function<vspace />
+  Status of Operation: Beta<vspace />
   Coverage: ARC Chain validity status checking is operational, but only
     applied to email addresses enrolled in the test program.
-    This system conforms to <xref target="ARC-DRAFT-05"/>
-  Licensing: Proprietary - Internal only
+    This system conforms to <xref target="ARC-DRAFT-05"/><vspace />
+  Licensing: Proprietary - Internal only<vspace />
   Implementation Notes:</t>
 
 <t><list style="symbols">
@@ -1183,9 +1189,9 @@ of June 2018.</t>
 </section>
 <section anchor="dkimpy" title="dkimpy">
 
-<t>Organization: dkimpy developers/Scott Kitterman
-   Description: Python DKIM package
-   Status of Operation: Production
+<t>Organization: dkimpy developers/Scott Kitterman<vspace />
+   Description: Python DKIM package<vspace />
+   Status of Operation: Production<vspace />
    Coverage:</t>
 
 <t><list style="symbols">
@@ -1196,18 +1202,18 @@ of June 2018.</t>
    <eref target="https://github.com/Valimail/arc_test_suite">arc_test_suite</eref> with both python and python3.</t>
 </list></t>
 
-<t>Licensing: Open/Other (same as dkimpy package = BCD version 2)
+<t>Licensing: Open/Other (same as dkimpy package = BCD version 2)<vspace />
    Contact Info: https://launchpad.net/dkimpy</t>
 
 </section>
 <section anchor="openarc" title="OpenARC">
 
-<t>Organization: TDP/Murray Kucherawy
+<t>Organization: TDP/Murray Kucherawy<vspace />
   Description: Implemention of milter functionality related to the OpenDKIM
-    and OpenDMARC packages
-  Status of Operation: Beta
-  Coverage: Built to support <xref target="ARC-DRAFT-14"/>
-  Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)
+    and OpenDMARC packages<vspace />
+  Status of Operation: Beta<vspace />
+  Coverage: Built to support <xref target="ARC-DRAFT-14"/><vspace />
+  Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)<vspace />
   Implementation Notes:</t>
 
 <t><list style="symbols">
@@ -1227,11 +1233,11 @@ of June 2018.</t>
 </section>
 <section anchor="mailman-3x-patch" title="Mailman 3.x patch">
 
-<t>Organization: Mailman development team
-  Description: Integrated ARC capabilities within the Mailman 3.2 package
-  Status of Operation: Patch submitted
-  Coverage: Based on OpenARC
-  Licensing: Same as mailman package - GPL
+<t>Organization: Mailman development team<vspace />
+  Description: Integrated ARC capabilities within the Mailman 3.2 package<vspace />
+  Status of Operation: Patch submitted<vspace />
+  Coverage: Based on OpenARC<vspace />
+  Licensing: Same as mailman package - GPL<vspace />
   Implementation Notes:</t>
 
 <t><list style="symbols">
@@ -1245,11 +1251,11 @@ of June 2018.</t>
 </section>
 <section anchor="copernicamailerq-web-based-validation" title="Copernica/MailerQ web-based validation">
 
-<t>Organization: Copernica
-  Description: Web-based validation of ARC-signed messages
-  Status of Operation: Beta
-  Coverage: Built to support <xref target="ARC-DRAFT-05"/>
-  Licensing: On-line usage only
+<t>Organization: Copernica<vspace />
+  Description: Web-based validation of ARC-signed messages<vspace />
+  Status of Operation: Beta<vspace />
+  Coverage: Built to support <xref target="ARC-DRAFT-05"/><vspace />
+  Licensing: On-line usage only<vspace />
   Implementation Notes:</t>
 
 <t><list style="symbols">
@@ -1267,11 +1273,11 @@ listed in this section.</t>
 </section>
 <section anchor="rspamd" title="Rspamd">
 
-<t>Organization: Rspamd community
-  Description: ARC signing and verification module
-  Status of Operation: Production, though deployment usage is unknown
-  Coverage: Built to support <xref target="ARC-DRAFT-14"/>
-  Licensing: Open source
+<t>Organization: Rspamd community<vspace />
+  Description: ARC signing and verification module<vspace />
+  Status of Operation: Production, though deployment usage is unknown<vspace />
+  Coverage: Built to support <xref target="ARC-DRAFT-14"/><vspace />
+  Licensing: Open source<vspace />
   Implementation Notes:</t>
 
 <t><list style="symbols">
@@ -1285,12 +1291,12 @@ listed in this section.</t>
 </section>
 <section anchor="perl-maildkim-module" title="PERL MAIL::DKIM module">
 
-<t>Organization: FastMail
-  Description: Email domain authentication (sign and/or verify) module, previously included SPF / DKIM / DMARC,
-now has ARC added
-  Status of Operation: Production, deployment usage unknown
-  Coverage: Built to support <xref target="ARC-DRAFT-10"/>
-  Licensing: Open Source
+<t>Organization: FastMail<vspace />
+  Description: Email domain authentication (sign and/or verify) module, 
+previously included SPF / DKIM / DMARC, now has ARC added<vspace />
+  Status of Operation: Production, deployment usage unknown<vspace />
+  Coverage: Built to support <xref target="ARC-DRAFT-10"/><vspace />
+  Licensing: Open Source<vspace />
   Implementation Notes:</t>
 
 <t><list style="symbols">
@@ -1302,12 +1308,12 @@ now has ARC added
 </section>
 <section anchor="perl-mailmilterauthentication-module" title="PERL Mail::Milter::Authentication module">
 
-<t>Organization: FastMail
-  Description: Email domain authentication milter, uses MAIL::DKIM (see above)
+<t>Organization: FastMail<vspace />
+  Description: Email domain authentication milter, uses MAIL::DKIM (see above)<vspace />
   Status of Operation: Intial validation completed during IETF99 hackathon with some follow-on work 
-  during the week
-  Coverage: Built to support <xref target="ARC-DRAFT-14"/>
-  Licensing: Open Source
+  during the week<vspace />
+  Coverage: Built to support <xref target="ARC-DRAFT-14"/><vspace />
+  Licensing: Open Source<vspace />
   Implementation Notes:</t>
 
 <t><list style="symbols">
@@ -1321,11 +1327,11 @@ now has ARC added
 </section>
 <section anchor="sympa-list-manager" title="Sympa List Manager">
 
-<t>Organization: Sympa Dev Community
-  Description: Work in progress
-  Status of Operation: Work in progress
-  Coverage: unknown
-  Licensing: open source
+<t>Organization: Sympa Dev Community<vspace />
+  Description: Work in progress<vspace />
+  Status of Operation: Work in progress<vspace />
+  Coverage: unknown<vspace />
+  Licensing: open source<vspace />
   Implementation Notes:</t>
 
 <t><list style="symbols">
@@ -1337,12 +1343,12 @@ now has ARC added
 </section>
 <section anchor="oracle-messaging-server" title="Oracle Messaging Server">
 
-<t>Organization: Oracle
-  Description:
+<t>Organization: Oracle<vspace />
+  Description:<vspace />
   Status of Operation: Intial development work during IETF99 hackathon. Framework code is complete,
-    crypto functionality requires integration with libsodium
-  Coverage: Work in progress
-  Licensing: Unknown
+    crypto functionality requires integration with libsodium<vspace />
+  Coverage: Work in progress<vspace />
+  Licensing: Unknown<vspace />
   Implementation Notes:</t>
 
 <t><list style="symbols">
@@ -1354,11 +1360,11 @@ now has ARC added
 </section>
 <section anchor="messagesystems-momentum-and-powermta-platforms" title="MessageSystems Momentum and PowerMTA platforms">
 
-<t>Organization: MessageSystems/SparkPost
-  Description: OpenARC integration into the LUA-enabled Momentum processing space
-  Status of Operation: Beta
-  Coverage: Same as OpenARC
-  Licensing: Unknown
+<t>Organization: MessageSystems/SparkPost<vspace />
+  Description: OpenARC integration into the LUA-enabled Momentum processing space<vspace />
+  Status of Operation: Beta<vspace />
+  Coverage: Same as OpenARC<vspace />
+  Licensing: Unknown<vspace />
   Implementation Notes:</t>
 
 <t><list style="symbols">
@@ -1370,15 +1376,15 @@ now has ARC added
 </section>
 <section anchor="exim" title="Exim">
 
-<t>Organization: Exim developers
-  Status of Operation: Operational; requires specific enabling for compile.
-  Coverage: Full spec implemented as of <xref target="ARC-DRAFT-13"/>
-  Licensing: GPL
-  Contact Info: exim-users@exim.org
+<t>Organization: Exim developers<vspace />
+  Status of Operation: Operational; requires specific enabling for compile.<vspace />
+  Coverage: Full spec implemented as of <xref target="ARC-DRAFT-13"/><vspace />
+  Licensing: GPL<vspace />
+  Contact Info: exim-users@exim.org<vspace />
   Implementation notes:</t>
 
 <t><list style="symbols">
-  <t>Exim 4.91</t>
+  <t>Implemented as of Exim 4.91</t>
 </list></t>
 
 </section>
@@ -1408,7 +1414,7 @@ now has ARC added
 
     <references title='Informative References'>
 
-&RFC6982;
+&RFC7942;
 &RFC7489;
 &RFC7960;
 <reference anchor="ENHANCED-STATUS" target="http://www.iana.org/assignments/smtp-enhanced-status-codes/smtp-enhanced-status-codes.xhtml">
@@ -1578,397 +1584,402 @@ discussions planning can be found at <eref target="mailto:arc-interop@dmarc.org"
   </back>
 
 <!-- ##markdown-source:
-H4sIAEluMFsAA9V96XIbV5bm//sUOVBMm3QD4KLNptsOQyQl0yVKKpEqd7fL
-oUgACTCLQCYqM0EK5XBHvUZHzETMs8yj1JPM+c45d0sAJF3ljo6pKNsgkHmX
-c8++3V6vZ5q8mWVHyWDZXGVFk4/SJhsn77NRlt/Qh+OrNC+SncH7493kXVU2
-5aicmXQ4rLIbeuf9cc99OS5HRTqnkcZVOml6edZMeuN5Wo16+Gehj/UOnpox
-TXGUHO4ffNHbf9Y7fGLMo6Ru0mL8MZ2VBf3UVMvMmHxR8ce6Odzf/3L/0KRV
-lh4ladWY2+lRcnJO0yc/lNV1XkyTV1W5XJjr26PkrGiyqsia3gnWYerlcJ7X
-dV4W9NPp5UtDGzxKsk8LY0blmF49Spa00i/MIj9K6H+PklFaJMs6o4mqdJXs
-5JMknc2SVVbvJmWVXKX1VXKVVRktOukltCn5UJdVU2WTWv9azfmPBA8c4WX6
-aB854mnG2SRdzpqanrC/y0vyuEnpQMrqyCT8v57+N0nygp74XT8ZFOOsqrPC
-/SDQ/92yatZ/Kyva5+u8uM7GZ/7bmpaTETQO9vf3kx+yuknO0+U4SwY3mXtm
-lDero+RiWRSrm3Tmv6+yKcP0OJ3lk7Iq8tS/Uo5pIV8+2f/iafDdsmgqGunD
-xcB9mc3TfHaUXNOS029nvLq86I/K+eZNv+gnr8ti2trwi4owpyzin3i/r8py
-Gq64BJ7TFE1ZtZcwJMSbfjvlF7Yv4KKfvJilxXVrBRdZc9X6gef/A4EGwz9o
-BTUN8u2NvrF9Ced9OuER4V96u2ot43zJCLv+My/m8uTdw9axXGREc1n17fTu
-lVz2E6KwbFq2MfAyn6/9wktgbpCnxYPW0eTzb+0LvAhTlNU8bYgrgSbevzw+
-PDj4Uj8+fvLssX58evj4if34+PDQfnz65Rf68dnj58/8x+f68fnhvn3g+ZP9
-p/bjs/0D/fjFwXMa1+TFpLWMZ19+ceje/MKu6PmXz/bx8fTNd4M3x6cnvYvL
-weWHCyFnZblngzeD5OL88l1yWlylxYjY7UWTNss6OSYKquXRtJqCRK+aZnG0
-t3d7e9sngKR9AuheSmxtWsyJa9d79bxZ9DIdplfzMD0Q4l0/9T9dNXOgJxj5
-yfvBy8vewZNoib9CKiQ7Z70Ten93bd01Lbwpy1ndh1DgpWPevXsExRMe6Ddi
-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
+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
+2AAA
 
 -->
 
