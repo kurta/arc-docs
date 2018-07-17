@@ -1,8 +1,8 @@
 ﻿---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-15
-date: 2018-06-24
+docname: draft-ietf-dmarc-arc-protocol-15.2
+date: 2018-07-17
 
 # stand_alone: true
 
@@ -187,7 +187,7 @@ Authenticated Received Chain (ARC) creates a mechanism for individual Internet
 Mail Handlers to add their authentication processing results to a message's
 ordered set of processing results. ARC encapsulates processing results in a
 DKIM signature derivative to grant other handlers the ability to verify the
-authenticity of each individual processing results as well as the aggregate
+authenticity of the individual processing results as well as the aggregate
 set and sequence of results.
 
 Ordered sets of processing results can be used by ARC-enabled Internet Mail
@@ -214,8 +214,12 @@ state of evidence and to document all processing steps.
 In ARC's situation, the "evidence" is a message's authentication state at any
 point along the delivery path between origination and final delivery.
 Authentication state can change when intermediate handlers modify message
-content, route messages through unforeseen paths, or change envelope
-information.
+content (headers and/or body content), route messages through unforeseen paths,
+or change envelope information.
+
+The authentication state of a message is determined upon receipt of a message
+and documented in the Authentication-Results header field(s). ARC extends this
+mechanism to survive transit through intermediary ADMDs.
 
 ## Custody
 
@@ -248,7 +252,7 @@ This section defines terms used in the rest of the document.
 
 Readers should to be familiar with the contents, core concepts, and definitions
 found in {{RFC5598}}. The potential roles of intermediaries in the delivery of
-email is directly relevant.
+email are directly relevant.
 
 Language, syntax (including some ABNF constructs), and concepts are imported
 from DKIM {{RFC6376}}. Specific references to DKIM are made throughout this
@@ -371,12 +375,15 @@ The AMS header field is similar in syntax and semantics to a DKIM-Signature
 field {{RFC6376}}, with three (3) differences:
 
 * the name of the header field itself;
-* no version tag ("v") is defined for the AMS header. As required for undefined
+* no version tag ("v") is defined for the AMS header field. As required 
+  for undefined
   tags (in {{RFC6376}}), if seen, a version tag MUST be ignored;
 * the presence of the "instance tag". Additional information on the "instance
   tag" can be found in {{i-defn}}. The instance tag replaces the DKIM 
-  "AUID" tag.
-
+  "AUID" tag;
+* when building the header field list to be signed, ARC-related headers MUST
+  be submitted to the hash function in increasing instance order.
+  
 ARC places no requirements on the selectors and/or domains used for the AMS
 header field signatures.
 
@@ -388,7 +395,7 @@ The formal ABNF for the AMS header field is:
 To avoid unwanted invalidation of AMS signatures:
 
 * AMS header fields are added by ARC-participating ADMDs as messages exit the
-ADMD. AMS header fields should be attached so that any modifications made by
+ADMD. AMS header fields SHOULD be attached so that any modifications made by
 the ADMD are included in the signature of the AMS header field.
 * Authentication-Results header fields MUST NOT be included in AMS signatures
 as they are likely to be deleted by downstream ADMDs (per 
@@ -456,6 +463,11 @@ addition of an ARC Set. Through the incremental values of instance tags, an ARC
 Validator can determine the order in which ARC Sets were added to a message.
 
 Instance tag values can range from 1-50 (inclusive).
+
+_INFORMATIONAL:_ The upper limit of 50 was picked based on some initial
+observations reported by early working group members with a safety margin
+multiple added on top to support the vast majority of all intermediary mail
+flows.
 
 Valid ARC Sets MUST have exactly one instance of each ARC Header field (AAR,
 AMS, and AS) for a given instance value and signing algorithm.
@@ -683,10 +695,10 @@ restriction which prevents chain continuation or re-establishment, see
 
 ### Responding to ARC Validation Failures During the SMTP Transaction
 
-If an ARC Validator determines that the Authenticated Received Chain has
-failed, the Validator MAY signal the breakage through the extended SMTP
-response code 5.7.7 {{RFC3463}} "message integrity failure" {{ENHANCED-STATUS}}
-and corresponding SMTP response code.
+If an ARC Validator determines that the incoming message fails authentication
+checks (potentially including ARC validation), the Validator MAY signal the
+breakage through the extended SMTP response code 5.7.7 {{RFC3463}} "message
+integrity failure" {{ENHANCED-STATUS}} and corresponding SMTP response code.
 
 ## Result of Validation
 
@@ -881,7 +893,9 @@ DMARC), ARC makes no claims about the semantic content of messages.
 ## Increased Header Size
 
 Inclusion of Authenticated Received Chains into messages may cause issues for
-older or constrained MTAs due to increased total header size.
+older or constrained MTAs due to increased total header size. Large header
+blocks, in general, may cause failures to deliver or other outage scenarios for
+such MTAs. ARC itself would not cause problems.
 
 ## DNS Operations {#dns-impact}
 
@@ -939,7 +953,7 @@ and following the same signing scope guidance from
 
 # IANA Considerations
 
-\[\[ **Note to the RFC Editors:** dkim header.s is defined both here and in
+\[\[ **Note to the RFC Editors:** "dkim - header - s" is defined both here and in
 {{I-D-7601bis}}. Please delete the overlap from whichever document goes through
 the publication process after the other. ]]
 
