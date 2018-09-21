@@ -1,8 +1,8 @@
 ﻿---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-16
-date: 2018-07-17
+docname: draft-ietf-dmarc-arc-protocol-17
+date: 2018-09
 
 # stand_alone: true
 
@@ -177,11 +177,9 @@ Policy Framework (SPF) {{RFC7208}} and DomainKeys Identified Mail (DKIM)
 handlers. This impact is thoroughly documented in the defining documents for
 SPF and DKIM and further discussed in {{RFC6377}} and {{RFC7960}}.
 
-The utility of technologies that build upon SPF and DKIM (such as DMARC
-{{RFC7489}}) is similarly impacted by intermediate handlers. The disruption of
-authentication mechanisms for legitimate messages by intermediate handlers can
-impact all aspects of Internet Mail - message authors, message recipients, and
-even the intermediary handler itself.
+DMARC {{RFC7489}} also relies upon SPF and DKIM authentication mechanisms.
+Failures of authentication caused by the actions of intermediate handlers can
+cause legitimate mail to be incorrectly rejected or misdirected.
 
 Authenticated Received Chain (ARC) creates a mechanism for individual Internet
 Mail Handlers to add their authentication processing results to a message's
@@ -206,7 +204,7 @@ state of evidence and to document all processing steps.
 In ARC's situation, the "evidence" is a message's authentication state at any
 point along the delivery path between origination and final delivery.
 Authentication state can change when intermediate handlers modify message
-content (headers and/or body content), route messages through unforeseen paths,
+content (header fields and/or body content), route messages through unforeseen paths,
 or change envelope information.
 
 The authentication state of a message is determined upon receipt of a message
@@ -228,6 +226,7 @@ travels with a message.
 
 ## Validation of Chain of Custody
 
+<!-- TBD: review and update from Crocker -->
 Any ARC-enabled Internet Mail Handler can validate the entire set of evidence
 and custody to yield a valid Chain of Custody. If the evidence-supplying
 Custodians can be trusted, then the validated Chain of Custody describes the
@@ -254,27 +253,28 @@ document.  The following terms are imported from {{RFC5598}}:
 * Message Transfer Agents (MTA), Section 4.3.2
 * Message Submission Agent (MSA), Section 4.3.1
 * Message Delivery Agent (MDA), Section 4.3.3
-
-Internet Mail Handlers process and deliver messages across the Internet and
-include MSAs, MTAs, MDAs, gateways, and mailing lists.
+* Internet Mail Handlers process and deliver messages across the Internet and
+include MSAs, MTAs, MDAs, gateways, and mailing lists as defined in {{RFC5598}}
 
 Syntax descriptions use Augmented BNF (ABNF) {{RFC5234}} and {{RFC7405}}.
 
 {::boilerplate bcp14+}
 
+<!-- TBD: consider adding defn of "Authentication Assessment" -->
+
 ## ARC Set {#arc-set-defn}
 
-{{hdr-defn}} introduces three (3) ARC header fields. Together, the 3 header
-fields compose a single "ARC Set". An ARC Set provides the means for an Internet
-Mail Handler to attach authentication state to a message in a manner that can
-be verified by future handlers. A single message can contain multiple ARC
-Sets.
+{{hdr-defn}} introduces three (3) ARC header fields which are added to a
+message by an ARC-enabled internet mail handler. Together, the 3 header fields
+compose a single "ARC Set". An ARC Set provides the means for an Internet Mail
+Handler to attach authentication state to a message in a manner that can be
+verified by future handlers. A single message can contain multiple ARC Sets.
 
 In General Concept terms, an ARC Set represents Evidence and Custody.
 
 ## Authenticated Received Chain (ARC) {#arc-chain-defn}
 
-The complete sequence of ARC Sets attached to a message is called the
+The complete sequence of ARC Sets attached to a message at a given time is called the
 Authenticated Received Chain. An Authenticated Received Chain is a recording of
 individual authentication states as a message traverses through
 ARC-participating ADMDs.
@@ -304,6 +304,13 @@ In General Concept terms, a Validator inspects the Chain of Custody to
 determine the content and validity of individual Evidence supplied by
 Custodians.
 
+## Signing vs Sealing
+
+Signing is the process of affixing a digital signature to a message as a header
+field, such as when a DKIM-Signature (as in {{RFC6376}} section 2.1), or an AMS
+or AS is added. Sealing is when an ADMD affixes a complete and valid ARC Set to
+a message creating or continuing an Authenticated Received Chain.
+
 ##  Imported ABNF Tokens
 
 The following ABNF tokens are imported:
@@ -316,6 +323,8 @@ The following ABNF tokens are imported:
 
 The following ABNF tokens are used elsewhere in this document:
 
+<!-- TBD: Seth suggests cutting the ';' on instance - review -->
+
     position = 1*2DIGIT ; 1 - 50
     instance = \[CFWS] %s"i" \[CFWS] "=" \[CFWS] position \[CFWS] ";"
     chain-status = ("none" / "fail" / "pass")
@@ -323,12 +332,11 @@ The following ABNF tokens are used elsewhere in this document:
 
 # Protocol Elements
 
-## ARC Headers {#hdr-defn}
+## ARC Header Fields {#hdr-defn}
 
-ARC introduces three new header fields. Syntax for new header fields borrows
-heavily from existing specifications. This document only describes where
-ARC-specific changes in syntax and semantics differ from existing
-specifications.
+ARC introduces three new header fields. Syntax for new header fields adapts
+existing specifications. This document only describes where ARC-specific
+changes in syntax and semantics differ from existing specifications.
 
 ### ARC-Authentication-Results (AAR) {#aar-defn}
 
@@ -353,7 +361,7 @@ The formal ABNF for the AAR header field is:
 
 Because there is only one AAR allowed per ARC set, the AAR MUST contain all
 authentication results from within the participating ADMD, regardless of how
-many Authentication-Results headers are attached to the message.
+many Authentication-Results header fields are attached to the message.
 
 ### ARC-Message-Signature (AMS) {#ams-defn}
 
@@ -363,18 +371,17 @@ message modifications to future ARC-participating Custodians.
 
 In General Concept terms, the AMS header field identifies a Custodian.
 
-The AMS header field is similar in syntax and semantics to a DKIM-Signature
-field {{RFC6376}}, with three (3) differences:
+The AMS header field has the same syntax and semantics as the DKIM-Signature
+field {{RFC6376}}, with four (4) differences:
 
 * the name of the header field itself;
 * no version tag ("v") is defined for the AMS header field. As required 
   for undefined
   tags (in {{RFC6376}}), if seen, a version tag MUST be ignored;
-* the presence of the "instance tag". Additional information on the "instance
-  tag" can be found in {{i-defn}}. The instance tag replaces the DKIM 
-  "AUID" tag;
-* when building the header field list to be signed, ARC-related headers MUST
-  be submitted to the hash function in increasing instance order.
+* the "i" (AUID) tag is not imported from DKIM; instead, this tag is replaced 
+  by the "instance tag" as defined in {{i-defn}}; 
+* when building the header field list to be signed, ARC-related header fields 
+  MUST be submitted to the hash function in increasing instance order.
   
 ARC places no requirements on the selectors and/or domains used for the AMS
 header field signatures.
@@ -384,7 +391,7 @@ The formal ABNF for the AMS header field is:
     arc-ams-info = instance \[CFWS] ";" tag-list
     arc-message-signature = "ARC-Message-Signature:" \[CFWS] arc-ams-info
 
-To avoid unwanted invalidation of AMS signatures:
+To reduce the chances of accidental invalidation of AMS signatures:
 
 * AMS header fields are added by ARC-participating ADMDs as messages exit the
 ADMD. AMS header fields SHOULD be attached so that any modifications made by
@@ -402,8 +409,8 @@ present in the message.
 
 ### ARC-Seal (AS) {#as-defn}
 
-The ARC-Seal (AS) header field is the mechanism by which ARC-participating
-ADMDs can verify the integrity of AAR header fields and corresponding AMS
+The ARC-Seal (AS) header field permits ARC-participating
+ADMDs to verify the integrity of AAR header fields and corresponding AMS
 header fields.
 
 In General Concept terms, the AS header field is how Custodians bind Evidence
@@ -413,14 +420,14 @@ Custodians.
 The AS header field is similar in syntax and semantics to DKIM-Signatures
 {{RFC6376}}, with the following differences:
 
-* the presence of the "instance tag". Additional information on the "instance
-  tag" can be found in {{i-defn}}.
+* the "i" (AUID) tag is not imported from DKIM; instead, this tag is replaced 
+  by the "instance tag" as defined in {{i-defn}}; 
 * the signature of the AS header field does not cover the body of the
   message and therefore there is no 'bh' tag. The signature of the AS header 
-  field only covers specific header fields as defined in {{as-hdrs}}.
+  field only covers specific header fields as defined in {{as-hdrs}};
 * no body canonicalization is performed as the AS signature does not cover the
-  body of a message.
-* only "relaxed" header canonicalization ({{RFC6376}} section 3.4.2) is used.
+  body of a message;
+* only "relaxed" header field canonicalization ({{RFC6376}} section 3.4.2) is used;
 * the only supported tags are "i" (from {{i-defn}} of this document), and
   "a", "b", "d, "s", "t" from {{RFC6376}} Section 3.5. Note especially that
   the DKIM "h" tag is NOT allowed and if found, MUST result in a cv status
@@ -428,8 +435,8 @@ The AS header field is similar in syntax and semantics to DKIM-Signatures
 * an additional tag, "cv" ("seal-cv-tag" in the ARC-Seal ABNF definition) is
   used to communicate Chain Validation Status to subsequent ADMDs.
 
-ARC places no requirements on the selectors and/or domains used for the AS
-header field signatures.
+Any selectors and/or (sub)domains (under the control of the sealing ADMD) may be 
+used for ARC header field signatures.
 
 The formal ABNF for the AS header field is:
 
@@ -438,17 +445,17 @@ The formal ABNF for the AS header field is:
 
 ## ARC Set
 
-An "ARC Set" is a single collection of three ARC Headers (AAR, AMS, and AS).
-ARC Headers of an ARC Set share the same "instance" value.
+An "ARC Set" is a single collection of three ARC header fields (AAR, AMS, and AS).
+ARC header fields of an ARC Set share the same "instance" value.
 
-By adding all ARC Headers to a message, an ARC Sealer adds an ARC Set to a
+By adding all ARC header fields to a message, an ARC Sealer adds an ARC Set to a
 message. A description of how Sealers add an ARC Set to a message is found in
 {{sealer-actions}}.
 
 ### Instance Tags {#i-defn}
 
-Instance tags describe which ARC Headers belong to an ARC Set. Each ARC Header
-of an ARC Set shares the same instance tag value.
+Instance tags describe which ARC header fields belong to an ARC Set. Each ARC
+header field of an ARC Set shares the same instance tag value.
 
 Instance tag values are integers that begin at 1 and are incremented by each
 addition of an ARC Set. Through the incremental values of instance tags, an ARC
@@ -461,7 +468,7 @@ observations reported by early working group members with a safety margin
 multiple added on top to support the vast majority of all intermediary mail
 flows.
 
-Valid ARC Sets MUST have exactly one instance of each ARC Header field (AAR,
+Valid ARC Sets MUST have exactly one instance of each ARC header field (AAR,
 AMS, and AS) for a given instance value and signing algorithm.
 
 _INFORMATIONAL:_ Initial development of ARC is only being done with a single
@@ -471,7 +478,7 @@ expanding that. For handling multiple signing algorithms, see {{ARC-MULTI}}.
 ## Authenticated Received Chain
 
 An Authenticated Received Chain is an ordered collection of ARC Sets. As ARC
-Sets are enumerated sets of ARC Headers, an Authenticated Received Chain
+Sets are enumerated sets of ARC header fields, an Authenticated Received Chain
 represents the output of message authentication state along the handling path
 of ARC-enabled processors.
 
@@ -494,7 +501,7 @@ called the "Chain Validation Status". Chain Validation Status information is
 communicated in several ways:
 
 * the AS header field in the "cv" tag, and
-* as part of Authentication-Results and AAR headers.
+* as part of Authentication-Results and AAR header field(s).
 
 Chain Validation Status has one of three possible values:
 
@@ -513,6 +520,19 @@ Chain Validation Status has one of three possible values:
 ARC-enabled Internet Mail Handlers generally act as both ARC Sealers (when
 sending messages) and ARC Validators (when receiving messages).
 
+<!-- moved from end of section - outcome -->
+
+An Authenticated Received Chain with a Chain Validation Status of "pass" allows
+Internet Mail Handlers to ascertain:
+
+* all ARC-participating ADMDs that claim responsibility for handling (and
+  possibly modifying) the message in transit;
+* the authentication state of the message as assessed by each ADMD (from AAR header fields).
+
+Given this information, Internet Mail Handlers can inform local policy
+decisions regarding disposition of messages that experience authentication
+failure due to intermediate processing.
+
 ## Sealer Actions {#sealer-actions}
 
 To "seal" a message, an ARC Sealer adds an ARC Set (the three ARC header fields
@@ -522,27 +542,39 @@ same instance tag value.
 To perform Sealing (aka to build and attach a new ARC Set), the following
 actions must be taken by an ARC Sealer when presented with a message:
 
-1. All message modifications (including adding DKIM-Signatures) MUST be
+1. All message modifications (including adding DKIM-Signature(s)) MUST be
   performed before Sealing.
 
-2. Calculate the instance value: if the message contains an Authenticated
+2. If the message already contains an Authenticated Received Chain with a "fail"
+  Chain Validation status, then there is no need to proceed and the algorithm
+  stops here.
+
+3. Calculate the instance value: if the message already contains an Authenticated
   Received Chain, the instance value is 1 more than the highest instance number
   found in the Authenticated Received Chain. If no Authenticated Received Chain
   exists, the instance value is 1.
 
-3. Using the calculated instance value, generate and attach to the message in
+4. Using the calculated instance value, generate and attach to the message in
   the following order:
 
-  1. An ARC-Authentication-Results header field as defined in {{aar-defn}}.
-  2. An ARC-Message-Signature header field as defined in {{ams-defn}}.
+  1. An ARC-Authentication-Results header field as defined in {{aar-defn}}.  
+  2. An ARC-Message-Signature header field as defined in {{ams-defn}}.  
   3. An ARC-Seal header field using the AS definition found in {{as-defn}}, 
-  the method described in {{as-hdrs}}, and the Chain Validation Status as 
-  determined during ARC validation.
+    the method described in {{as-hdrs}}, and the Chain Validation Status as 
+    determined during ARC validation.
+
+<!-- TBD: verify proper sub-listing above -->
 
 ### Header Fields To Include In ARC-Seal Signatures {#as-hdrs}
 
-The signature of an AS header field signs a specific canonicalized form of the
-ARC Set header values. The ARC set header values are supplied to the hash
+<!-- TBD: refer to John L's text -->
+
+The ARC-Seal is generated in a manner similar to how DKIM-Signatures are added
+to messages ({{RFC6376}}, section 3.7), with explicit requirements on the header
+fields and ordering of those fields.
+
+The signature of an AS header field signs a canonicalized form of the ARC Set
+header field values. The ARC set header field values are supplied to the hash
 function in increasing instance order, starting at 1, and include the ARC Set
 being added at the time of Sealing the message.
 
@@ -553,9 +585,6 @@ following order:
 2. ARC-Message-Signature
 3. ARC-Seal
 
-The ARC-Seal is generated in a manner similar to when DKIM-Signatures are added
-to messages ({{RFC6376}}, section 3.7).
-
 Note that when an Authenticated Received Chain has failed validation, the
 signing scope for the ARC-Seal is modified (see {{cv-fail-case}}).
 
@@ -563,8 +592,8 @@ signing scope for the ARC-Seal is modified (see {{cv-fail-case}}).
 
 In the case of a failed Authenticated Received Chain, the header fields
 included in the signature scope of the AS header field b= value MUST only
-include the ARC Set headers created by the MTA which detected the malformed
-chain, as if this newest ARC Set was the only set present.
+include the ARC Set header fields created by the MTA which detected the
+malformed chain, as if this newest ARC Set was the only set present.
 
 _INFORMATIONAL_: This approach is mandated to handle the case of a malformed or
 otherwise invalid Authenticated Received Chain. There is no way to generate a
@@ -601,25 +630,20 @@ of authentication failures. Specifically:
 * An ADMD may choose to Seal all inbound messages whether or not a message has
   been modified or will be retransmitted.
 
-### Signing vs Sealing
-
-Signing is the process of affixing a digital signature to a message as a
-header, such as when a DKIM-Signature (as in {{RFC6376}} section 2.1), or an AMS or
-AS is added. Sealing is when an ADMD affixes a complete and valid ARC Set to a
-message creating or continuing an Authenticated Received Chain.
-
 ## Validator Actions {#validate-actions}
 
 A validator performs the following steps, in sequence, to process an
 Authenticated Received Chain. Canonicalization, hash functions, and signature
 validation methods are imported from {{RFC6376}} section 5.
 
-1. Collect all ARC Sets currently attached to the message. If there are none,
-  the Chain Validation Status is "none" and the algorithm stops here. The maximum
-  number of ARC Sets that can be attached to a message is 50. If more than the
-  maximum number exist the Chain Validation Status is "fail" and the algorithm
-  stops here. In the following algorithm, the maximum ARC instance value is 
-  referred to as "N".
+1. Collect all ARC Sets currently attached to the message. 
+   * If there are none, the Chain Validation Status is "none" and the algorithm 
+   stops here. 
+   * The maximum number of ARC Sets that can be attached to a message is 50. If 
+   more than the maximum number exist the Chain Validation Status is "fail" and 
+   the algorithm stops here. 
+   * In the following algorithm, the maximum discovered ARC instance value is 
+   referred to as "N".
 
 2. If the Chain Validation Status of the highest instance value ARC Set is "fail",
   then the Chain Validation status is "fail" and the algorithm stops here.
@@ -633,9 +657,9 @@ validation methods are imported from {{RFC6376}} section 5.
    2. The instance values of the ARC Sets MUST form a continuous sequence from
    1..N with no gaps or repetition.
 
-   3. The "cv" value for all ARC-Seal header fields must be non-failing. For
-   instance values > 1, the value must be "pass". For instance value = 1, the
-   value must be "none".
+   3. The "cv" value for all ARC-Seal header fields MUST NOT be "fail". For
+   instance values > 1, the value MUST be "pass". For instance value = 1, the
+   value MUST be "none".
 
    * If any of these conditions are not met, the Chain Validation Status is "fail"
    and the algorithm stops here.
@@ -648,12 +672,12 @@ validation methods are imported from {{RFC6376}} section 5.
   each prior AMS beginning with the N-1 and proceeding in decreasing order to the
   AMS with the instance value of 1:
 
-  1. If an AMS fails to validate (for instance value "M"), then set the
+   1. If an AMS fails to validate (for instance value "M"), then set the
   oldest-pass value to the lowest AMS instance value which passed (M+1) and go to
-  the next step (there is no need to check any other (older) AMS headers). This 
+  the next step (there is no need to check any other (older) AMS header fields). This 
   does not affect the validity of the Authenticated Received Chain.
 
-  2. If all AMS headers verify, set the oldest-pass value to zero (0).
+   2. If all AMS header fields verify, set the oldest-pass value to zero (0).
 
 6. Validate each AS beginning with the greatest instance value and proceeding
   in decreasing order to the AS with the instance value of 1. If any AS fails to
@@ -663,11 +687,12 @@ validation methods are imported from {{RFC6376}} section 5.
   "pass", and the algorithm is complete.
 
 The end result of this Validation algorithm is added into the
-Authentication-Results header for the ADMD.
+Authentication-Results header field for the ADMD.
 
-As with a failing DKIM signature ({{RFC6376}} section 6.3), a message with a
-failing Authenticated Received Chain MUST be treated the same as a message with
-no Authenticated Received Chain.
+As with a DKIM signature ({{RFC6376}} section 6.3) which fails verification, a
+message with an Authenticated Received Chain with a Chain Validation status of
+"fail" MUST be treated the same as a message with no Authenticated Received
+Chain.
 
 _INFORMATIONAL_: Recipients of an invalid or failing Authenticated Received Chain
 can use that information as part of a wider handling context. ARC adoption
@@ -692,32 +717,17 @@ checks (potentially including ARC validation), the Validator MAY signal the
 breakage through the extended SMTP response code 5.7.7 {{RFC3463}} "message
 integrity failure" {{ENHANCED-STATUS}} and corresponding SMTP response code.
 
-## Result of Validation
-
-An Authenticated Received Chain with a Chain Validation Status of "pass" allows
-Internet Mail Handlers to ascertain:
-
-* all ARC-participating ADMDs that claim responsibility for handling (and
-  possibly modifying) the message in transit;
-
-* the authentication state of the message as perceived by each ADMD (from
-  Authentication-Results header fields).
-
-Given this information, handlers can inform local policy decisions regarding
-disposition of messages that experience authentication failure due to
-intermediate processing.
-
 # Communication of Validation Results
 
 Chain Validation Status (described in {{cv-defn}}) is communicated via
-Authentication-Results (and AAR) headers using the auth method "arc". This auth
-method is described in {{iana-auth}}.
+Authentication-Results (and AAR) header fields using the auth method "arc".
+This auth method is described in {{iana-auth}}.
 
 If necessary data is available, the ptypes and properties defined in 
 {{iana-ptypes}} SHOULD be recorded in an Authentication-Results header field:
 
-* smtp.client-ip - The connecting client IP address from which the message is
-  received.
+* smtp.remote-ip - The address of the connection-initiating SMTP server, 
+  from which the message is being relayed.
 
 * header.oldest-pass - The instance number of the oldest AMS that still
   validates, or 0 if all pass.
@@ -725,10 +735,6 @@ If necessary data is available, the ptypes and properties defined in
 Upon Sealing of a message, this Authentication-Results information along with
 all other Authentications-Results added by the ADMD will be recorded into the 
 AAR as defined in section {{aar-defn}}.
-
-In General Concept terms, the information recorded in the
-ARC-Authentication-Results header field is the Evidence that gets attached to a
-message.
 
 # Use Cases
 
@@ -739,7 +745,7 @@ by ARC.
 
 When an intermediary ADMD adds an ARC Set to a message's Authenticated Received
 Chain (or creates the initial ARC Set), the ADMD communicates authentication
-state to the next ADMD in the message handling path.
+state to the next ARC-participating ADMD in the message handling path.
 
 If ARC-enabled ADMDs are trusted, Authenticated Received Chains can be used to
 bridge administrative boundaries.
@@ -780,9 +786,9 @@ between processing tiers.
 
 ### Mailing Lists
 
-Mailing lists resend posted messages to subscribers. A full description of
-authentication-related mailing list issues can be found in {{RFC7960}} Section 
-3.2.3. 
+Mailing lists take delivery of messages and re-post them to subscribers. A full
+description of authentication-related mailing list issues can be found in
+{{RFC7960}} Section 3.2.3. 
 
 Mailing list services can implement ARC to convey the original authentication
 state of posted messages sent to the list's subscriber base. The ADMDs of the
@@ -792,13 +798,10 @@ handling.
 
 ## Inform Message Disposition Decisions
 
-ARC functionality allows Internet Mail Handlers to reliably identify
-intermediary ADMDs and for ADMDs to expose authentication state that can
-survive additional intermediary handling.
-
 Intermediaries often break authentication through content modification,
 interfere with path-based authentication (such as SPF), and strip
-authentication results (if an MTA removes Authentication-Results headers).
+authentication results (if an MTA removes Authentication-Results header
+fields).
 
 Authenticated Received Chains allow ARC Validators to:
 
@@ -823,7 +826,7 @@ issues between DMARC and indirect email flows are documented in {{RFC7960}}.
 
 Authenticated Received Chains allow DMARC processors to consider authentication
 states provided by other ADMDs. As a matter of local policy, a DMARC processor
-may choose to accept the authentication state provided by an Authenticated
+MAY choose to accept the authentication state provided by an Authenticated
 Received Chain when determining if a message is DMARC compliant.
 
 When an Authenticated Received Chain is used to determine message disposition,
@@ -834,7 +837,8 @@ as described in {{dmarc-rpt}}.
 
 DMARC-enabled receivers indicate when ARC Validation influences DMARC-related
 local policy decisions. DMARC reporting of ARC-influenced decisions is
-accomplished by adding a local_policy comment containing a list of data
+accomplished by adding a reason of "local_policy" with a comment string
+(per {{RFC7489}} Appendix C) containing a list of data
 discovered during ARC Validation, which at a minimum includes:
 
 * the Chain Validation Status,
@@ -871,8 +875,8 @@ accommodations.
 
 The Authenticated Received Chain provides a verifiable record of the handlers
 for a message. This record may include Personally Identifiable Information such
-as IP address and domain names. Such information is also including in existing
-header fields such as the "Received" header field.
+as IP address(es) and domain names. Such information is also included in existing
+non-ARC related header fields such as the "Received" header fields.
 
 # Security Considerations {#security-consider}
 
@@ -882,11 +886,11 @@ to this specification.
 As with other domain authentication technologies (such as SPF, DKIM, and
 DMARC), ARC makes no claims about the semantic content of messages.
 
-## Increased Header Size
+## Increased Header Field Size
 
 Inclusion of Authenticated Received Chains into messages may cause issues for
-older or constrained MTAs due to increased total header size. Large header
-blocks, in general, may cause failures to deliver or other outage scenarios for
+older or constrained MTAs due to increased total header field size. Large header
+field blocks, in general, may cause failures to deliver or other outage scenarios for
 such MTAs. ARC itself would not cause problems.
 
 ## DNS Operations {#dns-impact}
@@ -914,6 +918,9 @@ Recipients are cautioned to treat messages bearing Authenticated Received
 Chains with the same suspicion applied to all other messages. This includes
 appropriate content scanning and other checks for potentially malicious
 content.
+
+ARC authenticates the identity of some email handling actors.  It does not make
+any assessment of their trustworthiness.
 
 Just as passing message authentication is not an indication of message safety,
 forwarding that information through the mechanism of ARC is also not an
@@ -1041,7 +1048,7 @@ for improved decision making when processing legitimate messages.
 ## Failure Considerations
 
 ARC should function without introducing significant new vectors for abuse (see
-{{security-consider}}). If unforseen vectors are enabled by ARC, then
+{{security-consider}}). If unforeseen vectors are enabled by ARC, then
 this protocol will be a failure. Note that weaknesses inherent in the mail
 protocols ARC is built upon (such as DKIM replay attacks and other known
 issues) are not new vectors which can be attributed to this specification.
@@ -1052,7 +1059,7 @@ The following open questions are academic and have no clear answer at the time
 of the development of the protocol. However, additional deployment should be
 able to gather the necessary data to answer some or all of them.
 
-### Value of the ARC-Seal (AS) Header
+### Value of the ARC-Seal (AS) Header Field
 
 Data should be collected to show if the ARC-Seal (AS) provides value beyond the
 ARC Message Signature (AMS) for either making delivery decisions or catching
@@ -1177,25 +1184,16 @@ of June 2018.
 ## OpenARC
 
   Organization: TDP/Murray Kucherawy  
-  Description: Implemention of milter functionality related to the OpenDKIM
+  Description: Implementation of milter functionality related to the OpenDKIM
     and OpenDMARC packages  
   Status of Operation: Beta  
   Coverage: Built to support {{ARC-DRAFT-14}}  
   Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)  
   Implementation Notes:
 
-  * The build is FreeBSD oriented but some packages have been built for
-  easier deployment on RedHat-based Linux platforms.
+  * Known issues have been resolved with release X
 
-  * Some issues still exist when deploying in a chained milter
-  arrangement (such as OpenSPF --> OpenDKIM --> OpenDMARC --> OpenARC)
-  with coordination between the stages. When deployed in a "sandwich"
-  configuration around an MLM, there is no effective mechanism to
-  convey trust from the ingress (validator) to egress (signer) instances.
-  (_NOTE_: this is expected to resolved with a new release of OpenDMARC
-  expected in mid-2018.)
-
-  Contact Info: <arc-discuss@dmarc.org>
+  Contact Info: <arc-discuss@dmarc.org>, <openarc-users@openarc.org>
 
 ## Mailman 3.x patch
 
