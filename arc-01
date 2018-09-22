@@ -1325,6 +1325,17 @@ previously included SPF / DKIM / DMARC, now has ARC added
 
   * Implemented as of Exim 4.91
 
+## Halon MTA
+
+  Organization: Halon  
+  Status of Operation: Operational as of May 2018  
+  Coverage: Full spec implemented as of {{ARC-DRAFT-14}}  
+  Licensing: Commercial, trial version available for download  
+  Contact Info: https://halon.io  
+  Implementation notes:
+
+  * GPL'd library with ARC capabilities: https://github.com/halon/libdkimpp
+
 --- back
 
 # Appendix A - Design Requirements
