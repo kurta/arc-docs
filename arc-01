@@ -522,8 +522,8 @@ sending messages) and ARC Validators (when receiving messages).
 
 <!-- moved from end of section - outcome -->
 
-An Authenticated Received Chain with a Chain Validation Status of "pass" allows
-Internet Mail Handlers to ascertain:
+An Authenticated Received Chain with a Chain Validation Status of "pass" (or "none")
+allows Internet Mail Handlers to ascertain:
 
 * all ARC-participating ADMDs that claim responsibility for handling (and
   possibly modifying) the message in transit;
@@ -555,11 +555,11 @@ actions must be taken by an ARC Sealer when presented with a message:
   exists, the instance value is 1.
 
 4. Using the calculated instance value, generate and attach to the message in
-  the following order:
+  the following order:  
 
-  1. An ARC-Authentication-Results header field as defined in {{aar-defn}}.  
-  2. An ARC-Message-Signature header field as defined in {{ams-defn}}.  
-  3. An ARC-Seal header field using the AS definition found in {{as-defn}}, 
+   1. An ARC-Authentication-Results header field as defined in {{aar-defn}}.  
+   2. An ARC-Message-Signature header field as defined in {{ams-defn}}.  
+   3. An ARC-Seal header field using the AS definition found in {{as-defn}}, 
     the method described in {{as-hdrs}}, and the Chain Validation Status as 
     determined during ARC validation.
 
