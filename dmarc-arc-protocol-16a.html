@@ -801,7 +801,7 @@ arc-seal = "ARC-Seal:" [CFWS] arc-as-info
 </ul>
 <h1 id="rfc.section.5"><a href="#rfc.section.5">5.</a> <a href="#protocol-actions" id="protocol-actions">Protocol Actions</a></h1>
 <p id="rfc.section.5.p.1">ARC-enabled Internet Mail Handlers generally act as both ARC Sealers (when sending messages) and ARC Validators (when receiving messages).</p>
-<p id="rfc.section.5.p.2">An Authenticated Received Chain with a Chain Validation Status of &#8220;pass&#8221; allows Internet Mail Handlers to ascertain:</p>
+<p id="rfc.section.5.p.2">An Authenticated Received Chain with a Chain Validation Status of &#8220;pass&#8221; (or &#8220;none&#8221;) allows Internet Mail Handlers to ascertain:</p>
 <p/>
 
 <ul>
@@ -818,10 +818,7 @@ arc-seal = "ARC-Seal:" [CFWS] arc-as-info
   <li>All message modifications (including adding DKIM-Signature(s)) MUST be performed before Sealing.</li>
   <li>If the message already contains an Authenticated Received Chain with a &#8220;fail&#8221; Chain Validation status, then there is no need to proceed and the algorithm stops here.</li>
   <li>Calculate the instance value: if the message already contains an Authenticated Received Chain, the instance value is 1 more than the highest instance number found in the Authenticated Received Chain. If no Authenticated Received Chain exists, the instance value is 1.</li>
-  <li>Using the calculated instance value, generate and attach to the message in the following order:</li>
-  <li>An ARC-Authentication-Results header field as defined in <a href="#aar-defn">Section 4.1.1</a>.</li>
-  <li>An ARC-Message-Signature header field as defined in <a href="#ams-defn">Section 4.1.2</a>.</li>
-  <li>An ARC-Seal header field using the AS definition found in <a href="#as-defn">Section 4.1.3</a>, the method described in <a href="#as-hdrs">Section 5.1.1</a>, and the Chain Validation Status as determined during ARC validation.</li>
+  <li>Using the calculated instance value, generate and attach to the message in the following order:  <ol><li>An ARC-Authentication-Results header field as defined in <a href="#aar-defn">Section 4.1.1</a>.</li><li>An ARC-Message-Signature header field as defined in <a href="#ams-defn">Section 4.1.2</a>.</li><li>An ARC-Seal header field using the AS definition found in <a href="#as-defn">Section 4.1.3</a>, the method described in <a href="#as-hdrs">Section 5.1.1</a>, and the Chain Validation Status as determined during ARC validation.</li></ol></li>
 </ol>
 <h1 id="rfc.section.5.1.1"><a href="#rfc.section.5.1.1">5.1.1.</a> <a href="#as-hdrs" id="as-hdrs">Header Fields To Include In ARC-Seal Signatures</a></h1>
 <p id="rfc.section.5.1.1.p.1">The ARC-Seal is generated in a manner similar to how DKIM-Signatures are added to messages (<a href="#RFC6376">[RFC6376]</a>, section 3.7), with explicit requirements on the header fields and ordering of those fields.</p>

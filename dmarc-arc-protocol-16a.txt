@@ -649,7 +649,7 @@ Internet-Draft                ARC-Protocol                September 2018
    (when sending messages) and ARC Validators (when receiving messages).
 
    An Authenticated Received Chain with a Chain Validation Status of
-   "pass" allows Internet Mail Handlers to ascertain:
+   "pass" (or "none") allows Internet Mail Handlers to ascertain:
 
    o  all ARC-participating ADMDs that claim responsibility for handling
       (and possibly modifying) the message in transit;
@@ -694,15 +694,15 @@ Internet-Draft                ARC-Protocol                September 2018
    4.  Using the calculated instance value, generate and attach to the
        message in the following order:
 
-   5.  An ARC-Authentication-Results header field as defined in
-       Section 4.1.1.
+       1.  An ARC-Authentication-Results header field as defined in
+           Section 4.1.1.
 
-   6.  An ARC-Message-Signature header field as defined in
-       Section 4.1.2.
+       2.  An ARC-Message-Signature header field as defined in
+           Section 4.1.2.
 
-   7.  An ARC-Seal header field using the AS definition found in
-       Section 4.1.3, the method described in Section 5.1.1, and the
-       Chain Validation Status as determined during ARC validation.
+       3.  An ARC-Seal header field using the AS definition found in
+           Section 4.1.3, the method described in Section 5.1.1, and the
+           Chain Validation Status as determined during ARC validation.
 
 5.1.1.  Header Fields To Include In ARC-Seal Signatures
 
