@@ -60,7 +60,6 @@ author:
 
 normative:
   RFC2119:
-  RFC3463:
   RFC5234:
   RFC5322:
   RFC5598:
@@ -124,6 +123,14 @@ informative:
       -
         ins: K. Andersen
         name: Kurt Andersen
+  draft-levine-eaiauth:
+    title: E-mail Authentication for Internationalized Mail
+    target: https://tools.ietf.org/html/draft-levine-appsarea-eaiauth-03
+    date: 2018-08-11
+    author:
+      -
+        ins: J. Levine
+        name: John Levine
   I-D-7601bis:
     title: Message Header Field for Indicating Message Authentication Status
     target: https://datatracker.ietf.org/doc/draft-ietf-dmarc-rfc7601bis/
@@ -258,7 +265,7 @@ Readers should to be familiar with the contents, core concepts, and definitions
 found in {{RFC5598}}. The potential roles of transit services in the delivery of
 email are directly relevant. Throughout this document the term "intermediaries"
 refers to the both regular MTAs as well as delivery/reposting agents such as 
-mailing lists covered within the scope of {{RFC5998}}'s transit services.
+mailing lists covered within the scope of {{RFC5598}}'s transit services.
 
 Language, syntax (including some ABNF constructs), and concepts are imported
 from DKIM {{RFC6376}}. Specific references to DKIM are made throughout this
