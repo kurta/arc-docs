@@ -466,8 +466,8 @@ The AS header field is similar in syntax and semantics to DKIM-Signatures
 * an additional tag, "cv" ("seal-cv-tag" in the ARC-Seal ABNF definition) is
   used to communicate Chain Validation Status to subsequent ADMDs.
 
-Any selectors and/or (sub)domains (under the control of the sealing ADMD) may be 
-used for ARC header field signatures.
+ARC places no requirements on the selectors and/or domains used for the AS
+header field signatures.
 
 The formal ABNF for the AS header field is:
 
@@ -634,7 +634,7 @@ following order:
 3. ARC-Seal
 
 Note that when an Authenticated Received Chain has failed validation, the
-signing scope for the ARC-Seal is modified as specificed in {{cv-fail-case}}.
+signing scope for the ARC-Seal is modified as specified in {{cv-fail-case}}.
 
 ### Marking and Sealing “cv=fail” (Invalid) Chains {#cv-fail-case}
 
@@ -658,8 +658,9 @@ re-establishment, see {{ARC-USAGE}}.
 
 ### Broad Ability to Seal
 
-ARC is not solely intended for perimeter MTAs. Any mediator ({{RFC5598}},
-section 5) that modifies a message may Seal its own changes. For additional
+ARC is not solely intended for perimeter MTAs. Any Internet Mail Handler
+MAY seal a message by adding a complete ARC set, whether or not they have 
+modified or are aware of having modified the message. For additional
 information, see {{trust-boundaries}}.
 
 ### Sealing is Always Safe
@@ -705,9 +706,9 @@ validation methods are imported from {{RFC6376}} section 5.
    2. The instance values of the ARC Sets MUST form a continuous sequence from
    1..N with no gaps or repetition.
 
-   3. The "cv" value for all ARC-Seal header fields MUST NOT be "fail". For
-   instance values > 1, the value MUST be "pass". For instance value = 1, the
-   value MUST be "none".
+   3. The "cv" value for all ARC-Seal header fields MUST NOT be "fail". For ARC
+   Sets with instance values > 1, the values MUST be "pass". For the ARC Set
+   with instance value = 1, the value MUST be "none".
 
    * If any of these conditions are not met, the Chain Validation Status is "fail"
    and the algorithm stops here.
@@ -734,7 +735,7 @@ validation methods are imported from {{RFC6376}} section 5.
 7. If the algorithm reaches this step, then the Chain Validation Status is
   "pass", and the algorithm is complete.
 
-The end result of this Validation algorithm is added into the
+The end result of this Validation algorithm SHOULD be included within the
 Authentication-Results header field for the ADMD.
 
 As with a DKIM signature ({{RFC6376}} section 6.3) which fails verification, a
@@ -780,10 +781,6 @@ If necessary data is available, the ptypes and properties defined in
 
 * header.oldest-pass - The instance number of the oldest AMS that still
   validates, or 0 if all pass.
-
-Upon Sealing of a message, this Authentication-Results information along with
-all other Authentications-Results added by the ADMD will be recorded into the 
-AAR as defined in section {{aar-defn}}.
 
 # Use Cases
 
@@ -951,16 +948,17 @@ which can increase the total number of queries). This leads to two
 considerations:
 
 1. An attacker can send a message to an ARC participant with a concocted
-  sequence of ARC Sets bearing the domains of intended victims, and all of them
-  will be queried by the participant until a failure is discovered. The
-  difficulty of forging the signature values should limit the extent of this load
-  to domains under control of the attacker. Query traffic pattern analysis may
-  expose information about downstream validating ADMD infrastructure.
+sequence of ARC Sets bearing the domains of intended victims, and all of them
+will be queried by the participant until a failure is discovered. DNS caching
+and the difficulty of forging the signature values should limit the extent of
+this load to domains under control of the attacker. Query traffic pattern
+analysis may expose information about downstream validating ADMD
+infrastructure.
 
 2. DKIM only performs one DNS query per signature, while ARC can introduce many
-  (per chain). Absent caching, slow DNS responses can cause SMTP timeouts; and
-  backlogged delivery queues on Validating systems. This could be exploited as a
-  DoS attack.
+(per chain). Absent caching, slow DNS responses can cause SMTP timeouts; and
+backlogged delivery queues on Validating systems. This could be exploited as a
+DoS attack.
 
 ## Message Content Suspicion
 
@@ -982,7 +980,7 @@ authenticate messages.
 
 Recipients are cautioned to treat every Sealer of the ARC Chain with suspicion.
 Just as with a validated DKIM signature, responsibility for message handling is
-attributed to the signing domain, but whether or not that signer is a malicious
+attributed to the Sealing domain, but whether or not that Sealer is a malicious
 actor is out of scope of the authentication mechanism.  Since ARC aids message
 delivery in the event of an authentication failure, ARC Sealers should be
 treated with suspicion, so that a malicious actor cannot Seal spam or other
@@ -1093,7 +1091,7 @@ The ARC protocol is designed to address common interoperability issues
 introduced by intermediate message handlers. Interoperability issues are
 described in {{RFC6377}} and {{RFC7960}}.
 
-As the ARC protocol is implemented by intermediary handlers over time, the
+As the ARC protocol is implemented by Internet Mail Handlers over time, the
 following should be evaluated in order to determine the success of the protocol
 in accomplishing the intended benefits.
 
@@ -1104,7 +1102,9 @@ use heuristic-based methods to identify messages that arrive via indirect
 delivery paths.
 
 ARC will be a success if the presence of Authenticated Received Chains allows
-for improved decision making when processing legitimate messages.
+for improved decision making when processing legitimate messages, specifically 
+resulting in equal or better delivery rates than achieve through the use of 
+heuristic approaches.
 
 ## Failure Considerations
 
@@ -1117,7 +1117,7 @@ issues) are not new vectors which can be attributed to this specification.
 ## Open Questions
 
 The following open questions are academic and have no clear answer at the time
-of the development of the protocol. However, additional deployment should be
+of the development of the protocol. However, additional deployments should be
 able to gather the necessary data to answer some or all of them.
 
 ### Value of the ARC-Seal (AS) Header Field
@@ -1127,6 +1127,9 @@ ARC Message Signature (AMS) for either making delivery decisions or catching
 malicious actors trying to craft or replay malicious chains.
 
 ### Usage and/or signals from multiple selectors and/or domains in ARC sets
+
+Any selectors and/or (sub)domains (under the control of the sealing ADMD) may be 
+used for ARC header field signatures.
 
 While implementers may choose to use various selectors and/or
 domains for ARC set header fields, no compelling argument for or against such
@@ -1158,17 +1161,17 @@ difference between message delivery or rejection. For example, if there is a
 well known mailing list that seals with ARC but doesn’t do its own initial DMARC
 enforcement, an Internet Mail Handler with this knowledge could make a delivery
 decision based upon the authentication information it sees in the corresponding
-AAR header.
+AAR header field.
 
 Certain trace information in the AAR is useful/necessary in the construction of
 DMARC reports.
 
-Certain receivers believe the entire set of trace information would be valuable
+Further, certain receivers believe the entire set of trace information would be valuable
 to feed into machine learning systems to identify fraud and/or provide other
 signals related to message delivery.
 
-It is unclear what trace information will be valuable for all receivers,
-regardless of size.
+At this point, however, it is unclear what trace information will be valuable
+for all receivers, regardless of size.
 
 Data should be collected on what trace information receivers are using that
 provides useful signals that affect deliverability, and what portions of the
@@ -1199,7 +1202,7 @@ This information is known to be correct as of the eighth interoperability
 test event which was held on 2018-03-17 at IETF101.
 
 For a few of the implementations, later status information was available as
-of June 2018.
+of August 2018.
 
 ## GMail test reflector and incoming validation
 
