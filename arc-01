@@ -1,7 +1,7 @@
 ﻿---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-16b
+docname: draft-ietf-dmarc-arc-protocol-16c
 date: 2018-09
 
 # stand_alone: true
@@ -244,7 +244,7 @@ travels with a message.
 
 ## Validation of Chain of Custody
 
-<!-- TBD: review and update from Crocker -->
+<!-- Done: review and update from Crocker -->
 <!-- adjusted to use testimony/assertion lingo -->
 
 Any ARC-enabled Internet Mail Handler can validate the entire set of custody
@@ -282,7 +282,8 @@ Syntax descriptions use Augmented BNF (ABNF) {{RFC5234}} and {{RFC7405}}.
 
 {::boilerplate bcp14+}
 
-<!-- TBD: consider adding defn of "Authentication Assessment" -->
+<!-- Done: consider adding defn of "Authentication Assessment" -->
+<!-- not needed because of language change to "authentication results" throughout" -->
 
 ## ARC Set {#arc-set-defn}
 
@@ -386,7 +387,7 @@ Because there is only one AAR allowed per ARC set, the AAR MUST contain all
 authentication results from within the participating ADMD, regardless of how
 many Authentication-Results header fields are attached to the message.
 
-<!-- TBD: consider note that syntax violating authres-payloads do not 
+<!-- Done: consider note that syntax violating authres-payloads do not 
 affect the validity of the ARC set? -->
 
 Also note that any failures of sealers to properly construct the authres-payload
@@ -515,9 +516,13 @@ Instance tag values can range from 1-50 (inclusive).
 <!-- TBD: Dave's comment to cite technical/operational concerns -->
 
 _INFORMATIONAL:_ The upper limit of 50 was picked based on some initial
-observations reported by early working group members with a safety margin
-multiple added on top to support the vast majority of all intermediary mail
-flows.
+observations reported by early working group members. The value was chosen so
+as to balance the risk of excessive header field growth {{big-hf-risk}} against
+expert opinion regarding the probability of long-tail but non-looping
+multiple-intermediary mail flows.  Longer ARC chains will also impose load on
+validators and DNS to support additional verification steps.  Observed
+quantities of "Received" header fields was also considered in establishing this
+as an experimental initial value.
 
 Valid ARC Sets MUST have exactly one instance of each ARC header field (AAR,
 AMS, and AS) for a given instance value and signing algorithm.
@@ -603,20 +608,20 @@ actions must be taken by an ARC Sealer when presented with a message:
   found in the Authenticated Received Chain. If no Authenticated Received Chain
   exists, the instance value is 1.
 
-4. Using the calculated instance value, generate and attach to the message in
-  the following order:  
+4. Using the calculated instance value, generate and attach a complete ARC set
+  to the message as follows:
 
-   1. An ARC-Authentication-Results header field as defined in {{aar-defn}}.  
-   2. An ARC-Message-Signature header field as defined in {{ams-defn}}.  
-   3. An ARC-Seal header field using the AS definition found in {{as-defn}}, 
-    the method described in {{as-hdrs}}, and the Chain Validation Status as 
+   1. Generate and attach an ARC-Authentication-Results header field as defined in {{aar-defn}}.  
+   2. Generate and attach an ARC-Message-Signature header field as defined in {{ams-defn}}.  
+   3. Generate and attach an ARC-Seal header field using the AS definition found in {{as-defn}}, 
+    the prescribed headers defined in {{as-hdrs}}, and the Chain Validation Status as 
     determined during ARC validation.
 
-<!-- TBD: verify proper sub-listing above -->
+<!-- Done: confirm proper sub-numbering above -->
 
 ### Header Fields To Include In ARC-Seal Signatures {#as-hdrs}
 
-<!-- TBD: refer to John L's text -->
+<!-- Done: refer to John L's text -->
 
 The ARC-Seal is generated in a manner similar to how DKIM-Signatures are added
 to messages ({{RFC6376}}, section 3.7), with explicit requirements on the header
@@ -937,7 +942,7 @@ to this specification.
 As with other domain authentication technologies (such as SPF, DKIM, and
 DMARC), ARC makes no claims about the semantic content of messages.
 
-## Increased Header Field Size
+## Increased Header Field Size {#big-hf-risk}
 
 Inclusion of Authenticated Received Chains into messages may cause issues for
 older or constrained MTAs due to increased total header field size. Large header
@@ -1375,6 +1380,7 @@ previously included SPF / DKIM / DMARC, now has ARC added
   * Initial deployments for validation expected in mid-2018.
 
   Contact Info: TBD
+  <!-- TBD: check w/ Juan & Elliott regarding listing them here -->
 
 ## Exim
 
