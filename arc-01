@@ -226,7 +226,7 @@ ARC-enabled handler) than hard evidence which can be independently evaluated.
 ## Custody
 
 "Custody" refers to when an Internet Mail Handler processes a message. When a
-handler takes custody of a message, the handler becomes a Custodian and
+handler takes custody of a message, the handler becomes a custodian and
 attaches their own evidence (authentication results upon receipt) to the
 message if they are ARC-enabled. Evidence is added in such a way so that future
 handlers can verify the authenticity of both evidence and custody.
@@ -243,12 +243,12 @@ travels with a message.
 
 Any ARC-enabled Internet Mail Handler can validate the entire set of custody
 and the authentication results asserted by each party to yield a valid Chain of
-Custody. If the evidence-supplying Custodians can be trusted, then the
+Custody. If the evidence-supplying custodians can be trusted, then the
 validated Chain of Custody describes the (possibly changing) authentication
-results as the message traveled through various Custodians.  
+results as the message traveled through various custodians.  
 
 Even though a message's authentication results might have changed, the validated
-chain of custody can be used to determine if the changes (and the Custodians
+chain of custody can be used to determine if the changes (and the custodians
 responsible for the changes) can be tolerated.
 
 # Terminology and Definitions
@@ -319,7 +319,7 @@ A Sealer is an Internet Mail Handler that attaches a complete and valid ARC Set
 to a message.  
 
 In general concept terms, a Sealer adds its testimony (assertion of authentication
-results) and proof of Custody to the Chain of Custody.
+results) and proof of custody to the Chain of Custody.
 
 ## Validator
 
@@ -330,7 +330,7 @@ Chain is described in {{validate-actions}}.
 
 In general concept terms, a Validator inspects the Chain of Custody to
 determine the content and validity of individual Evidence supplied by
-Custodians.
+custodians.
 
 ##  Imported ABNF Tokens
 
@@ -366,7 +366,7 @@ authentication results as processed by an ARC-participating ADMD at message
 arrival time.
 
 In general concept terms, the AAR header field is where Evidence is recorded by
-a Custodian.
+a custodian.
 
 The AAR header field is similar in syntax and semantics to an
 Authentication-Results field {{I-D-7601bis}}, with two (2) differences:
@@ -395,9 +395,9 @@ the AS signature.
 
 The ARC-Message-Signature (AMS) header field allows an ARC-participating ADMD
 to convey some responsibility (custodianship) for a message and possible
-message modifications to future ARC-participating Custodians.
+message modifications to future ARC-participating custodians.
 
-In general concept terms, the AMS header field identifies a Custodian.
+In general concept terms, the AMS header field identifies a custodian.
 
 The AMS header field has the same syntax and semantics as the DKIM-Signature
 field {{RFC6376}}, with three (3) differences:
@@ -439,9 +439,9 @@ The ARC-Seal (AS) header field permits ARC-participating
 ADMDs to verify the integrity of AAR header fields and corresponding AMS
 header fields.
 
-In general concept terms, the AS header field is how Custodians bind Evidence
-into a Chain of Custody so that Validators can inspect individual Evidence and
-Custodians.
+In general concept terms, the AS header field is how custodians bind their
+authentication results assertions (testimonial) into a Chain of Custody so that
+Validators can inspect individual evidence and custodians.
 
 The AS header field is similar in syntax and semantics to DKIM-Signatures
 {{RFC6376}}, with the following differences:
@@ -534,8 +534,8 @@ Authenticated Received Chain itself.
 
 In general concept terms, an Authenticated Received Chain represents a
 message's Chain of Custody. Validators can consult a message's Chain of Custody
-to gain insight regarding each Custodian of a message and the Evidence
-collected by each Custodian.
+to gain insight regarding each custodian of a message and the Evidence
+collected by each custodian.
 
 ## Chain Validation Status {#cv-defn}
 
