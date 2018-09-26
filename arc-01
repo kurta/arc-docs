@@ -51,12 +51,6 @@ author:
         org: TDP
         role: editor
         email: superuser@gmail.com
-      -
-        ins: T. Draegen
-        name: Tim Draegen
-        org: dmarcian
-        role: editor
-        email: tim@dmarcian.com
 
 normative:
   RFC2119:
@@ -275,8 +269,6 @@ document.  The following terms are imported from {{RFC5598}}:
 * Message Transfer Agents (MTA), Section 4.3.2
 * Message Submission Agent (MSA), Section 4.3.1
 * Message Delivery Agent (MDA), Section 4.3.3
-* Internet Mail Handlers process and deliver messages across the Internet and
-include MSAs, MTAs, MDAs, gateways, and mailing lists as defined in {{RFC5598}}
 
 Syntax descriptions use Augmented BNF (ABNF) {{RFC5234}} and {{RFC7405}}.
 
@@ -308,6 +300,11 @@ Received Chain to be created. Additional attachments of ARC Sets cause the
 Authenticated Received Chain to be extended.
 
 In General concept terms, an Authenticated Received Chain represents Chain of Custody.
+
+## Internet Mail Handlers
+
+Internet Mail Handlers process and deliver messages across the Internet and
+include MSAs, MTAs, MDAs, gateways, and mailing lists as defined in {{RFC5598}}.
 
 ## Signing vs Sealing {#sign_v_seal}
 
@@ -403,7 +400,7 @@ message modifications to future ARC-participating Custodians.
 In general concept terms, the AMS header field identifies a Custodian.
 
 The AMS header field has the same syntax and semantics as the DKIM-Signature
-field {{RFC6376}}, with four (4) differences:
+field {{RFC6376}}, with three (3) differences:
 
 * the name of the header field itself;
 * no version tag ("v") is defined for the AMS header field. As required 
@@ -411,16 +408,9 @@ field {{RFC6376}}, with four (4) differences:
   tags (in {{RFC6376}}), if seen, a version tag MUST be ignored;
 * the "i" (AUID) tag is not imported from DKIM; instead, this tag is replaced 
   by the "instance tag" as defined in {{i-defn}}; 
-* when building the header field list to be signed, ARC-related header fields 
-  MUST be submitted to the hash function in increasing instance order.
   
 ARC places no requirements on the selectors and/or domains used for the AMS
 header field signatures.
-
-_INFORMATIONAL:_ While implementers may choose to use various selectors and/or
-domains for ARC set header fields, no compelling arguement for or against such
-usage has been made within the working group. As such we have chosen to allow
-maximum freedom for the experimental definition of this protocol.
 
 The formal ABNF for the AMS header field is:
 
@@ -479,15 +469,14 @@ The formal ABNF for the AS header field is:
     arc-as-info = instance \[CFWS] ";" tag-list
     arc-seal = "ARC-Seal:" \[CFWS] arc-as-info
 
-### Internationalized mail (EAI)
+### Internationalized Email (EAI)
 
 In internationalized messages {{RFC6532}} many header fields can contain UTF-8
 as well as ASCII text.  The changes for EAI are all inherited from DKIM as
 updated by {{draft-levine-eaiauth}} and Authentication-Results as updated
 in {{I-D-7601bis}}, but are called out here for emphasis.
 
-In an AS header, the d= s= tags can be contain U-labels.  In an AMS header, the
-d= s= tags can contain U-labels, U-labels in the domain, and in all tags,
+In all ARC header fields, the d= s= tags can contain U-labels.  In all tags,
 non-ASCII characters need not be quoted in dkim-quoted-printable.  
 
 The AAR header allows UTF-8 in the same places that A-R does, as
@@ -1131,6 +1120,16 @@ able to gather the necessary data to answer some or all of them.
 Data should be collected to show if the ARC-Seal (AS) provides value beyond the
 ARC Message Signature (AMS) for either making delivery decisions or catching
 malicious actors trying to craft or replay malicious chains.
+
+### Usage and/or signals from multiple selectors and/or domains in ARC sets
+
+While implementers may choose to use various selectors and/or
+domains for ARC set header fields, no compelling argument for or against such
+usage has been made within the working group. As such we have chosen to allow
+maximum freedom for the experimental definition of this protocol.
+
+Wider deployment experience and higher volumes of traffic may show whether this
+is useful.
 
 ### DNS Overhead
 
