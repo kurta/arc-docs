@@ -1,7 +1,7 @@
 ﻿---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-16c
+docname: draft-ietf-dmarc-arc-protocol-16d
 date: 2018-09
 
 # stand_alone: true
@@ -218,10 +218,10 @@ The authentication results for a message are determined upon receipt of a
 message and documented in the Authentication-Results header field(s). ARC
 extends this mechanism to survive transit through intermediary ADMDs.
 
-Because the first-hand determination of the authentication results may never
-be able to be reproduced by other handlers, the assertion of authentication 
-results is more akin to testimony by a verifiable party (the sealing 
-ARC-enabled handler) than hard evidence which can be independently evaluated.
+Because the first-hand determination of the authentication results may never be
+able to be reproduced by other handlers, the assertion of authentication
+results is more akin to testimony by a verifiable party than hard evidence
+which can be independently evaluated.
 
 ## Custody
 
@@ -257,9 +257,7 @@ This section defines terms used in the rest of the document.
 
 Readers should to be familiar with the contents, core concepts, and definitions
 found in {{RFC5598}}. The potential roles of transit services in the delivery of
-email are directly relevant. Throughout this document the term "intermediaries"
-refers to the both regular MTAs as well as delivery/reposting agents such as 
-mailing lists covered within the scope of {{RFC5598}}'s transit services.
+email are directly relevant. 
 
 Language, syntax (including some ABNF constructs), and concepts are imported
 from DKIM {{RFC6376}}. Specific references to DKIM are made throughout this
@@ -301,10 +299,17 @@ Authenticated Received Chain to be extended.
 
 In General concept terms, an Authenticated Received Chain represents Chain of Custody.
 
-## Internet Mail Handlers
+## Internet Mail Handlers / Intermediaries
 
 Internet Mail Handlers process and deliver messages across the Internet and
 include MSAs, MTAs, MDAs, gateways, and mailing lists as defined in {{RFC5598}}.
+
+Throughout this document the term "intermediaries" refers to the both regular
+MTAs as well as delivery/reposting agents such as mailing lists covered within
+the scope of {{RFC5598}}'s transit services.
+
+"Intermediaries" and "Internet Mail Handlers" are used synonomously throughout 
+this document.
 
 ## Signing vs Sealing {#sign_v_seal}
 
