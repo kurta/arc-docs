@@ -590,12 +590,12 @@ same instance tag value.
 To perform Sealing (aka to build and attach a new ARC Set), the following
 actions must be taken by an ARC Sealer when presented with a message:
 
-1. All message modifications (including adding DKIM-Signature(s)) MUST be
-  performed before Sealing.
+1. All message modifications (including adding DKIM-Signature header field(s)) 
+  MUST be performed before Sealing.
 
-2. If the message already contains an Authenticated Received Chain with a "fail"
-  Chain Validation status, then there is no need to proceed and the algorithm
-  stops here.
+2. If the message already contains an Authenticated Received Chain with the
+  most recent AS reporting "cv=fail", then there is no need to proceed and the
+  algorithm stops here.
 
 3. Calculate the instance value: if the message already contains an Authenticated
   Received Chain, the instance value is 1 more than the highest instance number
@@ -609,7 +609,7 @@ actions must be taken by an ARC Sealer when presented with a message:
    2. Generate and attach an ARC-Message-Signature header field as defined in {{ams-defn}}.  
    3. Generate and attach an ARC-Seal header field using the AS definition found in {{as-defn}}, 
     the prescribed headers defined in {{as-hdrs}}, and the Chain Validation Status as 
-    determined during ARC validation.
+    determined during ARC Validation.
 
 <!-- Done: confirm proper sub-numbering above -->
 
@@ -653,7 +653,7 @@ chains.
 A message can have only one Authenticated Received Chain on it at a time. Once
 broken, the chain cannot be continued, as the chain of custody is no longer
 valid and responsibility for the message has been lost. For further discussion
-of this topic and the designed restriction which prevents chain continuation or
+of this topic and the design restriction which prevents chain continuation or
 re-establishment, see {{ARC-USAGE}}.
 
 ### Broad Ability to Seal
