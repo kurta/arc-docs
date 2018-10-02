@@ -1088,15 +1088,15 @@ Header Field Registry", as follows:
 
 The following value should be added to the {{ENHANCED-STATUS}} registry, as follows:
 
-* Code: X.7.29
-  Sample Text: ARC validation failure
-  Associated basic status code: 550
-  Description: This status code may be returned when 
+* Code: X.7.29  
+  Sample Text: ARC validation failure  
+  Associated basic status code: 550  
+  Description: This status code may be returned when
      a message fails multiple authentication checks,
-     including ARC validation
-  Reference: {{&SELF}}
-  Submitter: K. Andersen
-  Change controller: IESG
+     including ARC validation  
+  Reference: {{&SELF}}  
+  Submitter: K. Andersen  
+  Change controller: IESG  
 
 # Experimental Considerations {#exp-consider}
 
