@@ -1,7 +1,7 @@
 ﻿---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-17
+docname: draft-ietf-dmarc-arc-protocol-17a
 date: 2018-10
 
 # stand_alone: true
@@ -62,8 +62,8 @@ normative:
   RFC6532:
   RFC7208:
   RFC7405:
-  RFC7601:
   RFC8174:
+#  RFC7601:
 
 informative:
   RFC7942:
@@ -151,7 +151,9 @@ informative:
         name: Seth Blank
 
 entity:
-      SELF: "[I-D.ARC]"
+      SELF: "this document"
+
+# was previously set as SELF --> "[I-D.ARC]"
 
 # --- note_IESG_Note
 #
@@ -305,7 +307,7 @@ Throughout this document the term "intermediaries" refers to the both regular
 MTAs as well as delivery/reposting agents such as mailing lists covered within
 the scope of {{RFC5598}}'s transit services.
 
-"Intermediaries" and "Internet Mail Handlers" are used synonomously throughout 
+"Intermediaries" and "Internet Mail Handlers" are used synonymously throughout 
 this document.
 
 ## Authentication Assessment
@@ -561,7 +563,7 @@ communicated in several ways:
 Chain Validation Status has one of three possible values:
 
 * none: There was no Authenticated Received Chain on the message when it
-  arrived for validation. Typically this occurs when a message is received
+  arrived for validation. Typically, this occurs when a message is received
   directly from a message's original Message Transfer Agent (MTA) or Message
   Submission Agent (MSA), or from an upstream Internet Mail Handler that is not
   participating in ARC handling. 
@@ -1084,6 +1086,8 @@ Header Field Registry", as follows:
 
 ## New Enhanced Status Code - ARC Validation
 
+The following value should be added to the {{ENHANCED-STATUS}} registry, as follows:
+
 * Code: X.7.29
   Sample Text: ARC validation failure
   Associated basic status code: 550
@@ -1157,7 +1161,7 @@ be added.  This is similar to some of the initial processing and query load
 concerns which were debated at the time of the DKIM specification development.
 
 Data should be collected to better understand usable length and distribution of
-lengths found in valid Authenticated Received Chains along with the the DNS
+lengths found in valid Authenticated Received Chains along with the DNS
 impact of processing Authenticated Received Chains.
 
 An effective operational maximum will have to be developed through deployment
@@ -1345,7 +1349,7 @@ previously included SPF / DKIM / DMARC, now has ARC added
 
   Organization: FastMail  
   Description: Email domain authentication milter, uses MAIL::DKIM (see above)  
-  Status of Operation: Intial validation completed during IETF99 hackathon with some follow-on work 
+  Status of Operation: Initial validation completed during IETF99 hackathon with some follow-on work 
   during the week  
   Coverage: Built to support {{ARC-DRAFT-14}}  
   Licensing: Open Source  
@@ -1374,7 +1378,7 @@ previously included SPF / DKIM / DMARC, now has ARC added
 
   Organization: Oracle  
   Description:  
-  Status of Operation: Intial development work during IETF99 hackathon. Framework code is complete,
+  Status of Operation: Initial development work during IETF99 hackathon. Framework code is complete,
     crypto functionality requires integration with libsodium  
   Coverage: Work in progress  
   Licensing: Unknown  
