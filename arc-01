@@ -1,8 +1,8 @@
 ﻿---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-16e
-date: 2018-09
+docname: draft-ietf-dmarc-arc-protocol-17
+date: 2018-10
 
 # stand_alone: true
 
@@ -572,8 +572,9 @@ Chain Validation Status has one of three possible values:
 
 # Protocol Actions
 
-ARC-enabled Internet Mail Handlers generally act as both ARC Sealers (when
-sending messages) and ARC Validators (when receiving messages).
+ARC-enabled Internet Mail Handlers generally act as both ARC Validators (when
+receiving messages) and ARC Sealers (when sending messages onward, not originated
+locally).
 
 <!-- moved from end of section - outcome -->
 
@@ -582,9 +583,10 @@ allows Internet Mail Handlers to ascertain:
 
 * all ARC-participating ADMDs that claim responsibility for handling (and
   possibly modifying) the message in transit;
-* the authentication assessments of the message as determined by each ADMD (from AAR header fields).
+* the authentication assessments of the message as determined by each ADMD 
+  (from AAR header fields).
 
-Given this information, Internet Mail Handlers MAY inform local policy
+With this information, Internet Mail Handlers MAY inform local policy
 decisions regarding disposition of messages that experience authentication
 failure due to intermediate processing.
 
@@ -921,8 +923,8 @@ header field with instance value of 2). d2.example is the Sealing domain for
 ARC Set #2 (i=2) and d1.example is the Sealing domain for ARC Set #1 (i=1).
 
 Depending on the reporting practices of intermediate message handlers, Domain
-Owners may receive multiple DMARC reports for a single message. DMARC report
-processors should be aware of this behaviour and make the necessary
+Owners may receive multiple DMARC reports for a single message. Receivers of 
+DMARC reports should be aware of this behaviour and make the necessary
 accommodations.
 
 # Privacy Considerations {#privacy-consider}
@@ -1422,9 +1424,6 @@ previously included SPF / DKIM / DMARC, now has ARC added
 
 # Appendix A - Design Requirements
 
-\[\[ Note: This section is re-inserted for background information
-from early versions of the spec. ]]
-
 The specification of the ARC framework is driven by the following high-level
 goals, security considerations, and practical operational requirements.
 
@@ -1449,13 +1448,12 @@ making unsubstantiated conclusions when encountering a "broken" ARC sequence.
 
 # Appendix B - Example Usage
 
-\[\[ Note: The following examples were mocked up early in the definition
-process for the spec. They no longer reflect the current definition and
-need various updates which will be included in a future draft.
+\[\[ TODO: There have been several small changes to the spec that have
+invalidated all the old examples. Those old examples have been removed to
+prevent confusion. New examples will be forthcoming shortly (early October,
+2018) as existing software comes up to date with the spec and can independently
+generate and validate the examples. 
 [Issue 17](https://trac.ietf.org/trac/dmarc/ticket/17) ]]
-
-\[\[ Note: Need input from the WG as to what sort of sequence of examples
-would be considered useful - otherwise we'll just drop this section entirely. ]]
 
     <removed for now to reduce confusion>
 
@@ -1467,7 +1465,7 @@ The authors thank all of the OAR-Dev group for the ongoing help and
 though-provoking discussions from all the participants, especially: Alex
 Brotman, Brandon Long, Dave Crocker, Elizabeth Zwicky, Franck Martin, Greg
 Colburn, J. Trent Adams, John Rae-Grant, Mike Hammer, Mike Jones, Steve Jones,
-Terry Zink, Tim Draegen.
+Terry Zink, Tim Draegen, Gene Shuman, Scott Kitterman, Bron Gondwana.
 
 Grateful appreciation is extended to the people who provided feedback through
 the discuss mailing list.
