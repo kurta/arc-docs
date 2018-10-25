@@ -64,6 +64,22 @@ normative:
   RFC7405:
   RFC8174:
 #  RFC7601:
+  draft-levine-eaiauth:
+    title: E-mail Authentication for Internationalized Mail
+    target: https://tools.ietf.org/html/draft-levine-appsarea-eaiauth-03
+    date: 2018-08-11
+    author:
+      -
+        ins: J. Levine
+        name: John Levine
+  I-D-7601bis:
+    title: Message Header Field for Indicating Message Authentication Status
+    target: https://datatracker.ietf.org/doc/draft-ietf-dmarc-rfc7601bis/
+    date: 2018-02-07
+    author:
+      -
+        ins: M. Kucherawy
+        name: Murray Kucherawy
 
 informative:
   RFC7942:
@@ -117,26 +133,10 @@ informative:
       -
         ins: K. Andersen
         name: Kurt Andersen
-  draft-levine-eaiauth:
-    title: E-mail Authentication for Internationalized Mail
-    target: https://tools.ietf.org/html/draft-levine-appsarea-eaiauth-03
-    date: 2018-08-11
-    author:
-      -
-        ins: J. Levine
-        name: John Levine
-  I-D-7601bis:
-    title: Message Header Field for Indicating Message Authentication Status
-    target: https://datatracker.ietf.org/doc/draft-ietf-dmarc-rfc7601bis/
-    date: 2018-02-07
-    author:
-      -
-        ins: M. Kucherawy
-        name: Murray Kucherawy
   ARC-MULTI:
     title: Using Multiple Signing Algorithms with ARC
-    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-multi-01
-    date: 2018-01
+    target: https://tools.ietf.org/html/draft-ietf-dmarc-arc-multi-02
+    date: 2018-06
     author:
       -
         ins: K. Andersen
