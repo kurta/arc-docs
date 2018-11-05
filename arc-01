@@ -1,8 +1,8 @@
 ﻿---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-18
-date: 2018-10
+docname: draft-ietf-dmarc-arc-protocol-18a
+date: 2018-11
 
 # stand_alone: true
 
@@ -1036,7 +1036,7 @@ most recently defined in {{I-D-7601bis}}:
 * Method: arc  
   Definition: {{&SELF}}  
   ptype: smtp  
-  Property: client-ip  
+  Property: remote-ip  
   Value: IP address of originating SMTP connection  
   Status: active  
   Version: 1
