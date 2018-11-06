@@ -14,7 +14,7 @@ Expires: May 10, 2019                                             Google
 
 
               Authenticated Received Chain (ARC) Protocol
-                    draft-ietf-dmarc-arc-protocol-19
+                    draft-ietf-dmarc-arc-protocol-20
 
 Abstract
 
@@ -1337,7 +1337,7 @@ Internet-Draft                ARC-Protocol                 November 2018
 
    o  Header field name: ARC-Seal
       Applicable protocol: mail
-      Status: draft
+      Status: Experimental
 
 
 
@@ -1352,14 +1352,14 @@ Internet-Draft                ARC-Protocol                 November 2018
 
    o  Header field name: ARC-Message-Signature
       Applicable protocol: mail
-      Status: draft
+      Status: Experimental
       Author/Change controller: IETF
       Specification document(s): this document
       Related information: [RFC6376]
 
    o  Header field name: ARC-Authentication-Results
       Applicable protocol: mail
-      Status: standard
+      Status: Experimental
       Author/Change controller: IETF
       Specification document(s): this document
       Related information: [I-D-7601bis]
