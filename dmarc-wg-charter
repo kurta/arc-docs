@@ -1,4 +1,4 @@
- Domain-based Message Authentication, Reporting & Conformance (DMARC)
+Domain-based Message Authentication, Reporting & Conformance (DMARC)
 uses existing mail authentication technologies (SPF and DKIM) to
 extend validation to the RFC5322.From field. DMARC uses DNS records
 to add policy-related requests for receivers and defines a feedback
@@ -80,6 +80,9 @@ organizational domain is out of scope for this working group. However
 the working group can consider extending the base DMARC specification
 to accommodate such a standard, should it be developed during the
 life of this working group.
+
+Clarifying the handling of internationalized email addresses (EAI) 
+throughout the authentication stack of SPF, DKIM, and DMARC.
 
 Improvements in DMARC features (identifier alignment, reporting,
 policy preferences) will be considered, such as:
