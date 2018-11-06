@@ -1,7 +1,7 @@
 ﻿---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-18a
+docname: draft-ietf-dmarc-arc-protocol-18b
 date: 2018-11
 
 # stand_alone: true
@@ -1452,14 +1452,13 @@ making unsubstantiated conclusions when encountering a "broken" ARC sequence.
 
 # Appendix B - Example Usage
 
-\[\[ TODO: There have been several small changes to the spec that have
-invalidated all the old examples. Those old examples have been removed to
-prevent confusion. New examples will be forthcoming shortly (early October,
-2018) as existing software comes up to date with the spec and can independently
-generate and validate the examples. 
-[Issue 17](https://trac.ietf.org/trac/dmarc/ticket/17) ]]
+The following message is an example of one which has passed through several 
+intermediary handlers, some of which have modified the message and others which
+have not:
 
-    <removed for now to reduce confusion>
+~~~~~~~~~~
+
+~~~~~~~~~~
 
 # Acknowledgements
 
