@@ -1,7 +1,7 @@
 ﻿---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-19
+docname: draft-ietf-dmarc-arc-protocol-20
 date: 2018-11
 
 # stand_alone: true
@@ -1065,21 +1065,21 @@ Header Field Registry", as follows:
 
 * Header field name: ARC-Seal  
   Applicable protocol: mail  
-  Status: draft  
+  Status: Experimental  
   Author/Change controller: IETF  
   Specification document(s): {{&SELF}}  
   Related information: {{RFC6376}}
 
 * Header field name: ARC-Message-Signature  
   Applicable protocol: mail  
-  Status: draft  
+  Status: Experimental  
   Author/Change controller: IETF  
   Specification document(s): {{&SELF}}  
   Related information: {{RFC6376}}
 
 * Header field name: ARC-Authentication-Results  
   Applicable protocol: mail  
-  Status: standard  
+  Status: Experimental  
   Author/Change controller: IETF  
   Specification document(s): {{&SELF}}  
   Related information: {{I-D-7601bis}}  
