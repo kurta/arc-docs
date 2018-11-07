@@ -774,10 +774,11 @@ restriction which prevents chain continuation or re-establishment, see
 
 If an ARC Validator determines that the incoming message fails ARC validation,
 the Validator MAY signal the breakage through the extended SMTP response code
-5.7.29 "ARC validation failure" and corresponding SMTP basic response code. As
-indicated in {{RFC6376}}, DKIM validation failures MAY be indicated with codes
-X.7.20 - X.7.22.  Validators MAY use the more general 5.7.26 "Multiple
-authentication checks failed" instead of the specific codes.
+5.7.29 "ARC validation failure" and corresponding SMTP basic response code. 
+Because ARC failures are likely only to be detected in the context of other
+underlying authentication mechanism failures, validators MAY use the more 
+general 5.7.26 "Multiple authentication checks failed" instead of the 
+ARC-specific code.
 
 # Communication of Validation Results
 
