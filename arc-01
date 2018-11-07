@@ -1,7 +1,7 @@
 ﻿---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-20
+docname: draft-ietf-dmarc-arc-protocol-21
 date: 2018-11
 
 # stand_alone: true
@@ -32,7 +32,7 @@ author:
         region: California
         code: 94085
         country: USA
-        email: kurta@linkedin.com
+        email: kurt+ietf@drkurt.com
       -
         ins: B. Long
         name: Brandon Long
@@ -772,11 +772,12 @@ restriction which prevents chain continuation or re-establishment, see
 
 ### Responding to ARC Validation Failures During the SMTP Transaction
 
-If an ARC Validator determines that the incoming message fails authentication
-checks (potentially including ARC validation), the Validator MAY signal the
-breakage through the extended SMTP response code 5.7.29 "ARC validation failure"
-and corresponding SMTP basic response code. Validators MAY use the more
-general 5.7.28 "Multiple authentication checks failed" instead.
+If an ARC Validator determines that the incoming message fails ARC validation,
+the Validator MAY signal the breakage through the extended SMTP response code
+5.7.29 "ARC validation failure" and corresponding SMTP basic response code. As
+indicated in {{RFC6376}}, DKIM validation failures MAY be indicated with codes
+X.7.20 - X.7.22.  Validators MAY use the more general 5.7.26 "Multiple
+authentication checks failed" instead of the specific codes.
 
 # Communication of Validation Results
 
@@ -1092,8 +1093,7 @@ The following value should be added to the {{ENHANCED-STATUS}} registry, as foll
   Sample Text: ARC validation failure  
   Associated basic status code: 550  
   Description: This status code may be returned when
-     a message fails multiple authentication checks,
-     including ARC validation  
+     a message fails ARC validation  
   Reference: {{&SELF}}  
   Submitter: K. Andersen  
   Change controller: IESG  
@@ -1437,7 +1437,7 @@ previously included SPF / DKIM / DMARC, now has ARC added
 
 --- back
 
-# Appendix A - Design Requirements
+# Design Requirements
 
 The specification of the ARC framework is driven by the following high-level
 goals, security considerations, and practical operational requirements.
@@ -1461,7 +1461,7 @@ across trust boundaries.
 ARC is not a trust framework. Users of the ARC header fields are cautioned against
 making unsubstantiated conclusions when encountering a "broken" ARC sequence.
 
-# Appendix B - Example Usage
+# Example Usage
 
 The following message is an example of one which has passed through several 
 intermediary handlers, some of which have modified the message and others which
