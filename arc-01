@@ -1036,7 +1036,7 @@ This draft adds several new items to the Email Authentication Methods registry,
 most recently defined in {{I-D-7601bis}}:
 
 * Method: arc  
-  Definition: {{&SELF}}  
+  Definition: {{&SELF}} section 6  
   ptype: smtp  
   Property: remote-ip  
   Value: IP address of originating SMTP connection  
@@ -1044,19 +1044,11 @@ most recently defined in {{I-D-7601bis}}:
   Version: 1
 
 * Method: arc  
-  Definition: {{&SELF}}  
+  Definition: {{&SELF}} section 6   
   ptype: header  
   Property: oldest-pass  
   Value: The instance id of the oldest validating AMS, or 0 if they all pass 
     (see {{validate-actions}})  
-  Status: active  
-  Version: 1
-
-* Method: dkim  
-  Definition: {{I-D-7601bis}}  
-  ptype: header  
-  Property: s  
-  Value: value of signature "s" tag  
   Status: active  
   Version: 1
 
