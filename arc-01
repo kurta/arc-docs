@@ -1478,9 +1478,9 @@ Received: from \[2001:DB8::1A] (w-x-y-z.dsl.static.isp.example \[w.x.y.z])
     by segv.d1.example with ESMTP id t0FN4a8O084569;
     Thu, 14 Jan 2015 15:00:01 -0800 (PST)
     (envelope-from jqd@d1.example)
-Received: from mail-ob0-f188.google.example (mail-ob0-f188.google.example
-    \[208.69.40.157]) by clochette.example.org with ESMTP id
-    d200mr22663000ykb.93.1421363268
+Received: from mail-ob0-f188.google.example 
+    (mail-ob0-f188.google.example \[208.69.40.157]) by 
+    clochette.example.org with ESMTP id d200mr22663000ykb.93.1421363268
     for &lt;fmartin@example.org>; Thu, 14 Jan 2015 15:03:15 -0800 (PST)
 ARC-Seal: i=3; a=rsa-sha256; cv=pass; d=clochette.example.org; s=
 	clochette; t=12345; b=CU87XzXlNlk5X/yW4l73UvPUcP9ivwYWxyBWcVrRs7
@@ -1510,8 +1510,8 @@ ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=
 	9WSqI9s9DfyKDfWg==
 ARC-Authentication-Results: i=2; gmail.example; spf=fail
     smtp.from=jqd@d1.example; dkim=fail (512-bit key)
-    header.i=@example.org; dmarc=fail; arc=pass (as.1.lists.example.org=pass, 
-    ams.1.lists.example.org=pass)
+    header.i=@example.org; dmarc=fail; arc=pass 
+    (as.1.lists.example.org=pass, ams.1.lists.example.org=pass)
 ARC-Seal: i=1; a=rsa-sha256; cv=none; d=lists.example.org; s=dk-lists;
          t=12345; b=TlCCKzgk3TrAa+G77gYYO8Fxk4q/Ml0biqduZJeOYh6+0zhwQ8u/
         lHxLi21pxu347isLSuNtvIagIvAQna9a5A==
@@ -1520,9 +1520,9 @@ ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=
         dk-lists; t=12345; bh=KWSe46TZKCcDbH4klJPo+tjk5LWJnVRlP5pvjXFZYL
         Q=; b=DsoD3n3hiwlrN1ma8IZQFgZx8EDO7Wah3hUjIEsYKuShRKYB4LwGUiKD5Y
         yHgcIwGHhSc/4+ewYqHMWDnuFxiQ==
-ARC-Authentication-Results: i=1; lists.example.org; spf=pass smtp.mfrom=jqd@d1.example;
-    dkim=pass (512-bit key) header.i=@d1.example;
-    dmarc=pass
+ARC-Authentication-Results: i=1; lists.example.org; spf=pass 
+    smtp.mfrom=jqd@d1.example; dkim=pass (512-bit key) 
+    header.i=@d1.example; dmarc=pass
 DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; d=d1.example; h=
 	message-id:date:from:to:subject; s=origin2015; bh=bIxxaeIQvmOBdT
 	AitYfSNFgzPP4=; b=qKjd5fYibKXWWIcMKCgRYuo1vJ2fD+IAQPjX+uamXIGY2Q
