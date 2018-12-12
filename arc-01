@@ -1,8 +1,8 @@
 ﻿---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-21
-date: 2018-11
+docname: draft-ietf-dmarc-arc-protocol-22
+date: 2018-12
 
 # stand_alone: true
 
@@ -916,7 +916,7 @@ EXAMPLE:
    &lt;type>local_policy&lt;/type>
    &lt;comment>arc=pass as\[2].d=d2.example as\[2].s=s2 
      as\[1].d=d1.example as\[1].s=s3 
-     remote-ip[1]=10.10.10.13&lt;/comment>
+     remote-ip[1]=2001:DB8::1A&lt;/comment>
   &lt;/reason>
 &lt;/policy_evaluated>
 ~~~~~~~~~~
@@ -945,6 +945,10 @@ to this specification.
 
 As with other domain authentication technologies (such as SPF, DKIM, and
 DMARC), ARC makes no claims about the semantic content of messages.
+A received message with an ARC chain provides evidence (at instance N) that:
+The sealing domain (ARC-Seal d=) processed a message with this body, 
+determined the reported ARC-Authentication-Results, and the ARC chain
+1..N-1. 
 
 ## Increased Header Field Size {#big-hf-risk}
 
@@ -1039,7 +1043,7 @@ most recently defined in {{I-D-7601bis}}:
   Definition: {{&SELF}} section 6  
   ptype: smtp  
   Property: remote-ip  
-  Value: IP address of originating SMTP connection  
+  Value: IP address (v4 or v6) of originating SMTP connection  
   Status: active  
   Version: 1
 
@@ -1469,7 +1473,7 @@ Received: from segv.d1.example (segv.d1.example \[72.52.75.15])
     by lists.example.org (8.14.5/8.14.5) with ESMTP id t0EKaNU9010123
     for &lt;arc@example.org>; Thu, 14 Jan 2015 15:01:30 -0800 (PST)
     (envelope-from jqd@d1.example)
-Received: from \[10.10.10.131] (w-x-y-z.dsl.static.isp.com \[w.x.y.z])
+Received: from \[2001:DB8::1A] (w-x-y-z.dsl.static.isp.example \[w.x.y.z])
     (authenticated bits=0)
     by segv.d1.example with ESMTP id t0FN4a8O084569;
     Thu, 14 Jan 2015 15:00:01 -0800 (PST)
