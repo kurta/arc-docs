@@ -1,7 +1,7 @@
 ﻿---
 title: Authenticated Received Chain (ARC) Protocol
 abbrev: ARC-Protocol
-docname: draft-ietf-dmarc-arc-protocol-22
+docname: draft-ietf-dmarc-arc-protocol-23
 date: 2018-12
 
 # stand_alone: true
@@ -944,11 +944,11 @@ The Security Considerations of {{RFC6376}} and {{I-D-7601bis}} apply directly
 to this specification.
 
 As with other domain authentication technologies (such as SPF, DKIM, and
-DMARC), ARC makes no claims about the semantic content of messages.
-A received message with an ARC chain provides evidence (at instance N) that:
-The sealing domain (ARC-Seal d=) processed a message with this body, 
-determined the reported ARC-Authentication-Results, and the ARC chain
-1..N-1. 
+DMARC), ARC makes no claims about the semantic content of messages.  
+A received message with an ARC chain provides evidence (at instance N) that: 
+The sealing domain (ARC-Seal d=) processed a message with this body, determined
+the authentication assessment reported in the ARC-Authentication-Results, and
+the ARC chain 1..N-1 (with the validation status as reported in the cv field). 
 
 ## Increased Header Field Size {#big-hf-risk}
 
@@ -1220,11 +1220,13 @@ of August 2018.
    Description: Internal production implementation with both debug
      analysis and validating + sealing pass-through function  
    Status of Operation: Production - Incoming Validation  
-   Coverage: Full spec implemented as of {{ARC-DRAFT-14}}  
-   Licensing: Proprietary - Internal only  
+   Coverage: Full spec implemented as of {{&SELF}}  
+   Licensing: Internal only  
    Implementation Notes:
 
-  * Full functionality was demonstrated during the interop testing on 2018-03-17.
+  * Full functionality was demonstrated during the interop testing on 2018-03-17
+    and 2018-10-12. All traffic going into GSuite, Google Groups, or GMail 
+    mailboxes will have ARC validation and sealing. 
 
    Contact Info: <arc-discuss@dmarc.org>
 
@@ -1246,6 +1248,8 @@ of August 2018.
   integrated OATH environment. The implementation was based on the Apache
   James DKIM code base and may be contributed back to that project in 
   the future.
+  * 2018-10: No longer available due to infrastucture changes at
+  AOL/Yahoo!/Oath.
 
   Contact Info: <arc-discuss@dmarc.org>
 
@@ -1254,13 +1258,14 @@ of August 2018.
    Organization: dkimpy developers/Scott Kitterman  
    Description: Python DKIM package  
    Status of Operation: Production  
-   Coverage:
+   Coverage: Full spec implemented as of {{&SELF}}
 
    * 2017-07-15: The internal test suite is incomplete, but the command line
    developmental version of validator was demonstrated to interoperate with
    the Google and AOL implementations during the interop on 2017-07-15 and the
    released version passes the tests in {{ARC-TEST}}
    [arc_test_suite](https://github.com/Valimail/arc_test_suite) with both python and python3.
+   * 2018-10: Re-validated in the interop
 
    Licensing: Open/Other (same as dkimpy package = BCD version 2)  
    Contact Info: https://launchpad.net/dkimpy
@@ -1271,11 +1276,12 @@ of August 2018.
   Description: Implementation of milter functionality related to the OpenDKIM
     and OpenDMARC packages  
   Status of Operation: Beta  
-  Coverage: Built to support {{ARC-DRAFT-14}}  
+  Coverage: Built to support {{&SELF}}  
   Licensing: Open/Other (same as OpenDKIM and OpenDMARC packages)  
   Implementation Notes:
 
-  * Known issues have been resolved with release X
+  * 2018-10: Validated with one bug discovered during interop
+  * 2018-11: Known issues have been resolved with release 1.0.0-Beta2
 
   Contact Info: <arc-discuss@dmarc.org>, <openarc-users@openarc.org>
 
@@ -1291,6 +1297,7 @@ of August 2018.
   * Appears to work properly in at least one beta deployment, but
   waiting on acceptance of the pull request into the mainline of
   mailman development
+  * Discussions continuing with Mailman team to get this integrated
 
   Contact Info: https://www.gnu.org/software/mailman/contact.html
 
@@ -1310,6 +1317,7 @@ http://arc.mailerq.com/ (warning - https is not supported).
 willing to paste a private key into an unsecured web form.
    * 2017-07-15: Testing shows that results match the other implementations
 listed in this section.
+   * 2018-10: not tested during interop
 
   Contact Info: https://www.copernica.com/
 
@@ -1325,6 +1333,7 @@ listed in this section.
   * 2017-06-12: Released with version 1.6.0
   * 2017-07-15: Testing during the interop showed that the validation functionality
   interoperated with the Google, AOL, dkimpy and MailerQ implementations
+  * 2018-10: Re-validated during the interop
 
   Contact Info: https://rspamd.com/doc/modules/arc.html and https://github.com/vstakhov/rspamd
 
@@ -1339,6 +1348,8 @@ previously included SPF / DKIM / DMARC, now has ARC added
   Implementation Notes:
 
   * 2017-12-15: v0.50 released with full test set passing for ARC
+  * 2018-10: Revalidated during the interop and used for the creation of the
+  Appendix B example
 
   Contact Info: http://search.cpan.org/~mbradshaw/Mail-DKIM-0.50/
 
@@ -1355,19 +1366,21 @@ previously included SPF / DKIM / DMARC, now has ARC added
   * 2017-07-15: Validation functionality which interoperates with Gmail, AOL, dkimpy was demonstrated; later in
   the week of IETF99, the signing functionality was reported to be working
   * 2017-07-20: ARC functionality has not yet been pushed back to the github repo but should be showing up soon
+  * 2018-10: Revalidated during the interop
 
   Contact Info: https://github.com/fastmail/authentication_milter
 
 ## Sympa List Manager
 
   Organization: Sympa Dev Community  
-  Description: Work in progress  
-  Status of Operation: Work in progress  
-  Coverage: unknown  
+  Description: Beta released
+  Status of Operation: Beta released
+  Coverage: Built to support {{&SELF}}, based on Mail::DKIM module
   Licensing: open source  
   Implementation Notes:
 
   * 2018-01-05: Tracked as https://github.com/sympa-community/sympa/issues/153
+  * 2018-12-08: Sympa 6.2.37 beta 3 incorporates ARC support, scheduled for stable release 6.2.38 on 2018-12-21
 
   Contact Info: https://github.com/sympa-community
 
@@ -1394,7 +1407,7 @@ previously included SPF / DKIM / DMARC, now has ARC added
   Licensing: Unknown  
   Implementation Notes:
 
-  * Initial deployments for validation expected in mid-2018.
+  * 2018-10: Beta version in private evaluation, not tested during interop.
 
   Contact Info: TBD
   <!-- TBD: check w/ Juan & Elliott regarding listing them here -->
@@ -1414,12 +1427,13 @@ previously included SPF / DKIM / DMARC, now has ARC added
 
   Organization: Halon  
   Status of Operation: Operational as of May 2018  
-  Coverage: Full spec implemented as of {{ARC-DRAFT-14}}  
+  Coverage: Full spec implemented as of {{&SELF}}
   Licensing: Commercial, trial version available for download  
   Contact Info: https://halon.io  
   Implementation notes:
 
   * GPL'd library with ARC capabilities: https://github.com/halon/libdkimpp
+  * 2018-10: Validated during interop
 
 ## IIJ
 
@@ -1430,7 +1444,7 @@ previously included SPF / DKIM / DMARC, now has ARC added
   Contact Info: https://www.iij.ad.jp/en/  
   Implementation notes:
 
-  * Internal MTA implementation validated during the ARC interop exercise in mid-October 2018
+  * 2018-10: Internal MTA implementation validated during the ARC interop 
 
 --- back
 
