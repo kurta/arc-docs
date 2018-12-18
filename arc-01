@@ -1342,7 +1342,7 @@ listed in this section.
   Description: Email domain authentication (sign and/or verify) module, 
 previously included SPF / DKIM / DMARC, now has ARC added  
   Status of Operation: Production, deployment usage unknown  
-  Coverage: Built to support {{ARC-DRAFT-10}}  
+  Coverage: Built to support {{&SELF}}  
   Licensing: Open Source  
   Implementation Notes:
 
@@ -1372,9 +1372,9 @@ previously included SPF / DKIM / DMARC, now has ARC added
 ## Sympa List Manager
 
   Organization: Sympa Dev Community  
-  Description: Beta released
-  Status of Operation: Beta released
-  Coverage: Built to support {{&SELF}}, based on Mail::DKIM module
+  Description: Beta released  
+  Status of Operation: Beta released  
+  Coverage: Built to support {{&SELF}}, based on Mail::DKIM module  
   Licensing: open source  
   Implementation Notes:
 
