@@ -1246,8 +1246,7 @@ of August 2018.
   * 2018-06: Partially retired but still accessible by special request
   due to the in process evolution of the AOL mail infrastructure to the
   integrated OATH environment. The implementation was based on the Apache
-  James DKIM code base and may be contributed back to that project in 
-  the future.
+  James DKIM code base.
   * 2018-10: No longer available due to infrastucture changes at
   AOL/Yahoo!/Oath.
 
